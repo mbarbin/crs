@@ -11,11 +11,11 @@ bug-reports: "https://github.com/mbarbin/crs/issues"
 depends: [
   "dune" {>= "3.17"}
   "ocaml" {>= "5.2"}
-  "crs" {= version}
-  "crs-tests" {= version}
   "ocamlformat" {with-dev-setup & = "0.27.0"}
   "base" {>= "v0.17" & < "v0.18"}
   "cmdlang" {>= "0.0.9"}
+  "crs" {= version}
+  "crs-tests" {= version}
   "expect_test_helpers_core" {>= "v0.17" & < "v0.18"}
   "pplumbing" {>= "0.0.9"}
   "ppx_compare" {>= "v0.17" & < "v0.18"}
