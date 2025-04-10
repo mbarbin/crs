@@ -1,0 +1,9 @@
+description: """\
+
+A longer description for the package.
+
+It can span multiple lines!
+
+"""
+tags: [ "this" "that" ]
+x-maintenance-intent: [ "(latest)" ]
