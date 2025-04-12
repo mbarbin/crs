@@ -56,6 +56,7 @@
   * - Remove support for extra headers.
   * - Remove support for attributes.
   * - Remove assignee computation (left as external work).
+  * - Do not export [Raw].
 *)
 
 module Kind : sig
@@ -71,24 +72,6 @@ module Due : sig
     | Soon
     | Someday
   [@@deriving compare, equal, sexp_of]
-end
-
-module Raw : sig
-  type t [@@deriving sexp_of]
-
-  val content : t -> string
-
-  module With_file_positions : sig
-    type nonrec t =
-      { content_start : int
-      ; start_index : int
-      ; end_index : int
-      ; cr : t
-      }
-    [@@deriving sexp_of]
-
-    val extract : path:Vcs.Path_in_repo.t -> file_contents:string -> unit -> t list
-  end
 end
 
 type t [@@deriving sexp_of]

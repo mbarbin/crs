@@ -64,6 +64,7 @@
    * - Remove assignee computation (left as external work).
    * - Replace [is_xcr] by a variant type [Kind.t].
    * - Make [reported_by] mandatory.
+   * - Refactor [Raw], make [t] a record with a processed part that may fail.
 *)
 
 module Regex = Re2
@@ -107,275 +108,208 @@ end
 let cr_pattern_re2 = "\\bX?CR[-v: \\t]"
 let cr_pattern_egrep = cr_pattern_re2
 
-module Raw : sig
-  type t =
-    { path : Vcs.Path_in_repo.t
-    ; content : string
-    ; start_line : int
-    ; start_col : int
-    }
-  [@@deriving compare, sexp_of]
+(* [content] is the text of the CR with comment markers removed from
+   the beginning and end (if applicable).
 
-  val content : t -> string
+   [start_line, start_col] is the two-dimensional start position of
+   the whole comment in [path]. *)
 
-  module For_sorted_output : sig
-    type nonrec t = t [@@deriving compare]
-  end
+type t =
+  { path : Vcs.Path_in_repo.t
+  ; content : string
+  ; start_line : int
+  ; start_col : int
+  ; processed : Processed.t Or_error.t
+  }
+[@@deriving compare, sexp_of]
 
-  module With_file_positions : sig
-    type nonrec t =
-      { content_start : int
-      ; start_index : int
-      ; end_index : int
-      ; cr : t
-      }
-    [@@deriving sexp_of]
+let content t = t.content
+let path t = t.path
+let start_line t = t.start_line
+let start_col t = t.start_col
 
-    val extract : path:Vcs.Path_in_repo.t -> file_contents:string -> unit -> t list
-  end
+module For_sorted_output : sig
+  type nonrec t = t [@@deriving compare]
 end = struct
-  (* [content] is the text of the CR with comment markers removed from the beginning
-     and end (if applicable).
+  type nonrec t = t
 
-     [start_line, start_col] is the two-dimensional start position of the whole
-     comment in [path]. *)
-  type t =
-    { path : Vcs.Path_in_repo.t
-    ; content : string
-    ; start_line : int
-    ; start_col : int
-    }
-  [@@deriving compare, sexp_of]
-
-  let content t = t.content
-
-  module For_sorted_output = struct
-    type nonrec t = t
-
-    let compare t1 t2 =
-      let c = Vcs.Path_in_repo.compare t1.path t2.path in
-      if c <> 0
-      then c
-      else (
-        let c = Int.compare t1.start_line t2.start_line in
-        if c <> 0 then c else Int.compare t1.start_col t2.start_col)
-    ;;
-  end
-
-  let cr_regex = Regex.create_exn cr_pattern_re2
-
-  let slice_after contents last_excluded_index =
-    (* the longest suffix not containing [last_excluded_index] *)
-    String.sub
-      contents
-      ~pos:(last_excluded_index + 1)
-      ~len:(String.length contents - last_excluded_index - 1)
+  let compare t1 t2 =
+    let c = Vcs.Path_in_repo.compare t1.path t2.path in
+    if c <> 0
+    then c
+    else (
+      let c = Int.compare t1.start_line t2.start_line in
+      if c <> 0 then c else Int.compare t1.start_col t2.start_col)
   ;;
+end
 
-  (* several functions in Regex take a [sub] argument, but this is going to be [`Index 0]
-     everywhere in this module, indicating that we're interested in the entire match *)
-  let sub = `Index 0
+let cr_regex = Regex.create_exn cr_pattern_re2
 
-  let find_ml_end =
-    let regex = Regex.create_exn "\\(\\*|\\*\\)" in
-    fun file_contents start_pos ->
-      let rec nest_comments ~depth current_pos =
-        let rest_of_file = slice_after file_contents current_pos in
-        match Regex.get_matches_exn ~max:1 regex rest_of_file with
-        | [] -> None
-        | m :: _ ->
-          let match_start, match_len = Regex.Match.get_pos_exn ~sub m in
-          let next_pos = current_pos + match_start + match_len in
-          (match Regex.Match.get_exn ~sub m with
-           | "(*" -> nest_comments ~depth:(depth + 1) next_pos
-           | "*)" ->
-             if depth = 0
-             then Some next_pos
-             else nest_comments ~depth:(depth - 1) next_pos
-           | _ ->
-             failwith "ML regex matched something other than an ML comment start/end!")
+let slice_after contents last_excluded_index =
+  (* the longest suffix not containing [last_excluded_index] *)
+  String.sub
+    contents
+    ~pos:(last_excluded_index + 1)
+    ~len:(String.length contents - last_excluded_index - 1)
+;;
+
+(* several functions in Regex take a [sub] argument, but this is going to be [`Index 0]
+   everywhere in this module, indicating that we're interested in the entire match *)
+let sub = `Index 0
+
+let find_ml_end =
+  let regex = Regex.create_exn "\\(\\*|\\*\\)" in
+  fun file_contents start_pos ->
+    let rec nest_comments ~depth current_pos =
+      let rest_of_file = slice_after file_contents current_pos in
+      match Regex.get_matches_exn ~max:1 regex rest_of_file with
+      | [] -> None
+      | m :: _ ->
+        let match_start, match_len = Regex.Match.get_pos_exn ~sub m in
+        let next_pos = current_pos + match_start + match_len in
+        (match Regex.Match.get_exn ~sub m with
+         | "(*" -> nest_comments ~depth:(depth + 1) next_pos
+         | "*)" ->
+           if depth = 0 then Some next_pos else nest_comments ~depth:(depth - 1) next_pos
+         | _ -> failwith "ML regex matched something other than an ML comment start/end!")
+    in
+    nest_comments ~depth:0 start_pos
+;;
+
+let find_non_nesting_end end_regex file_contents start_pos =
+  let partial_contents = slice_after file_contents start_pos in
+  match Regex.get_matches_exn ~max:1 end_regex partial_contents with
+  | [] -> None
+  | m :: _ ->
+    let pos, len = Regex.Match.get_pos_exn ~sub m in
+    Some (start_pos + pos + len)
+;;
+
+let find_line_comment_end regex file_contents start_pos =
+  match Regex.get_matches_exn ~max:1 regex (slice_after file_contents start_pos) with
+  | [] ->
+    (* reached EOF without finding a match, so block ends at EOF *)
+    String.length file_contents - 1
+  | m :: _ ->
+    let newline_pos, _ = Regex.Match.get_pos_exn ~sub m in
+    start_pos + newline_pos
+;;
+
+let find_comment_bounds =
+  (* These end regexes are for matching the ends of block comments. *)
+  let ml_end_regex = Regex.create_exn "\\*+\\)$" in
+  let c_end_regex = Regex.create_exn "\\*+/" in
+  let xml_end_regex = Regex.create_exn "-->" in
+  (* The line regexes match lines that DON'T start with a line comment marker. *)
+  (* matches any character except [c], space, and tab *)
+  let not_char c = "[^" ^ Char.to_string c ^ " \\t]" in
+  (* newline, followed by any amount of space *)
+  let line_start = "\\n[ \\t]*" in
+  let sh_regex = Regex.create_exn (line_start ^ not_char '#') in
+  let lisp_regex = Regex.create_exn (line_start ^ not_char ';') in
+  (* The C line complicates things since it's two characters long.  The idea is that the
+     line can optionally start with '/', but that can't be followed by another '/'. *)
+  let c_line_regex = Regex.create_exn (line_start ^ "/?" ^ not_char '/') in
+  let sql_regex = Regex.create_exn (line_start ^ "-?" ^ not_char '-') in
+  fun file_contents content_start_pos ->
+    let end_block kind comment_start_pos =
+      let find_end, end_regex =
+        match kind with
+        | `ml -> find_ml_end, ml_end_regex
+        | `c -> find_non_nesting_end c_end_regex, c_end_regex
+        | `xml -> find_non_nesting_end xml_end_regex, xml_end_regex
       in
-      nest_comments ~depth:0 start_pos
-  ;;
-
-  let find_non_nesting_end end_regex file_contents start_pos =
-    let partial_contents = slice_after file_contents start_pos in
-    match Regex.get_matches_exn ~max:1 end_regex partial_contents with
-    | [] -> None
-    | m :: _ ->
-      let pos, len = Regex.Match.get_pos_exn ~sub m in
-      Some (start_pos + pos + len)
-  ;;
-
-  let find_line_comment_end regex file_contents start_pos =
-    match Regex.get_matches_exn ~max:1 regex (slice_after file_contents start_pos) with
-    | [] ->
-      (* reached EOF without finding a match, so block ends at EOF *)
-      String.length file_contents - 1
-    | m :: _ ->
-      let newline_pos, _ = Regex.Match.get_pos_exn ~sub m in
-      start_pos + newline_pos
-  ;;
-
-  let find_comment_bounds =
-    (* These end regexes are for matching the ends of block comments. *)
-    let ml_end_regex = Regex.create_exn "\\*+\\)$" in
-    let c_end_regex = Regex.create_exn "\\*+/" in
-    let xml_end_regex = Regex.create_exn "-->" in
-    (* The line regexes match lines that DON'T start with a line comment marker. *)
-    (* matches any character except [c], space, and tab *)
-    let not_char c = "[^" ^ Char.to_string c ^ " \\t]" in
-    (* newline, followed by any amount of space *)
-    let line_start = "\\n[ \\t]*" in
-    let sh_regex = Regex.create_exn (line_start ^ not_char '#') in
-    let lisp_regex = Regex.create_exn (line_start ^ not_char ';') in
-    (* The C line complicates things since it's two characters long.  The idea is that the
-       line can optionally start with '/', but that can't be followed by another '/'. *)
-    let c_line_regex = Regex.create_exn (line_start ^ "/?" ^ not_char '/') in
-    let sql_regex = Regex.create_exn (line_start ^ "-?" ^ not_char '-') in
-    fun file_contents content_start_pos ->
-      let end_block kind comment_start_pos =
-        let find_end, end_regex =
-          match kind with
-          | `ml -> find_ml_end, ml_end_regex
-          | `c -> find_non_nesting_end c_end_regex, c_end_regex
-          | `xml -> find_non_nesting_end xml_end_regex, xml_end_regex
-        in
-        match find_end file_contents content_start_pos with
-        | None -> None
-        | Some end_pos ->
-          (* string from "X?CR" to end of comment (including comment ender) *)
-          let raw_contents =
-            String.sub
-              file_contents
-              ~pos:content_start_pos
-              ~len:(end_pos + 1 - content_start_pos)
-          in
-          (* remove the comment ender *)
-          let contents = Regex.rewrite_exn end_regex raw_contents ~template:"" in
-          Some (comment_start_pos, end_pos, contents)
-      in
-      let end_lines regex comment_start_pos =
-        let end_pos = find_line_comment_end regex file_contents content_start_pos in
-        let contents =
+      match find_end file_contents content_start_pos with
+      | None -> None
+      | Some end_pos ->
+        (* string from "X?CR" to end of comment (including comment ender) *)
+        let raw_contents =
           String.sub
             file_contents
             ~pos:content_start_pos
             ~len:(end_pos + 1 - content_start_pos)
         in
-        comment_start_pos, end_pos, contents
-      in
-      (* Works backwards from "X?CR" to find a comment starter. *)
-      let rec check_backwards ~last pos =
-        let end_lines regex = Some (end_lines regex (pos + 1)) in
-        if pos < 0
-        then (
-          match last with
-          | `semi -> end_lines lisp_regex
-          | `hash -> end_lines sh_regex
-          | `slashes n -> if n >= 2 then end_lines c_line_regex else None
-          | `dashes n -> if n >= 2 then end_lines sql_regex else None
-          | `star | `not_special -> None)
-        else (
-          let curr_char = file_contents.[pos] in
-          let check_backwards last = check_backwards ~last (pos - 1) in
-          match last, curr_char with
-          | `star, '*' -> check_backwards `star
-          | `star, '/' -> end_block `c pos (* found /* *)
-          | `star, '(' -> end_block `ml pos (* found "(*" (* "*)" *) *)
-          | `star, _ -> None
-          | `slashes n, '/' -> check_backwards (`slashes (n + 1))
-          | `slashes n, _ ->
-            if n >= 2 then end_lines c_line_regex (* found //+ *) else None
-          | `semi, ';' -> check_backwards `semi
-          | `semi, _ -> end_lines lisp_regex (* found ;+ *)
-          | `hash, '#' -> check_backwards `hash
-          | `hash, _ -> end_lines sh_regex (* found #+ *)
-          | `dashes n, '-' -> check_backwards (`dashes (n + 1))
-          | `dashes n, '!'
-          (* checking if we found <!-- *)
-            when n >= 2 && pos > 0 && Char.( = ) '<' file_contents.[pos - 1] ->
-            end_block `xml (pos - 1)
-          | `dashes n, _ -> if n >= 2 then end_lines sql_regex else None
-          | `not_special, '/' -> check_backwards (`slashes 1)
-          | `not_special, '*' -> check_backwards `star
-          | `not_special, ';' -> check_backwards `semi
-          | `not_special, '#' -> check_backwards `hash
-          | `not_special, '-' -> check_backwards (`dashes 1)
-          | `not_special, (' ' | '\t' | '\n') -> check_backwards `not_special
-          | `not_special, _ -> None)
-      in
-      check_backwards ~last:`not_special (content_start_pos - 1)
-  ;;
-
-  let index_to_2d_pos file_contents =
-    (* Maps newline positions (indices of file_contents) to the number of the line they
-       begin. *)
-    let map, _last_line =
-      let init = Map.singleton (module Int) (-1) 1, 1 in
-      String.foldi file_contents ~init ~f:(fun pos ((map, prev_line) as acc) c ->
-        if Char.equal c '\n'
-        then (
-          let curr_line = prev_line + 1 in
-          Map.set map ~key:pos ~data:curr_line, curr_line)
-        else acc)
+        (* remove the comment ender *)
+        let contents = Regex.rewrite_exn end_regex raw_contents ~template:"" in
+        Some (comment_start_pos, end_pos, contents)
     in
-    `Staged
-      (fun index ->
-        match Map.closest_key map `Less_than index with
-        | None -> failwith "gave a negative input to index_to_2d_pos"
-        | Some (newline_index, line_num) -> line_num, index - newline_index)
-  ;;
-
-  module With_file_positions = struct
-    type nonrec t =
-      { content_start : int
-      ; start_index : int
-      ; end_index : int
-      ; cr : t
-      }
-    [@@deriving sexp_of]
-
-    let extract ~path ~file_contents () =
-      let ms = Regex.get_matches_exn cr_regex file_contents in
-      let pos_2d =
-        lazy
-          (match index_to_2d_pos file_contents with
-           | `Staged f -> f)
+    let end_lines regex comment_start_pos =
+      let end_pos = find_line_comment_end regex file_contents content_start_pos in
+      let contents =
+        String.sub
+          file_contents
+          ~pos:content_start_pos
+          ~len:(end_pos + 1 - content_start_pos)
       in
-      List.filter_map ms ~f:(fun m ->
-        let open Option.Let_syntax in
-        let cr_start, _ = Regex.Match.get_pos_exn ~sub m in
-        let%map start_index, end_index, content =
-          find_comment_bounds file_contents cr_start
-        in
-        let start_line, start_col = Lazy.force pos_2d start_index in
-        { content_start = cr_start
-        ; start_index
-        ; end_index
-        ; cr = { path; content; start_line; start_col }
-        })
-    ;;
-  end
-end
+      comment_start_pos, end_pos, contents
+    in
+    (* Works backwards from "X?CR" to find a comment starter. *)
+    let rec check_backwards ~last pos =
+      let end_lines regex = Some (end_lines regex (pos + 1)) in
+      if pos < 0
+      then (
+        match last with
+        | `semi -> end_lines lisp_regex
+        | `hash -> end_lines sh_regex
+        | `slashes n -> if n >= 2 then end_lines c_line_regex else None
+        | `dashes n -> if n >= 2 then end_lines sql_regex else None
+        | `star | `not_special -> None)
+      else (
+        let curr_char = file_contents.[pos] in
+        let check_backwards last = check_backwards ~last (pos - 1) in
+        match last, curr_char with
+        | `star, '*' -> check_backwards `star
+        | `star, '/' -> end_block `c pos (* found /* *)
+        | `star, '(' -> end_block `ml pos (* found "(*" (* "*)" *) *)
+        | `star, _ -> None
+        | `slashes n, '/' -> check_backwards (`slashes (n + 1))
+        | `slashes n, _ -> if n >= 2 then end_lines c_line_regex (* found //+ *) else None
+        | `semi, ';' -> check_backwards `semi
+        | `semi, _ -> end_lines lisp_regex (* found ;+ *)
+        | `hash, '#' -> check_backwards `hash
+        | `hash, _ -> end_lines sh_regex (* found #+ *)
+        | `dashes n, '-' -> check_backwards (`dashes (n + 1))
+        | `dashes n, '!'
+        (* checking if we found <!-- *)
+          when n >= 2 && pos > 0 && Char.( = ) '<' file_contents.[pos - 1] ->
+          end_block `xml (pos - 1)
+        | `dashes n, _ -> if n >= 2 then end_lines sql_regex else None
+        | `not_special, '/' -> check_backwards (`slashes 1)
+        | `not_special, '*' -> check_backwards `star
+        | `not_special, ';' -> check_backwards `semi
+        | `not_special, '#' -> check_backwards `hash
+        | `not_special, '-' -> check_backwards (`dashes 1)
+        | `not_special, (' ' | '\t' | '\n') -> check_backwards `not_special
+        | `not_special, _ -> None)
+    in
+    check_backwards ~last:`not_special (content_start_pos - 1)
+;;
 
-type t =
-  { raw : Raw.t
-  ; processed : Processed.t Or_error.t
-  }
-[@@deriving compare, sexp_of]
+let index_to_2d_pos file_contents =
+  (* Maps newline positions (indices of file_contents) to the number of the line they
+     begin. *)
+  let map, _last_line =
+    let init = Map.singleton (module Int) (-1) 1, 1 in
+    String.foldi file_contents ~init ~f:(fun pos ((map, prev_line) as acc) c ->
+      if Char.equal c '\n'
+      then (
+        let curr_line = prev_line + 1 in
+        Map.set map ~key:pos ~data:curr_line, curr_line)
+      else acc)
+  in
+  `Staged
+    (fun index ->
+      match Map.closest_key map `Less_than index with
+      | None -> failwith "gave a negative input to index_to_2d_pos"
+      | Some (newline_index, line_num) -> line_num, index - newline_index)
+;;
 
 type cr_comment = t [@@deriving sexp_of]
 
 let hash (t : t) = Hashtbl.hash t
-let raw t = t.raw
-let path t = (raw t).path
-let content t = (raw t).content
-let start_line t = (raw t).start_line
-let start_col t = (raw t).start_col
 
 let reindented_content t =
-  let indent = String.make ((raw t).start_col + 2) ' ' in
+  let indent = String.make (t.start_col + 2) ' ' in
   let str = content t in
   let lines = String.split str ~on:'\n' in
   let lines =
@@ -402,12 +336,6 @@ let reindented_content t =
 
 module Structurally_compared = struct
   type nonrec t = t [@@deriving compare, sexp_of]
-end
-
-module For_sorted_output = struct
-  type nonrec t = t
-
-  let compare t1 t2 = Raw.For_sorted_output.compare (raw t1) (raw t2)
 end
 
 let sort ts = List.sort ts ~compare:For_sorted_output.compare
@@ -464,8 +392,8 @@ let print_list ~crs ~include_content =
 
 module Cr_soon = struct
   module T = struct
-    type t =
-      { raw : Raw.t
+    type nonrec t =
+      { cr_comment : t
       ; processed : Processed.t
       ; digest_of_condensed_content : Digest_hex.t
       ; hash_of_path_and_condensed_content : int
@@ -485,16 +413,15 @@ module Cr_soon = struct
       match cr_comment.processed with
       | Error _ -> failwith "a raw CR comment cannot be a CR-soon"
       | Ok processed ->
-        let raw = cr_comment.raw in
         let digest_of_condensed_content =
-          Digest_hex.create (condense_whitespace raw.content)
+          Digest_hex.create (condense_whitespace cr_comment.content)
         in
         let t =
-          { raw
+          { cr_comment
           ; processed
           ; digest_of_condensed_content
           ; hash_of_path_and_condensed_content =
-              Vcs.Path_in_repo.hash raw.path
+              Vcs.Path_in_repo.hash cr_comment.path
               lxor Digest_hex.hash digest_of_condensed_content
           }
         in
@@ -517,11 +444,10 @@ module Cr_soon = struct
         [%sexp_of: exn * cr_comment]
   ;;
 
-  let cr_comment t = { raw = t.raw; processed = Ok t.processed }
-  let raw t = t.raw
-  let start_line t = (raw t).start_line
-  let path t = (raw t).path
-  let content t = (raw t).content
+  let cr_comment t = t.cr_comment
+  let start_line t = t.cr_comment.start_line
+  let path t = t.cr_comment.path
+  let content t = t.cr_comment.content
 
   module Structurally_compared = struct
     type nonrec t = t [@@deriving compare, sexp_of]
@@ -564,7 +490,7 @@ module Cr_soon = struct
   module For_sorted_output = struct
     type nonrec t = t
 
-    let compare t1 t2 = Raw.For_sorted_output.compare (raw t1) (raw t2)
+    let compare t1 t2 = For_sorted_output.compare t1.cr_comment t2.cr_comment
   end
 end
 
@@ -598,7 +524,7 @@ end
 *)
 
 module Process : sig
-  val process : Raw.t -> Processed.t Or_error.t
+  val process : content:string -> Processed.t Or_error.t
 end = struct
   (* various utilities -- mostly attempting to make the code more readable *)
   let named_group name patt = String.concat [ "(?P<"; name; ">"; patt; ")" ]
@@ -637,9 +563,8 @@ end = struct
          ])
   ;;
 
-  let process raw =
+  let process ~content =
     try
-      let content = raw.Raw.content in
       match Regex.get_matches_exn ~max:1 comment_regex content with
       | [] -> Or_error.error "Invalid CR comment" content String.sexp_of_t
       | m :: _ ->
@@ -665,7 +590,7 @@ end = struct
             | Error _ as err -> err
             | Ok due -> Ok { Processed.reported_by; for_; kind; due }))
     with
-    | exn -> Or_error.error "could not process CR" (raw, exn) [%sexp_of: Raw.t * exn]
+    | exn -> Or_error.error "could not process CR" (content, exn) [%sexp_of: string * exn]
   ;;
 end
 
@@ -678,9 +603,21 @@ module Crs = struct
 end
 
 let extract ~path ~file_contents =
-  List.map
-    (Raw.With_file_positions.extract ~path ~file_contents ())
-    ~f:(fun { cr = raw; _ } -> { raw; processed = Process.process raw })
+  let ms = Regex.get_matches_exn cr_regex file_contents in
+  let pos_2d =
+    lazy
+      (match index_to_2d_pos file_contents with
+       | `Staged f -> f)
+  in
+  List.filter_map ms ~f:(fun m ->
+    let open Option.Let_syntax in
+    let cr_start, _ = Regex.Match.get_pos_exn ~sub m in
+    let%map start_index, _end_index, content =
+      find_comment_bounds file_contents cr_start
+    in
+    let start_line, start_col = Lazy.force pos_2d start_index in
+    let processed = Process.process ~content in
+    { path; content; start_line; start_col; processed })
 ;;
 
 let grep ~vcs ~repo_root ~below =
