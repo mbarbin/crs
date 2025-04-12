@@ -1,6 +1,6 @@
 (library
- (name crs)
- (public_name crs)
+ (name crs_cli_test)
+ (public_name crs-tests.crs_cli_test)
  (flags
   :standard
   -w
@@ -10,10 +10,9 @@
   -open
   Base
   -open
-  Stdio
-  -open
-  Cmdlang)
- (libraries base cmdlang stdio)
+  Expect_test_helpers_base)
+ (libraries base crs_cli expect_test_helpers_core.expect_test_helpers_base)
+ (inline_tests)
  (lint
   (pps ppx_js_style -check-doc-comments))
  (preprocess
@@ -21,6 +20,7 @@
    -unused-code-warnings=force
    ppx_compare
    ppx_enumerate
+   ppx_expect
    ppx_hash
    ppx_here
    ppx_let

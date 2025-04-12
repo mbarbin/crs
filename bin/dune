@@ -3,4 +3,4 @@
  (public_name crs)
  (package crs)
  (flags :standard -w +a-4-40-41-42-44-45-48-66 -warn-error +a)
- (libraries crs pplumbing.cmdlang-cmdliner-runner))
+ (libraries crs_cli pplumbing.cmdlang-cmdliner-runner))

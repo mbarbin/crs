@@ -18,6 +18,3 @@
 (*_  and the LGPL-3.0 Linking Exception along with this library. If not, see     *)
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
-
-val hello_world : Sexp.t
-val main : unit Command.t
