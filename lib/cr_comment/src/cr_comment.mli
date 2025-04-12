@@ -54,7 +54,24 @@
   * - Use [Vcs] instead of [Hg].
   * - Remove [Crs_due_now_and_soon].
   * - Remove support for extra headers.
+  * - Remove support for attributes.
+  * - Remove assignee computation (left as external work).
 *)
+
+module Kind : sig
+  type t =
+    | CR
+    | XCR
+  [@@deriving compare, equal, sexp_of]
+end
+
+module Due : sig
+  type t =
+    | Now
+    | Soon
+    | Someday
+  [@@deriving compare, equal, sexp_of]
+end
 
 module Raw : sig
   type t [@@deriving sexp_of]
@@ -74,23 +91,6 @@ module Raw : sig
   end
 end
 
-module Due : sig
-  type t =
-    | Now
-    | Soon
-    | Someday
-  [@@deriving sexp_of]
-end
-
-module Assignee : sig
-  type t =
-    | This of Vcs.User_handle.t
-    | Feature_owner
-    | Missing_file_owner
-
-  val user_name : t -> feature_owner:Vcs.User_handle.t -> Vcs.User_handle.t
-end
-
 type t [@@deriving sexp_of]
 type cr_comment := t
 
@@ -99,17 +99,13 @@ val path : t -> Vcs.Path_in_repo.t
 val content : t -> string
 val start_line : t -> int
 val start_col : t -> int
-val assignee : t -> Assignee.t
 val due : t -> Due.t
 val is_xcr : t -> bool
 val work_on : t -> Due.t
-val to_string : ?attributes:(string * string) list -> t -> include_content:bool -> string
+val to_string : t -> include_content:bool -> string
 
 (** Sorts and prints a list of crs separated by whitespace (if needed). *)
-val print_list
-  :  crs_and_attributes:(t * (string * string) list) list
-  -> include_content:bool
-  -> unit
+val print_list : crs:t list -> include_content:bool -> unit
 
 module Structurally_compared : sig
   type nonrec t = t [@@deriving compare, sexp_of]
@@ -125,11 +121,6 @@ val sort : t list -> t list
     not an XCR). *)
 module Cr_soon : sig
   type t [@@deriving sexp_of]
-
-  (** Because CR-soons are never assigned implicitly to a feature's owner, we don't use
-      [Assignee.t].  Instead, CR-soons are either explicitly assigned to a user name in
-      the text of the CR-soon, or are assigned to the file owner via Iron obligations. *)
-  val assignee : t -> Vcs.User_handle.t
 
   val content : t -> string
   val cr_comment : t -> cr_comment
@@ -167,5 +158,4 @@ val grep
   :  vcs:[> Vcs.Trait.ls_files ] Vcs.t
   -> repo_root:Vcs.Repo_root.t
   -> below:Vcs.Path_in_repo.t
-  -> file_owner:(Vcs.Path_in_repo.t -> Vcs.User_handle.t Or_error.t)
   -> Crs.t

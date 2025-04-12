@@ -60,6 +60,10 @@
    * - Remove [Crs_due_now_and_soon].
    * - Remove support for in-file `Properties.
    * - Remove support for extra headers.
+   * - Remove support for attributes.
+   * - Remove assignee computation (left as external work).
+   * - Replace [is_xcr] by a variant type [Kind.t].
+   * - Make [reported_by] mandatory.
 *)
 
 module Regex = Re2
@@ -69,6 +73,35 @@ module Digest_hex = struct
 
   let hash = String.hash
   let create str = str |> Stdlib.Digest.string |> Stdlib.Digest.to_hex
+end
+
+module Kind = struct
+  type t =
+    | CR
+    | XCR
+  [@@deriving compare, equal, sexp_of]
+end
+
+module Due = struct
+  type t =
+    | Now
+    | Soon
+    | Someday
+  [@@deriving compare, equal, sexp_of]
+end
+
+module Processed = struct
+  (* [reported_by] is [user] in [CR user...].
+
+     [for_] is [user2] in [CR user1 for user2: ...]. It is none since
+     the part with the [for yser2] is optional. *)
+  type t =
+    { reported_by : Vcs.User_handle.t
+    ; for_ : Vcs.User_handle.t option
+    ; kind : Kind.t
+    ; due : Due.t
+    }
+  [@@deriving compare, sexp_of]
 end
 
 let cr_pattern_re2 = "\\bX?CR[-v: \\t]"
@@ -326,83 +359,16 @@ end = struct
   end
 end
 
-module Due = struct
-  type t =
-    | Now
-    | Soon
-    | Someday
-  [@@deriving compare, sexp_of]
-end
-
-let missing_file_owner = Vcs.User_handle.v "missing-file-owner"
-
-module Assignee = struct
-  type t =
-    | This of Vcs.User_handle.t
-    | Feature_owner
-    | Missing_file_owner
-  [@@deriving compare, sexp_of]
-
-  let user_name t ~feature_owner =
-    match t with
-    | This unresolved_name -> unresolved_name
-    | Feature_owner -> feature_owner
-    | Missing_file_owner -> missing_file_owner
-  ;;
-end
-
-module Processed = struct
-  (* [reported_by] is [user] in [CR user...].  It is an [option] because the text
-     might not have a valid user name.
-
-     [for_] is [user2] in [CR user1 for user2: ...].
-
-     Names stored in [Processed.t] have not yet been dealiased, so they are stored as
-     [Unresolve_name.t]s. *)
-  type t =
-    { raw : Raw.t
-    ; reported_by : Vcs.User_handle.t option
-    ; for_ : Vcs.User_handle.t option
-    ; due : Due.t
-    ; is_xcr : bool
-    ; assignee : Assignee.t
-    }
-  [@@deriving compare, sexp_of]
-
-  let compute_assignee ~file_owner ~reported_by ~for_ ~due ~is_xcr =
-    if is_xcr
-    then (
-      match reported_by with
-      | None -> Assignee.Feature_owner
-      | Some user -> This user)
-    else (
-      match for_ with
-      | Some user -> This user
-      | None ->
-        (match (due : Due.t) with
-         | Now -> Feature_owner
-         | Soon | Someday ->
-           (match file_owner with
-            | None -> Assignee.Missing_file_owner
-            | Some user -> This user)))
-  ;;
-end
-
 type t =
-  | Raw of Raw.t
-  | Processed of Processed.t
+  { raw : Raw.t
+  ; processed : Processed.t Or_error.t
+  }
 [@@deriving compare, sexp_of]
 
 type cr_comment = t [@@deriving sexp_of]
 
 let hash (t : t) = Hashtbl.hash t
-
-let raw t =
-  match t with
-  | Raw r -> r
-  | Processed p -> p.raw
-;;
-
+let raw t = t.raw
 let path t = (raw t).path
 let content t = (raw t).content
 let start_line t = (raw t).start_line
@@ -446,31 +412,31 @@ end
 
 let sort ts = List.sort ts ~compare:For_sorted_output.compare
 
-let assignee t =
-  match t with
-  | Raw _ -> Assignee.Feature_owner
-  | Processed p -> p.assignee
-;;
-
 let due t =
-  match t with
-  | Raw _ -> Due.Now
-  | Processed p -> p.due
+  match t.processed with
+  | Error _ -> Due.Now
+  | Ok p -> p.due
 ;;
 
 let is_xcr t =
-  match t with
-  | Raw _ -> false
-  | Processed p -> p.is_xcr
+  match t.processed with
+  | Error _ -> false
+  | Ok p ->
+    (match p.kind with
+     | CR -> false
+     | XCR -> true)
 ;;
 
 let work_on t : Due.t =
-  match t with
-  | Raw _ -> Now
-  | Processed p -> if p.is_xcr then Now else p.due
+  match t.processed with
+  | Error _ -> Now
+  | Ok p ->
+    (match p.kind with
+     | XCR -> Now
+     | CR -> p.due)
 ;;
 
-let to_string ?(attributes = []) t ~include_content =
+let to_string t ~include_content =
   let file_str =
     Printf.sprintf
       "%s:%d:%d:"
@@ -478,40 +444,29 @@ let to_string ?(attributes = []) t ~include_content =
       (start_line t)
       (start_col t)
   in
-  let attributes =
-    match attributes with
-    | [] -> []
-    | _ :: _ ->
-      let max_width =
-        List.fold_left attributes ~init:0 ~f:(fun acc (k, _) -> max acc (String.length k))
-      in
-      List.map attributes ~f:(fun (k, v) -> Printf.sprintf "%-*s : %s" max_width k v)
-  in
-  let contents = if include_content then [ reindented_content t ] else [] in
-  String.concat ~sep:"\n" ((file_str :: attributes) @ contents @ [ "" ])
+  let contents = if include_content then [ reindented_content t; "" ] else [ "" ] in
+  String.concat ~sep:"\n" (file_str :: contents)
 ;;
 
-let print ~attributes ~include_delim cr ~include_content =
-  let str = to_string cr ~attributes ~include_content in
+let print ~include_delim cr ~include_content =
+  let str = to_string cr ~include_content in
   let nl = if include_delim && include_content then "\n" else "" in
   print_string (Printf.sprintf "%s%s" nl str)
 ;;
 
-let print_list ~crs_and_attributes ~include_content =
-  let crs_and_attributes =
-    List.sort crs_and_attributes ~compare:(fun (cr, _) (cr2, _) ->
-      For_sorted_output.compare cr cr2)
-  in
+let print_list ~crs ~include_content =
+  let crs = List.sort crs ~compare:For_sorted_output.compare in
   let include_delim = ref false in
-  List.iter crs_and_attributes ~f:(fun (cr, attributes) ->
-    print ~attributes ~include_delim:!include_delim cr ~include_content;
+  List.iter crs ~f:(fun cr ->
+    print ~include_delim:!include_delim cr ~include_content;
     include_delim := true)
 ;;
 
 module Cr_soon = struct
   module T = struct
     type t =
-      { cr_comment : Processed.t
+      { raw : Raw.t
+      ; processed : Processed.t
       ; digest_of_condensed_content : Digest_hex.t
       ; hash_of_path_and_condensed_content : int
       }
@@ -527,15 +482,16 @@ module Cr_soon = struct
 
   let create ~(cr_comment : cr_comment) =
     try
-      match cr_comment with
-      | Raw _ -> failwith "a raw CR comment cannot be a CR-soon"
-      | Processed cr_comment ->
+      match cr_comment.processed with
+      | Error _ -> failwith "a raw CR comment cannot be a CR-soon"
+      | Ok processed ->
         let raw = cr_comment.raw in
         let digest_of_condensed_content =
           Digest_hex.create (condense_whitespace raw.content)
         in
         let t =
-          { cr_comment
+          { raw
+          ; processed
           ; digest_of_condensed_content
           ; hash_of_path_and_condensed_content =
               Vcs.Path_in_repo.hash raw.path
@@ -543,9 +499,12 @@ module Cr_soon = struct
           }
         in
         let () =
-          assert (not cr_comment.is_xcr);
           assert (
-            match cr_comment.due with
+            match processed.kind with
+            | CR -> true
+            | XCR -> false);
+          assert (
+            match processed.due with
             | Soon -> true
             | Now | Someday -> false)
         in
@@ -558,16 +517,8 @@ module Cr_soon = struct
         [%sexp_of: exn * cr_comment]
   ;;
 
-  let cr_comment t = Processed t.cr_comment
-
-  let assignee t =
-    match t.cr_comment.assignee with
-    | Feature_owner -> assert false
-    | This user_name -> user_name
-    | Missing_file_owner -> missing_file_owner
-  ;;
-
-  let raw t = t.cr_comment.raw
+  let cr_comment t = { raw = t.raw; processed = Ok t.processed }
+  let raw t = t.raw
   let start_line t = (raw t).start_line
   let path t = (raw t).path
   let content t = (raw t).content
@@ -597,7 +548,12 @@ module Cr_soon = struct
           then c
           else (
             let c = Vcs.Path_in_repo.compare (path t1) (path t2) in
-            if c <> 0 then c else Vcs.User_handle.compare (assignee t1) (assignee t2)))
+            if c <> 0
+            then c
+            else (
+              let r1 = t1.processed in
+              let r2 = t2.processed in
+              Option.compare Vcs.User_handle.compare r1.for_ r2.for_)))
       ;;
     end
 
@@ -642,7 +598,7 @@ end
 *)
 
 module Process : sig
-  val process : Raw.t -> file_owner:Vcs.User_handle.t option -> Processed.t Or_error.t
+  val process : Raw.t -> Processed.t Or_error.t
 end = struct
   (* various utilities -- mostly attempting to make the code more readable *)
   let named_group name patt = String.concat [ "(?P<"; name; ">"; patt; ")" ]
@@ -681,7 +637,7 @@ end = struct
          ])
   ;;
 
-  let process raw ~file_owner =
+  let process raw =
     try
       let content = raw.Raw.content in
       match Regex.get_matches_exn ~max:1 comment_regex content with
@@ -691,14 +647,13 @@ end = struct
         (match get "from_user" with
          | None -> Or_error.error "Couldn't parse username" content String.sexp_of_t
          | Some reported_by ->
-           let unresolved_name string =
-             match Vcs.User_handle.of_string string with
-             | Ok n -> Some n
-             | Error (`Msg _) -> None
+           let reported_by = Vcs.User_handle.v reported_by in
+           let kind =
+             match Option.is_some (get "is_xcr") with
+             | true -> Kind.XCR
+             | false -> Kind.CR
            in
-           let reported_by = unresolved_name reported_by in
-           let is_xcr = Option.is_some (get "is_xcr") in
-           let for_ = Option.bind (get "for") ~f:unresolved_name in
+           let for_ = Option.map (get "for") ~f:Vcs.User_handle.v in
            let due =
              match get "due" with
              | None -> Ok Due.Now
@@ -708,11 +663,7 @@ end = struct
            in
            (match due with
             | Error _ as err -> err
-            | Ok due ->
-              let assignee =
-                Processed.compute_assignee ~file_owner ~reported_by ~for_ ~due ~is_xcr
-              in
-              Ok { Processed.raw; reported_by; for_; due; is_xcr; assignee }))
+            | Ok due -> Ok { Processed.reported_by; for_; kind; due }))
     with
     | exn -> Or_error.error "could not process CR" (raw, exn) [%sexp_of: Raw.t * exn]
   ;;
@@ -726,16 +677,13 @@ module Crs = struct
     }
 end
 
-let extract ~path ~file_contents ~file_owner =
-  List.filter_map
+let extract ~path ~file_contents =
+  List.map
     (Raw.With_file_positions.extract ~path ~file_contents ())
-    ~f:(fun { cr = raw; _ } ->
-      match Process.process raw ~file_owner with
-      | Ok p -> Some (Processed p)
-      | Error _ -> Some (Raw raw))
+    ~f:(fun { cr = raw; _ } -> { raw; processed = Process.process raw })
 ;;
 
-let grep ~vcs ~repo_root ~below ~file_owner =
+let grep ~vcs ~repo_root ~below =
   let files_to_grep = Vcs.ls_files vcs ~repo_root ~below in
   let stdin =
     files_to_grep |> List.map ~f:Vcs.Path_in_repo.to_string |> String.concat ~sep:"\n"
@@ -776,12 +724,7 @@ let grep ~vcs ~repo_root ~below ~file_owner =
         In_channel.read_all
           (Vcs.Repo_root.append repo_root path_in_repo |> Absolute_path.to_string)
       in
-      let file_owner =
-        match file_owner path_in_repo with
-        | Error _ -> None
-        | Ok user -> Some user
-      in
-      List.iter (extract ~path:path_in_repo ~file_contents ~file_owner) ~f:(fun t ->
+      List.iter (extract ~path:path_in_repo ~file_contents) ~f:(fun t ->
         match work_on t with
         | Someday -> all_due_someday := t :: !all_due_someday
         | Now -> all_due_now := t :: !all_due_now
