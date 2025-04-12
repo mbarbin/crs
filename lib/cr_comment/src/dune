@@ -1,8 +1,19 @@
 (library
  (name cr_comment)
  (public_name crs.cr-comment)
- (flags :standard -w +a-4-40-41-42-44-45-48-66 -warn-error +a -open Base)
- (libraries base loc vcs)
+ (flags
+  :standard
+  -w
+  +a-4-40-41-42-44-45-48-66
+  -warn-error
+  +a
+  -open
+  Base
+  -open
+  Fpath_base
+  -open
+  Stdio)
+ (libraries base fpath fpath-base loc re2 shexp.process stdio vcs)
  (lint
   (pps ppx_js_style -allow-let-operators -check-doc-comments))
  (preprocess
