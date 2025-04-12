@@ -53,6 +53,7 @@
   * - Remove invariant checks.
   * - Use [Vcs] instead of [Hg].
   * - Remove [Crs_due_now_and_soon].
+  * - Remove support for extra headers.
 *)
 
 module Raw : sig
@@ -69,12 +70,7 @@ module Raw : sig
       }
     [@@deriving sexp_of]
 
-    val extract
-      :  ?extra_cr_comment_headers:string list
-      -> path:Vcs.Path_in_repo.t
-      -> file_contents:string
-      -> unit
-      -> t list
+    val extract : path:Vcs.Path_in_repo.t -> file_contents:string -> unit -> t list
   end
 end
 

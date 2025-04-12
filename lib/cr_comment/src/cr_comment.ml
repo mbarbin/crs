@@ -58,6 +58,8 @@
    * - Remove invariant checks.
    * - Use [Vcs] instead of [Hg].
    * - Remove [Crs_due_now_and_soon].
+   * - Remove support for in-file `Properties.
+   * - Remove support for extra headers.
 *)
 
 module Regex = Re2
@@ -96,12 +98,7 @@ module Raw : sig
       }
     [@@deriving sexp_of]
 
-    val extract
-      :  ?extra_cr_comment_headers:string list
-      -> path:Vcs.Path_in_repo.t
-      -> file_contents:string
-      -> unit
-      -> t list
+    val extract : path:Vcs.Path_in_repo.t -> file_contents:string -> unit -> t list
   end
 end = struct
   (* [content] is the text of the CR with comment markers removed from the beginning
@@ -306,15 +303,8 @@ end = struct
       }
     [@@deriving sexp_of]
 
-    let extract ?extra_cr_comment_headers ~path ~file_contents () =
-      let regex =
-        Option.value_map extra_cr_comment_headers ~default:cr_regex ~f:(fun l ->
-          Printf.ksprintf
-            Regex.create_exn
-            "\\b(%s)[-v: \\t]"
-            ("X?CR" :: List.map l ~f:Regex.escape |> String.concat ~sep:"|"))
-      in
-      let ms = Regex.get_matches_exn regex file_contents in
+    let extract ~path ~file_contents () =
+      let ms = Regex.get_matches_exn cr_regex file_contents in
       let pos_2d =
         lazy
           (match index_to_2d_pos file_contents with
@@ -652,16 +642,7 @@ end
 *)
 
 module Process : sig
-  val process
-    :  Raw.t
-    -> file_owner:Vcs.User_handle.t option
-    -> [ `Processed of Processed.t
-       | (* [`Property] is for in-file attributes, like "".
-            cr supports them, and Iron does not.  But while a repo is handled by both,
-            Iron must ignore them, to avoid reporting spurious CRs. *)
-         `Property of string * string
-       ]
-         Or_error.t
+  val process : Raw.t -> file_owner:Vcs.User_handle.t option -> Processed.t Or_error.t
 end = struct
   (* various utilities -- mostly attempting to make the code more readable *)
   let named_group name patt = String.concat [ "(?P<"; name; ">"; patt; ")" ]
@@ -700,34 +681,11 @@ end = struct
          ])
   ;;
 
-  let property_regex =
-    exactly
-      (seq
-         [ any whitespace
-         ; "CR"
-         ; some whitespace
-         ; "@"
-         ; named_group "key" word
-         ; any whitespace
-         ; ":"
-         ; named_group "value" (any ".")
-         ])
-  ;;
-
   let process raw ~file_owner =
     try
       let content = raw.Raw.content in
       match Regex.get_matches_exn ~max:1 comment_regex content with
-      | [] ->
-        (match Regex.get_matches_exn ~max:1 property_regex content with
-         | [] -> Or_error.error "Invalid CR comment" content String.sexp_of_t
-         | m :: _ ->
-           let get field_name = Regex.Match.get ~sub:(`Name field_name) m in
-           (match get "key", get "value" with
-            | Some key, Some value ->
-              Ok (`Property (String.strip key, String.strip value))
-            | None, _ | _, None ->
-              Or_error.error "Invalid property specification" content String.sexp_of_t))
+      | [] -> Or_error.error "Invalid CR comment" content String.sexp_of_t
       | m :: _ ->
         let get field_name = Regex.Match.get ~sub:(`Name field_name) m in
         (match get "from_user" with
@@ -754,7 +712,7 @@ end = struct
               let assignee =
                 Processed.compute_assignee ~file_owner ~reported_by ~for_ ~due ~is_xcr
               in
-              Ok (`Processed { Processed.raw; reported_by; for_; due; is_xcr; assignee })))
+              Ok { Processed.raw; reported_by; for_; due; is_xcr; assignee }))
     with
     | exn -> Or_error.error "could not process CR" (raw, exn) [%sexp_of: Raw.t * exn]
   ;;
@@ -773,8 +731,7 @@ let extract ~path ~file_contents ~file_owner =
     (Raw.With_file_positions.extract ~path ~file_contents ())
     ~f:(fun { cr = raw; _ } ->
       match Process.process raw ~file_owner with
-      | Ok (`Property _) -> None
-      | Ok (`Processed p) -> Some (Processed p)
+      | Ok p -> Some (Processed p)
       | Error _ -> Some (Raw raw))
 ;;
 
