@@ -57,6 +57,7 @@
   * - Remove support for attributes.
   * - Remove assignee computation (left as external work).
   * - Do not export [Raw].
+  * - Remove special type for cr soons. Return all CRs parsed.
 *)
 
 module Kind : sig
@@ -75,7 +76,6 @@ module Due : sig
 end
 
 type t [@@deriving sexp_of]
-type cr_comment := t
 
 val hash : t -> int
 val path : t -> Vcs.Path_in_repo.t
@@ -100,45 +100,8 @@ end
 
 val sort : t list -> t list
 
-(** A [Cr_soon] is a kind of processed CR with [work_on t = Soon] (which implies it's
-    not an XCR). *)
-module Cr_soon : sig
-  type t [@@deriving sexp_of]
-
-  val content : t -> string
-  val cr_comment : t -> cr_comment
-  val path : t -> Vcs.Path_in_repo.t
-  val start_line : t -> int
-
-  (** [Compare_ignoring_minor_text_changes] defines when we consider two CR-soons as
-      equivalent, which in turn affects whether a CR-soon is active in a feature, defined
-      as present at the base and not at the tip.
-      Changes in positions in a file, or changes in whitespaces are ignored. *)
-  module Compare_ignoring_minor_text_changes : sig
-    type nonrec t = t [@@deriving hash, sexp_of]
-
-    include Comparable.S with type t := t
-  end
-
-  module For_sorted_output : sig
-    type nonrec t = t [@@deriving compare]
-  end
-
-  module Structurally_compared : sig
-    type nonrec t = t [@@deriving compare, sexp_of]
-  end
-end
-
-module Crs : sig
-  type nonrec t =
-    { due_now : t list
-    ; due_soon : Cr_soon.t list
-    ; due_someday : t list
-    }
-end
-
 val grep
   :  vcs:[> Vcs.Trait.ls_files ] Vcs.t
   -> repo_root:Vcs.Repo_root.t
   -> below:Vcs.Path_in_repo.t
-  -> Crs.t
+  -> t list

@@ -65,6 +65,8 @@
    * - Replace [is_xcr] by a variant type [Kind.t].
    * - Make [reported_by] mandatory.
    * - Refactor [Raw], make [t] a record with a processed part that may fail.
+   * - Compute [digest_of_condensed_content] for all CR kinds.
+   * - Remove special type for cr soons. Return all CRs parsed.
 *)
 
 module Regex = Re2
@@ -72,7 +74,6 @@ module Regex = Re2
 module Digest_hex = struct
   type t = string [@@deriving compare, sexp_of]
 
-  let hash = String.hash
   let create str = str |> Stdlib.Digest.string |> Stdlib.Digest.to_hex
 end
 
@@ -120,6 +121,7 @@ type t =
   ; start_line : int
   ; start_col : int
   ; processed : Processed.t Or_error.t
+  ; digest_of_condensed_content : Digest_hex.t
   }
 [@@deriving compare, sexp_of]
 
@@ -304,8 +306,6 @@ let index_to_2d_pos file_contents =
       | Some (newline_index, line_num) -> line_num, index - newline_index)
 ;;
 
-type cr_comment = t [@@deriving sexp_of]
-
 let hash (t : t) = Hashtbl.hash t
 
 let reindented_content t =
@@ -389,110 +389,6 @@ let print_list ~crs ~include_content =
     print ~include_delim:!include_delim cr ~include_content;
     include_delim := true)
 ;;
-
-module Cr_soon = struct
-  module T = struct
-    type nonrec t =
-      { cr_comment : t
-      ; processed : Processed.t
-      ; digest_of_condensed_content : Digest_hex.t
-      ; hash_of_path_and_condensed_content : int
-      }
-    [@@deriving compare, sexp_of]
-  end
-
-  include T
-
-  let condense_whitespace =
-    let regex = Regex.create_exn "\\s+" in
-    fun s -> Regex.rewrite_exn regex ~template:" " s
-  ;;
-
-  let create ~(cr_comment : cr_comment) =
-    try
-      match cr_comment.processed with
-      | Error _ -> failwith "a raw CR comment cannot be a CR-soon"
-      | Ok processed ->
-        let digest_of_condensed_content =
-          Digest_hex.create (condense_whitespace cr_comment.content)
-        in
-        let t =
-          { cr_comment
-          ; processed
-          ; digest_of_condensed_content
-          ; hash_of_path_and_condensed_content =
-              Vcs.Path_in_repo.hash cr_comment.path
-              lxor Digest_hex.hash digest_of_condensed_content
-          }
-        in
-        let () =
-          assert (
-            match processed.kind with
-            | CR -> true
-            | XCR -> false);
-          assert (
-            match processed.due with
-            | Soon -> true
-            | Now | Someday -> false)
-        in
-        Ok t
-    with
-    | exn ->
-      Or_error.error
-        "Cr_soon.create failed"
-        (exn, cr_comment)
-        [%sexp_of: exn * cr_comment]
-  ;;
-
-  let cr_comment t = t.cr_comment
-  let start_line t = t.cr_comment.start_line
-  let path t = t.cr_comment.path
-  let content t = t.cr_comment.content
-
-  module Structurally_compared = struct
-    type nonrec t = t [@@deriving compare, sexp_of]
-  end
-
-  module Compare_ignoring_minor_text_changes = struct
-    module T = struct
-      include T
-
-      let hash t = t.hash_of_path_and_condensed_content
-      let hash_fold_t state t = Hash.fold_int state (hash t)
-
-      let compare t1 t2 =
-        let c = Int.compare (hash t1) (hash t2) in
-        if c <> 0
-        then c
-        else (
-          let c =
-            Digest_hex.compare
-              t1.digest_of_condensed_content
-              t2.digest_of_condensed_content
-          in
-          if c <> 0
-          then c
-          else (
-            let c = Vcs.Path_in_repo.compare (path t1) (path t2) in
-            if c <> 0
-            then c
-            else (
-              let r1 = t1.processed in
-              let r2 = t2.processed in
-              Option.compare Vcs.User_handle.compare r1.for_ r2.for_)))
-      ;;
-    end
-
-    include T
-    include Comparable.Make (T)
-  end
-
-  module For_sorted_output = struct
-    type nonrec t = t
-
-    let compare t1 t2 = For_sorted_output.compare t1.cr_comment t2.cr_comment
-  end
-end
 
 (* -------------------------------------------------------------------------- *)
 (*  Matching                                                                  *)
@@ -594,13 +490,10 @@ end = struct
   ;;
 end
 
-module Crs = struct
-  type nonrec t =
-    { due_now : t list
-    ; due_soon : Cr_soon.t list
-    ; due_someday : t list
-    }
-end
+let condense_whitespace =
+  let regex = Regex.create_exn "\\s+" in
+  fun s -> Regex.rewrite_exn regex ~template:" " s
+;;
 
 let extract ~path ~file_contents =
   let ms = Regex.get_matches_exn cr_regex file_contents in
@@ -617,7 +510,8 @@ let extract ~path ~file_contents =
     in
     let start_line, start_col = Lazy.force pos_2d start_index in
     let processed = Process.process ~content in
-    { path; content; start_line; start_col; processed })
+    let digest_of_condensed_content = Digest_hex.create (condense_whitespace content) in
+    { path; content; start_line; start_col; processed; digest_of_condensed_content })
 ;;
 
 let grep ~vcs ~repo_root ~below =
@@ -652,23 +546,10 @@ let grep ~vcs ~repo_root ~below =
     | 0 | 123 -> stdout |> String.split_lines |> List.map ~f:Vcs.Path_in_repo.v
     | _ -> raise_s [%sexp "xargs process failed", { exit_code : int }]
   in
-  let all_due_now = ref [] in
-  let all_due_soon = ref [] in
-  let all_due_someday = ref [] in
-  let () =
-    List.iter files_to_grep ~f:(fun path_in_repo ->
-      let file_contents =
-        In_channel.read_all
-          (Vcs.Repo_root.append repo_root path_in_repo |> Absolute_path.to_string)
-      in
-      List.iter (extract ~path:path_in_repo ~file_contents) ~f:(fun t ->
-        match work_on t with
-        | Someday -> all_due_someday := t :: !all_due_someday
-        | Now -> all_due_now := t :: !all_due_now
-        | Soon ->
-          (match Cr_soon.create ~cr_comment:t with
-           | Error _ -> all_due_now := t :: !all_due_now
-           | Ok cr_soon -> all_due_soon := cr_soon :: !all_due_soon)))
-  in
-  { Crs.due_now = !all_due_now; due_soon = !all_due_soon; due_someday = !all_due_someday }
+  List.concat_map files_to_grep ~f:(fun path_in_repo ->
+    let file_contents =
+      In_channel.read_all
+        (Vcs.Repo_root.append repo_root path_in_repo |> Absolute_path.to_string)
+    in
+    extract ~path:path_in_repo ~file_contents)
 ;;
