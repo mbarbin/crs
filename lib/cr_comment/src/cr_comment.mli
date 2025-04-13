@@ -136,6 +136,7 @@ val digest_ignoring_minor_text_changes : t -> Digest_hex.t
 
 (** {1 Print} *)
 
+(** Show the CR with a line showing the file position. *)
 val to_string : t -> string
 
 (** Sorts and prints a list of crs, visually separated if needed. *)
@@ -164,18 +165,18 @@ module Private : sig
 
   module Header : sig
     val create
-      :  reported_by:Vcs.User_handle.t Loc.Txt.t
-      -> for_:Vcs.User_handle.t Loc.Txt.t option
-      -> kind:Kind.t Loc.Txt.t
+      :  kind:Kind.t Loc.Txt.t
       -> due:Due.t Loc.Txt.t
+      -> reported_by:Vcs.User_handle.t Loc.Txt.t
+      -> for_:Vcs.User_handle.t Loc.Txt.t option
       -> header
   end
 
   val create
     :  path:Vcs.Path_in_repo.t
-    -> content:string
     -> whole_loc:Loc.t
     -> header:header Or_error.t
     -> digest_of_condensed_content:Digest_hex.t
+    -> content:string
     -> t
 end

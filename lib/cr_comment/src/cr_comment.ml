@@ -96,10 +96,10 @@ end
 
 module Header = struct
   type t =
-    { reported_by : Vcs.User_handle.t Loc.Txt.t
-    ; for_ : Vcs.User_handle.t Loc.Txt.t option
-    ; kind : Kind.t Loc.Txt.t
+    { kind : Kind.t Loc.Txt.t
     ; due : Due.t Loc.Txt.t
+    ; reported_by : Vcs.User_handle.t Loc.Txt.t
+    ; for_ : Vcs.User_handle.t Loc.Txt.t option
     }
   [@@deriving equal, sexp_of]
 
@@ -110,7 +110,7 @@ module Header = struct
     let due t = t.due
   end
 
-  let create ~reported_by ~for_ ~kind ~due = { reported_by; for_; kind; due }
+  let create ~kind ~due ~reported_by ~for_ = { kind; due; reported_by; for_ }
   let reported_by t = t.reported_by.txt
   let for_ t = Option.map t.for_ ~f:Loc.Txt.txt
   let kind t = t.kind.txt
@@ -119,10 +119,10 @@ end
 
 type t =
   { path : Vcs.Path_in_repo.t
-  ; content : string
   ; whole_loc : Loc.t
   ; header : Header.t Or_error.t
   ; digest_of_condensed_content : Digest_hex.t
+  ; content : string
   }
 [@@deriving equal, sexp_of]
 
@@ -131,8 +131,8 @@ let content t = t.content
 let whole_loc t = t.whole_loc
 let header t = t.header
 
-let create ~path ~content ~whole_loc ~header ~digest_of_condensed_content =
-  { path; content; whole_loc; header; digest_of_condensed_content }
+let create ~path ~whole_loc ~header ~digest_of_condensed_content ~content =
+  { path; whole_loc; header; digest_of_condensed_content; content }
 ;;
 
 let digest_ignoring_minor_text_changes t = t.digest_of_condensed_content
