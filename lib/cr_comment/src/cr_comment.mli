@@ -59,6 +59,8 @@
   * - Do not export [Raw].
   * - Remove special type for cr soons. Return all CRs parsed.
   * - Rename [Processed] to [Header].
+  * - Remove support for printing crs without their content.
+  * - Compute positions and offsets with [Loc].
 *)
 
 module Kind : sig
@@ -102,8 +104,6 @@ type t [@@deriving equal, sexp_of]
 
 val path : t -> Vcs.Path_in_repo.t
 val content : t -> string
-val start_line : t -> int
-val start_col : t -> int
 val whole_loc : t -> Loc.t
 val kind : t -> Kind.t
 val due : t -> Due.t
@@ -112,10 +112,10 @@ val header : t -> Header.t Or_error.t
 
 (** {1 Print} *)
 
-val to_string : t -> include_content:bool -> string
+val to_string : t -> string
 
 (** Sorts and prints a list of crs separated by whitespace (if needed). *)
-val print_list : crs:t list -> include_content:bool -> unit
+val print_list : crs:t list -> unit
 
 (** {1 Sort} *)
 
@@ -142,8 +142,6 @@ module Private : sig
   val create
     :  path:Vcs.Path_in_repo.t
     -> content:string
-    -> start_line:int
-    -> start_col:int
     -> whole_loc:Loc.t
     -> header:header Or_error.t
     -> digest_of_condensed_content:Digest_hex.t

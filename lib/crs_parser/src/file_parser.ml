@@ -49,6 +49,7 @@
    * - Remove support for extra headers.
    * - Remove support for attributes.
    * - Remove assignee computation (left as external work).
+   * - Compute positions and offsets with [Loc].
 *)
 
 module Regex = Re2
@@ -218,25 +219,6 @@ let find_comment_bounds =
     check_backwards ~last:`not_special (content_start_pos - 1)
 ;;
 
-let index_to_2d_pos file_contents =
-  (* Maps newline positions (indices of file_contents) to the number of the line they
-     begin. *)
-  let map, _last_line =
-    let init = Map.singleton (module Int) (-1) 1, 1 in
-    String.foldi file_contents ~init ~f:(fun pos ((map, prev_line) as acc) c ->
-      if Char.equal c '\n'
-      then (
-        let curr_line = prev_line + 1 in
-        Map.set map ~key:pos ~data:curr_line, curr_line)
-      else acc)
-  in
-  `Staged
-    (fun index ->
-      match Map.closest_key map `Less_than index with
-      | None -> failwith "gave a negative input to index_to_2d_pos"
-      | Some (newline_index, line_num) -> line_num, index - newline_index)
-;;
-
 let cr_pattern_re2 = "\\bX?CR[-v: \\t]"
 let cr_pattern_egrep = cr_pattern_re2
 let cr_regex = Regex.create_exn cr_pattern_re2
@@ -252,11 +234,6 @@ let parse_file ~path ~(file_contents : Vcs.File_contents.t) =
     lazy (Loc.File_cache.create ~path:(Vcs.Path_in_repo.to_fpath path) ~file_contents)
   in
   let ms = Regex.get_matches_exn cr_regex file_contents in
-  let pos_2d =
-    lazy
-      (match index_to_2d_pos file_contents with
-       | `Staged f -> f)
-  in
   List.filter_map ms ~f:(fun m ->
     let open Option.Let_syntax in
     let cr_start, _ = Regex.Match.get_pos_exn ~sub m in
@@ -264,7 +241,6 @@ let parse_file ~path ~(file_contents : Vcs.File_contents.t) =
       find_comment_bounds file_contents cr_start
     in
     let file_cache = Lazy.force file_cache in
-    let start_line, start_col = Lazy.force pos_2d start_index in
     let start_position = Loc.Offset.to_position start_index ~file_cache in
     let stop_position = Loc.Offset.to_position (end_index + 1) ~file_cache in
     let whole_loc = Loc.create (start_position, stop_position) in
@@ -275,8 +251,6 @@ let parse_file ~path ~(file_contents : Vcs.File_contents.t) =
     Cr_comment.Private.create
       ~path
       ~content
-      ~start_line
-      ~start_col
       ~whole_loc
       ~header
       ~digest_of_condensed_content)

@@ -68,6 +68,8 @@
    * - Compute [digest_of_condensed_content] for all CR kinds.
    * - Remove special type for cr soons. Return all CRs parsed.
    * - Rename [Processed] to [Header].
+   * - Remove support for printing crs without their content.
+   * - Compute positions and offsets with [Loc].
 *)
 
 module Digest_hex = struct
@@ -111,14 +113,12 @@ end
 (* [content] is the text of the CR with comment markers removed from
    the beginning and end (if applicable).
 
-   [start_line, start_col] is the two-dimensional start position of
-   the whole comment in [path]. *)
+   The [whole_loc] is suitable for removal of the entire CR comment.
+   It includes the comments boundaries from [path] as well. *)
 
 type t =
   { path : Vcs.Path_in_repo.t
   ; content : string
-  ; start_line : int
-  ; start_col : int
   ; whole_loc : Loc.t
   ; header : Header.t Or_error.t
   ; digest_of_condensed_content : Digest_hex.t
@@ -127,21 +127,11 @@ type t =
 
 let path t = t.path
 let content t = t.content
-let start_line t = t.start_line
-let start_col t = t.start_col
 let whole_loc t = t.whole_loc
 let header t = t.header
 
-let create
-      ~path
-      ~content
-      ~start_line
-      ~start_col
-      ~whole_loc
-      ~header
-      ~digest_of_condensed_content
-  =
-  { path; content; start_line; start_col; whole_loc; header; digest_of_condensed_content }
+let create ~path ~content ~whole_loc ~header ~digest_of_condensed_content =
+  { path; content; whole_loc; header; digest_of_condensed_content }
 ;;
 
 module For_sorted_output : sig
@@ -154,13 +144,16 @@ end = struct
     if c <> 0
     then c
     else (
-      let c = Int.compare t1.start_line t2.start_line in
-      if c <> 0 then c else Int.compare t1.start_col t2.start_col)
+      let c = Int.compare (Loc.start_line t1.whole_loc) (Loc.start_line t2.whole_loc) in
+      if c <> 0
+      then c
+      else Int.compare (Loc.start_offset t1.whole_loc) (Loc.start_offset t2.whole_loc))
   ;;
 end
 
 let reindented_content t =
-  let indent = String.make (t.start_col + 2) ' ' in
+  let start = Loc.start t.whole_loc in
+  let indent = String.make (start.pos_cnum - start.pos_bol + 2) ' ' in
   let str = content t in
   let lines = String.split str ~on:'\n' in
   let lines =
@@ -208,29 +201,21 @@ let work_on t : Due.t =
      | CR -> p.due)
 ;;
 
-let to_string t ~include_content =
-  let file_str =
-    Printf.sprintf
-      "%s:%d:%d:"
-      (Vcs.Path_in_repo.to_string (path t))
-      (start_line t)
-      (start_col t)
-  in
-  let contents = if include_content then [ reindented_content t; "" ] else [ "" ] in
-  String.concat ~sep:"\n" (file_str :: contents)
+let to_string t =
+  String.concat ~sep:"\n" [ Loc.to_string t.whole_loc; reindented_content t; "" ]
 ;;
 
-let print ~include_delim cr ~include_content =
-  let str = to_string cr ~include_content in
-  let nl = if include_delim && include_content then "\n" else "" in
+let print ~include_delim cr =
+  let str = to_string cr in
+  let nl = if include_delim then "\n" else "" in
   print_string (Printf.sprintf "%s%s" nl str)
 ;;
 
-let print_list ~crs ~include_content =
+let print_list ~crs =
   let crs = sort crs in
   let include_delim = ref false in
   List.iter crs ~f:(fun cr ->
-    print ~include_delim:!include_delim cr ~include_content;
+    print ~include_delim:!include_delim cr;
     include_delim := true)
 ;;
 
