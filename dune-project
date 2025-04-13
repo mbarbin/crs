@@ -30,12 +30,16 @@
     (< v0.18)))
   (cmdlang
    (>= 0.0.9))
+  (file-rewriter
+   (>= 0.0.3))
   (fpath
    (>= 0.7.3))
   (fpath-base
    (>= 0.2.2))
   (loc
    (>= 0.2.2))
+  (pp
+   (>= 2.0.0))
   (pplumbing
    (>= 0.0.9))
   (ppx_compare
@@ -80,8 +84,16 @@
    (and
     (>= v0.17)
     (< v0.18)))
+  (textutils
+   (and
+    (>= v0.17)
+    (< v0.18)))
   (vcs
-   (>= 0.0.9))))
+   (>= 0.0.11))
+  (vcs-base
+   (>= 0.0.11))
+  (vcs-git-blocking
+   (>= 0.0.11))))
 
 (package
  (name crs-tests)
@@ -117,6 +129,8 @@
    (and
     (>= v0.17)
     (< v0.18)))
+  (pp
+   (>= 2.0.0))
   (pplumbing
    (>= 0.0.9))
   (ppx_compare
@@ -170,8 +184,18 @@
    (and
     (>= v0.17)
     (< v0.18)))
+  (textutils
+   (and
+    (>= v0.17)
+    (< v0.18)))
   (vcs
-   (>= 0.0.9))
+   (>= 0.0.11))
+  (vcs-base
+   (>= 0.0.11))
+  (vcs-cli
+   (>= 0.0.11))
+  (vcs-git-blocking
+   (>= 0.0.11))
   (sherlodoc
    (and
     :with-doc
@@ -219,6 +243,8 @@
    (and
     (>= v0.17)
     (< v0.18)))
+  (pp
+   (>= 2.0.0))
   (pplumbing
    (>= 0.0.9))
   (ppx_compare
@@ -272,8 +298,18 @@
    (and
     (>= v0.17)
     (< v0.18)))
+  (textutils
+   (and
+    (>= v0.17)
+    (< v0.18)))
   (vcs
-   (>= 0.0.9))
+   (>= 0.0.11))
+  (vcs-base
+   (>= 0.0.11))
+  (vcs-cli
+   (>= 0.0.11))
+  (vcs-git-blocking
+   (>= 0.0.11))
   (sherlodoc
    (and
     :with-doc

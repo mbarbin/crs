@@ -19,8 +19,29 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-let main =
-  Command.group
-    ~summary:"A tool to manipulate code review comments embeded in source code"
-    [ "grep", Cmd__grep.main ]
+let find_enclosing_repo_root vcs ~from =
+  match Vcs.find_enclosing_git_repo_root vcs ~from with
+  | Some repo_root -> repo_root
+  | None ->
+    Err.raise
+      Pp.O.
+        [ Pp.text "Failed to locate enclosing repo root from '"
+          ++ Pp_tty.path (module Absolute_path) from
+          ++ Pp.text "'."
+        ]
+;;
+
+let relativize ~repo_root ~cwd ~path =
+  let path = Absolute_path.relativize ~root:cwd path in
+  match
+    Absolute_path.chop_prefix path ~prefix:(repo_root |> Vcs.Repo_root.to_absolute_path)
+  with
+  | Some relative_path -> Vcs.Path_in_repo.of_relative_path relative_path
+  | None ->
+    Err.raise
+      Pp.O.
+        [ Pp.text "Path "
+          ++ Pp_tty.path (module Absolute_path) path
+          ++ Pp.text " is not in repo."
+        ]
 ;;
