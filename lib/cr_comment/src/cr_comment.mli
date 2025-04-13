@@ -58,6 +58,7 @@
   * - Remove assignee computation (left as external work).
   * - Do not export [Raw].
   * - Remove special type for cr soons. Return all CRs parsed.
+  * - Rename [Processed] to [Header].
 *)
 
 module Kind : sig
@@ -73,6 +74,25 @@ module Due : sig
     | Soon
     | Someday
   [@@deriving compare, equal, sexp_of]
+end
+
+module Digest_hex : sig
+  type t [@@deriving compare, sexp_of]
+
+  val create : string -> t
+end
+
+module Header : sig
+  (** [reported_by] is [user] in [CR user...].
+
+      [for_] is [user2] in [CR user1 for user2: ...]. It is none since
+      the part with the [for user2] is optional. *)
+  type t [@@deriving compare, sexp_of]
+
+  val reported_by : t -> Vcs.User_handle.t
+  val for_ : t -> Vcs.User_handle.t option
+  val kind : t -> Kind.t
+  val due : t -> Due.t
 end
 
 type t [@@deriving sexp_of]
@@ -105,3 +125,25 @@ val grep
   -> repo_root:Vcs.Repo_root.t
   -> below:Vcs.Path_in_repo.t
   -> t list
+
+module Private : sig
+  type header := Header.t
+
+  module Header : sig
+    val create
+      :  reported_by:Vcs.User_handle.t
+      -> for_:Vcs.User_handle.t option
+      -> kind:Kind.t
+      -> due:Due.t
+      -> header
+  end
+
+  val create
+    :  path:Vcs.Path_in_repo.t
+    -> content:string
+    -> start_line:int
+    -> start_col:int
+    -> header:header Or_error.t
+    -> digest_of_condensed_content:Digest_hex.t
+    -> t
+end

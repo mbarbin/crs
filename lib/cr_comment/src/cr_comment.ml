@@ -67,6 +67,7 @@
    * - Refactor [Raw], make [t] a record with a processed part that may fail.
    * - Compute [digest_of_condensed_content] for all CR kinds.
    * - Remove special type for cr soons. Return all CRs parsed.
+   * - Rename [Processed] to [Header].
 *)
 
 module Regex = Re2
@@ -92,7 +93,7 @@ module Due = struct
   [@@deriving compare, equal, sexp_of]
 end
 
-module Processed = struct
+module Header = struct
   (* [reported_by] is [user] in [CR user...].
 
      [for_] is [user2] in [CR user1 for user2: ...]. It is none since
@@ -104,6 +105,12 @@ module Processed = struct
     ; due : Due.t
     }
   [@@deriving compare, sexp_of]
+
+  let create ~reported_by ~for_ ~kind ~due = { reported_by; for_; kind; due }
+  let reported_by t = t.reported_by
+  let for_ t = t.for_
+  let kind t = t.kind
+  let due t = t.due
 end
 
 (* [content] is the text of the CR with comment markers removed from
@@ -117,15 +124,19 @@ type t =
   ; content : string
   ; start_line : int
   ; start_col : int
-  ; processed : Processed.t Or_error.t
+  ; header : Header.t Or_error.t
   ; digest_of_condensed_content : Digest_hex.t
   }
 [@@deriving compare, sexp_of]
 
-let content t = t.content
 let path t = t.path
+let content t = t.content
 let start_line t = t.start_line
 let start_col t = t.start_col
+
+let create ~path ~content ~start_line ~start_col ~header ~digest_of_condensed_content =
+  { path; content; start_line; start_col; header; digest_of_condensed_content }
+;;
 
 module For_sorted_output : sig
   type nonrec t = t [@@deriving compare]
@@ -177,13 +188,13 @@ end
 let sort ts = List.sort ts ~compare:For_sorted_output.compare
 
 let due t =
-  match t.processed with
+  match t.header with
   | Error _ -> Due.Now
   | Ok p -> p.due
 ;;
 
 let is_xcr t =
-  match t.processed with
+  match t.header with
   | Error _ -> false
   | Ok p ->
     (match p.kind with
@@ -192,7 +203,7 @@ let is_xcr t =
 ;;
 
 let work_on t : Due.t =
-  match t.processed with
+  match t.header with
   | Error _ -> Now
   | Ok p ->
     (match p.kind with
@@ -414,8 +425,8 @@ let index_to_2d_pos file_contents =
    XML    <!-- X?CR ... --> may not nest recursively
 *)
 
-module Process : sig
-  val process : content:string -> Processed.t Or_error.t
+module Header_parser : sig
+  val parse : content:string -> Header.t Or_error.t
 end = struct
   (* various utilities -- mostly attempting to make the code more readable *)
   let named_group name patt = String.concat [ "(?P<"; name; ">"; patt; ")" ]
@@ -454,7 +465,7 @@ end = struct
          ])
   ;;
 
-  let process ~content =
+  let parse ~content =
     try
       match Regex.get_matches_exn ~max:1 comment_regex content with
       | [] -> Or_error.error "Invalid CR comment" content String.sexp_of_t
@@ -479,7 +490,7 @@ end = struct
            in
            (match due with
             | Error _ as err -> err
-            | Ok due -> Ok { Processed.reported_by; for_; kind; due }))
+            | Ok due -> Ok { Header.reported_by; for_; kind; due }))
     with
     | exn -> Or_error.error "could not process CR" (content, exn) [%sexp_of: string * exn]
   ;;
@@ -508,9 +519,9 @@ let extract ~path ~file_contents =
       find_comment_bounds file_contents cr_start
     in
     let start_line, start_col = Lazy.force pos_2d start_index in
-    let processed = Process.process ~content in
+    let header = Header_parser.parse ~content in
     let digest_of_condensed_content = Digest_hex.create (condense_whitespace content) in
-    { path; content; start_line; start_col; processed; digest_of_condensed_content })
+    { path; content; start_line; start_col; header; digest_of_condensed_content })
 ;;
 
 let grep ~vcs ~repo_root ~below =
@@ -552,3 +563,9 @@ let grep ~vcs ~repo_root ~below =
     in
     extract ~path:path_in_repo ~file_contents)
 ;;
+
+module Private = struct
+  module Header = Header
+
+  let create = create
+end
