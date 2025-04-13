@@ -3,8 +3,12 @@
 dirs=(
     # Add new directories below:
     "bin"
-    "lib/crs/src"
-    "lib/crs/test"
+    "lib/cr_comment/src"
+    "lib/cr_comment/test"
+    "lib/crs_cli/src"
+    "lib/crs_cli/test"
+    "lib/crs_parser/src"
+    "lib/crs_parser/test"
 )
 
 for dir in "${dirs[@]}"; do

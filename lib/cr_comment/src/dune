@@ -1,6 +1,6 @@
 (library
- (name crs_test)
- (public_name crs-tests.crs_test)
+ (name cr_comment)
+ (public_name crs.cr-comment)
  (flags
   :standard
   -w
@@ -10,17 +10,17 @@
   -open
   Base
   -open
-  Expect_test_helpers_base)
- (libraries base crs expect_test_helpers_core.expect_test_helpers_base)
- (inline_tests)
+  Fpath_base
+  -open
+  Stdio)
+ (libraries base fpath fpath-base loc re2 shexp.process stdio vcs)
  (lint
-  (pps ppx_js_style -check-doc-comments))
+  (pps ppx_js_style -allow-let-operators -check-doc-comments))
  (preprocess
   (pps
    -unused-code-warnings=force
    ppx_compare
    ppx_enumerate
-   ppx_expect
    ppx_hash
    ppx_here
    ppx_let

@@ -19,7 +19,4 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-let%expect_test "hello" =
-  print_s Crs.hello_world;
-  [%expect {| "Hello, World!" |}]
-;;
+let main = Command.group ~summary:"" []

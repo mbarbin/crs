@@ -1,6 +1,6 @@
 (library
- (name crs)
- (public_name crs)
+ (name crs_cli)
+ (public_name crs.crs-cli)
  (flags
   :standard
   -w
@@ -13,7 +13,7 @@
   Stdio
   -open
   Cmdlang)
- (libraries base cmdlang stdio)
+ (libraries base cmdlang cr_comment crs_parser stdio)
  (lint
   (pps ppx_js_style -check-doc-comments))
  (preprocess
