@@ -65,3 +65,6 @@ For example, in addition to the crs project header, such files carry the followi
 The exact list of modules that are derived from `Iron` is as follows:
 
 - lib/cr_comment/src/cr_comment
+- lib/crs_parser/src/crs_parser
+- lib/crs_parser/src/file_parser
+- lib/crs_parser/src/header_parser

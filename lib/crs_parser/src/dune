@@ -10,12 +10,12 @@
   -open
   Base
   -open
-  Stdio
+  Fpath_base
   -open
-  Cmdlang)
- (libraries base cmdlang stdio)
+  Stdio)
+ (libraries base cr_comment fpath fpath-base loc re2 shexp.process stdio vcs)
  (lint
-  (pps ppx_js_style -check-doc-comments))
+  (pps ppx_js_style -allow-let-operators -check-doc-comments))
  (preprocess
   (pps
    -unused-code-warnings=force

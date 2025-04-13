@@ -1,5 +1,5 @@
 (*_*******************************************************************************)
-(*_  crs - A tool to parse code review comments embedded in source code          *)
+(*_  crs - A tool to manipulate code review comments embedded in source code     *)
 (*_  Copyright (C) 2024-2025 Mathieu Barbin <mathieu.barbin@gmail.com>           *)
 (*_                                                                              *)
 (*_  This file is part of crs.                                                   *)
@@ -58,6 +58,9 @@
   * - Remove assignee computation (left as external work).
   * - Do not export [Raw].
   * - Remove special type for cr soons. Return all CRs parsed.
+  * - Rename [Processed] to [Header].
+  * - Remove support for printing crs without their content.
+  * - Compute positions and offsets with [Loc].
 *)
 
 module Kind : sig
@@ -75,24 +78,60 @@ module Due : sig
   [@@deriving compare, equal, sexp_of]
 end
 
-type t [@@deriving sexp_of]
+module Digest_hex : sig
+  type t [@@deriving compare, equal, sexp_of]
 
-val hash : t -> int
-val path : t -> Vcs.Path_in_repo.t
-val content : t -> string
-val start_line : t -> int
-val start_col : t -> int
-val due : t -> Due.t
-val is_xcr : t -> bool
-val work_on : t -> Due.t
-val to_string : t -> include_content:bool -> string
-
-(** Sorts and prints a list of crs separated by whitespace (if needed). *)
-val print_list : crs:t list -> include_content:bool -> unit
-
-module Structurally_compared : sig
-  type nonrec t = t [@@deriving compare, sexp_of]
+  val to_string : t -> string
+  val create : string -> t
 end
+
+module Header : sig
+  type t [@@deriving equal, sexp_of]
+
+  (** [reported_by] is [user] in [CR user...]. *)
+  val reported_by : t -> Vcs.User_handle.t
+
+  (** [for_] is [user2] in [CR user1 for user2: ...]. It is none since the part
+      with the [for user2] is optional. *)
+  val for_ : t -> Vcs.User_handle.t option
+
+  val kind : t -> Kind.t
+  val due : t -> Due.t
+end
+
+type t [@@deriving equal, sexp_of]
+
+(** {1 Getters} *)
+
+val path : t -> Vcs.Path_in_repo.t
+
+(** [content] is the text of the CR with comment markers removed from the
+    beginning and end (if applicable). *)
+val content : t -> string
+
+(** [whole_loc] is suitable for removal of the entire CR comment. It includes
+    the comments boundaries from [path] as well. *)
+val whole_loc : t -> Loc.t
+
+val header : t -> Header.t Or_error.t
+val kind : t -> Kind.t
+val due : t -> Due.t
+val work_on : t -> Due.t
+
+(** This digest is computed such that changes in positions in a file, or changes
+    in whitespaces are ignored. It is used by downstream systems to detect
+    that two crs are equivalent, which in turn may affect when a cr is
+    active. *)
+val digest_ignoring_minor_text_changes : t -> Digest_hex.t
+
+(** {1 Print} *)
+
+val to_string : t -> string
+
+(** Sorts and prints a list of crs, visually separated if needed. *)
+val print_list : crs:t list -> unit
+
+(** {1 Sort} *)
 
 module For_sorted_output : sig
   type nonrec t = t [@@deriving compare]
@@ -100,8 +139,33 @@ end
 
 val sort : t list -> t list
 
-val grep
-  :  vcs:[> Vcs.Trait.ls_files ] Vcs.t
-  -> repo_root:Vcs.Repo_root.t
-  -> below:Vcs.Path_in_repo.t
-  -> t list
+(** {1 Private}
+
+    This module is exported to be used by libraries with strong ties to
+    [cr_comment]. Its signature may change in breaking ways at any time without
+    prior notice, and outside of the guidelines set by semver.
+
+    In particular, the intention here is that cr comments may only be created
+    using dedicated helpers libraries that are defined in this project, parsing
+    comments from files in vcs trees. *)
+
+module Private : sig
+  type header := Header.t
+
+  module Header : sig
+    val create
+      :  reported_by:Vcs.User_handle.t
+      -> for_:Vcs.User_handle.t option
+      -> kind:Kind.t
+      -> due:Due.t
+      -> header
+  end
+
+  val create
+    :  path:Vcs.Path_in_repo.t
+    -> content:string
+    -> whole_loc:Loc.t
+    -> header:header Or_error.t
+    -> digest_of_condensed_content:Digest_hex.t
+    -> t
+end
