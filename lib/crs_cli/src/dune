@@ -14,6 +14,8 @@
   -open
   Cmdlang)
  (libraries base cmdlang cr_comment crs_parser stdio)
+ (instrumentation
+  (backend bisect_ppx))
  (lint
   (pps ppx_js_style -check-doc-comments))
  (preprocess
