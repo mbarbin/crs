@@ -92,7 +92,7 @@ let comment_regex =
        ])
 ;;
 
-let parse ~content =
+let parse ~file_cache:_ ~content_start_offset:_ ~content =
   try
     match Regex.get_matches_exn ~max:1 comment_regex content with
     | [] -> Or_error.error "Invalid CR comment" content String.sexp_of_t
