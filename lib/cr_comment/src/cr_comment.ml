@@ -96,18 +96,25 @@ end
 
 module Header = struct
   type t =
-    { reported_by : Vcs.User_handle.t
-    ; for_ : Vcs.User_handle.t option
-    ; kind : Kind.t
-    ; due : Due.t
+    { reported_by : Vcs.User_handle.t Loc.Txt.t
+    ; for_ : Vcs.User_handle.t Loc.Txt.t option
+    ; kind : Kind.t Loc.Txt.t
+    ; due : Due.t Loc.Txt.t
     }
   [@@deriving equal, sexp_of]
 
+  module With_loc = struct
+    let reported_by t = t.reported_by
+    let for_ t = t.for_
+    let kind t = t.kind
+    let due t = t.due
+  end
+
   let create ~reported_by ~for_ ~kind ~due = { reported_by; for_; kind; due }
-  let reported_by t = t.reported_by
-  let for_ t = t.for_
-  let kind t = t.kind
-  let due t = t.due
+  let reported_by t = t.reported_by.txt
+  let for_ t = Option.map t.for_ ~f:Loc.Txt.txt
+  let kind t = t.kind.txt
+  let due t = t.due.txt
 end
 
 type t =
@@ -179,22 +186,22 @@ let sort ts = List.sort ts ~compare:For_sorted_output.compare
 let due t =
   match t.header with
   | Error _ -> Due.Now
-  | Ok p -> p.due
+  | Ok p -> Header.due p
 ;;
 
 let kind t =
   match t.header with
   | Error _ -> Kind.CR
-  | Ok p -> p.kind
+  | Ok p -> Header.kind p
 ;;
 
 let work_on t : Due.t =
   match t.header with
   | Error _ -> Now
   | Ok p ->
-    (match p.kind with
+    (match Header.kind p with
      | XCR -> Now
-     | CR -> p.due)
+     | CR -> Header.due p)
 ;;
 
 let to_string t =

@@ -244,7 +244,9 @@ let parse_file ~path ~(file_contents : Vcs.File_contents.t) =
     let start_position = Loc.Offset.to_position start_index ~file_cache in
     let stop_position = Loc.Offset.to_position (end_index + 1) ~file_cache in
     let whole_loc = Loc.create (start_position, stop_position) in
-    let header = Header_parser.parse ~content in
+    let header =
+      Header_parser.parse ~file_cache ~content_start_offset:cr_start ~content
+    in
     let digest_of_condensed_content =
       Cr_comment.Digest_hex.create (condense_whitespace content)
     in

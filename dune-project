@@ -105,6 +105,8 @@
    (and
     (>= v0.17)
     (< v0.18)))
+  (file-rewriter
+   (>= 0.0.3))
   (fpath
    (>= 0.7.3))
   (fpath-base
@@ -205,6 +207,8 @@
    (and
     (>= v0.17)
     (< v0.18)))
+  (file-rewriter
+   (>= 0.0.3))
   (fpath
    (>= 0.7.3))
   (fpath-base

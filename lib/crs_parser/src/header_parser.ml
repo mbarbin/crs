@@ -78,8 +78,7 @@ let comment_regex =
   exactly
     (seq
        [ any whitespace
-       ; optional (named_group "is_xcr" "X")
-       ; "CR"
+       ; named_group "cr_kind" "X?CR"
        ; optional
            (seq [ "[-v]"; named_group "due" (alt [ "\\d{6}"; "soon"; "someday" ]) ])
        ; some whitespace
@@ -92,32 +91,57 @@ let comment_regex =
        ])
 ;;
 
-let parse ~content =
+let parse ~file_cache ~content_start_offset ~content =
+  let get_match_loc_exn ~sub m =
+    let pos, len = Re2.Match.get_pos_exn ~sub m in
+    let start = content_start_offset + pos in
+    Loc.of_file_range ~file_cache ~range:{ start; stop = start + len }
+  in
   try
-    match Regex.get_matches_exn ~max:1 comment_regex content with
-    | [] -> Or_error.error "Invalid CR comment" content String.sexp_of_t
-    | m :: _ ->
-      let get field_name = Regex.Match.get ~sub:(`Name field_name) m in
-      (match get "from_user" with
-       | None -> Or_error.error "Couldn't parse username" content String.sexp_of_t
-       | Some reported_by ->
-         let reported_by = Vcs.User_handle.v reported_by in
-         let kind =
-           match Option.is_some (get "is_xcr") with
-           | true -> Cr_comment.Kind.XCR
-           | false -> Cr_comment.Kind.CR
-         in
-         let for_ = Option.map (get "for") ~f:Vcs.User_handle.v in
-         let due =
-           match get "due" with
-           | None -> Ok Cr_comment.Due.Now
-           | Some "soon" -> Ok Cr_comment.Due.Soon
-           | Some "someday" -> Ok Cr_comment.Due.Someday
-           | Some _s -> (* dated CR -> CR-someday *) Ok Cr_comment.Due.Someday
-         in
-         (match due with
-          | Error _ as err -> err
-          | Ok due -> Ok (Cr_comment.Private.Header.create ~reported_by ~for_ ~kind ~due)))
+    let open Or_error.Let_syntax in
+    let%bind m =
+      match Regex.get_matches_exn ~max:1 comment_regex content with
+      | [] -> Or_error.error "Invalid CR comment" content String.sexp_of_t
+      | m :: _ -> return m
+    in
+    let get field_name =
+      let sub = `Name field_name in
+      match Regex.Match.get ~sub m with
+      | None -> None
+      | Some v -> Some (v, get_match_loc_exn ~sub m)
+    in
+    let%bind reported_by =
+      match get "from_user" with
+      | None -> Or_error.error "Couldn't parse username" content String.sexp_of_t
+      | Some (reported_by, loc) ->
+        return { Loc.Txt.txt = Vcs.User_handle.v reported_by; loc }
+    in
+    let%bind kind =
+      match get "cr_kind" with
+      | None -> Or_error.error "Couldn't parse cr kind" content String.sexp_of_t
+      | Some (kind, loc) ->
+        let%bind txt =
+          match kind with
+          | "CR" -> return Cr_comment.Kind.CR
+          | "XCR" -> return Cr_comment.Kind.XCR
+          | _ -> Or_error.error "Couldn't parse cr kind" kind String.sexp_of_t
+        in
+        return { Loc.Txt.txt; loc }
+    in
+    let for_ =
+      Option.map (get "for") ~f:(fun (user, loc) ->
+        { Loc.Txt.txt = Vcs.User_handle.v user; loc })
+    in
+    let due =
+      match get "due" with
+      | None -> { Loc.Txt.txt = Cr_comment.Due.Now; loc = kind.loc }
+      | Some ("soon", loc) -> { Loc.Txt.txt = Cr_comment.Due.Soon; loc }
+      | Some ("someday", loc) -> { Loc.Txt.txt = Cr_comment.Due.Someday; loc }
+      | Some (_, loc) ->
+        (* dated CR -> CR-someday *)
+        { Loc.Txt.txt = Cr_comment.Due.Someday; loc }
+    in
+    return (Cr_comment.Private.Header.create ~reported_by ~for_ ~kind ~due)
   with
   | exn -> Or_error.error "could not process CR" (content, exn) [%sexp_of: string * exn]
 ;;
