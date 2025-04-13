@@ -1,0 +1,5 @@
+(cram
+ (package crs-tests)
+ (deps
+  (package vcs-cli)
+  %{bin:crs}))

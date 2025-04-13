@@ -192,6 +192,8 @@
    (>= 0.0.9))
   (vcs-base
    (>= 0.0.9))
+  (vcs-cli
+   (>= 0.0.9))
   (vcs-git-blocking
    (>= 0.0.9))
   (sherlodoc
@@ -303,6 +305,8 @@
   (vcs
    (>= 0.0.9))
   (vcs-base
+   (>= 0.0.9))
+  (vcs-cli
    (>= 0.0.9))
   (vcs-git-blocking
    (>= 0.0.9))

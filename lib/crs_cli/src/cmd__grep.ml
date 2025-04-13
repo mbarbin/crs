@@ -20,7 +20,27 @@
 (********************************************************************************)
 
 let main =
-  Command.group
-    ~summary:"A tool to manipulate code review comments embeded in source code"
-    [ "grep", Cmd__grep.main ]
+  Command.make
+    ~summary:"Grep for CRs in the tree"
+    (let%map_open.Command below =
+       Arg.named_opt
+         [ "below" ]
+         (Param.validated_string (module Fpath))
+         ~docv:"PATH"
+         ~doc:"Only grep below the supplied path."
+     and sexp = Arg.flag [ "sexp" ] ~doc:"Print the CRs as sexps on stdout." in
+     let vcs = Vcs_git_blocking.create () in
+     let cwd = Unix.getcwd () |> Absolute_path.v in
+     let repo_root = Common_helpers.find_enclosing_repo_root vcs ~from:cwd in
+     let below =
+       match below with
+       | None -> Vcs.Path_in_repo.root
+       | Some path -> Common_helpers.relativize ~repo_root ~cwd ~path
+     in
+     let crs = Crs_parser.grep ~vcs ~repo_root ~below in
+     if sexp
+     then
+       List.iter crs ~f:(fun cr ->
+         print_endline (Sexp.to_string_hum [%sexp (cr : Cr_comment.t)]))
+     else print_endline "Table not implemented")
 ;;

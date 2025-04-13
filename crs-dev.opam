@@ -41,6 +41,7 @@ depends: [
   "textutils" {>= "v0.17" & < "v0.18"}
   "vcs" {>= "0.0.9"}
   "vcs-base" {>= "0.0.9"}
+  "vcs-cli" {>= "0.0.9"}
   "vcs-git-blocking" {>= "0.0.9"}
   "sherlodoc" {with-doc & >= "0.2"}
   "odoc" {with-doc}
