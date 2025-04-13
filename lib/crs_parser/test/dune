@@ -13,8 +13,13 @@
   Expect_test_helpers_base)
  (libraries
   base
+  cr_comment
   crs_parser
-  expect_test_helpers_core.expect_test_helpers_base)
+  expect_test_helpers_core.expect_test_helpers_base
+  fpath
+  loc
+  patdiff.expect_test_patdiff
+  vcs)
  (inline_tests)
  (instrumentation
   (backend bisect_ppx))

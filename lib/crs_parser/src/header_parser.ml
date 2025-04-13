@@ -141,7 +141,7 @@ let parse ~file_cache ~content_start_offset ~content =
         (* dated CR -> CR-someday *)
         { Loc.Txt.txt = Cr_comment.Due.Someday; loc }
     in
-    return (Cr_comment.Private.Header.create ~reported_by ~for_ ~kind ~due)
+    return (Cr_comment.Private.Header.create ~kind ~due ~reported_by ~for_)
   with
   | exn -> Or_error.error "could not process CR" (content, exn) [%sexp_of: string * exn]
 ;;

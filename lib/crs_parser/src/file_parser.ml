@@ -252,8 +252,8 @@ let parse_file ~path ~(file_contents : Vcs.File_contents.t) =
     in
     Cr_comment.Private.create
       ~path
-      ~content
       ~whole_loc
       ~header
-      ~digest_of_condensed_content)
+      ~digest_of_condensed_content
+      ~content)
 ;;
