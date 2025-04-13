@@ -9,6 +9,7 @@ dirs=(
     "lib/crs_cli/test"
     "lib/crs_parser/src"
     "lib/crs_parser/test"
+    "test/expect"
 )
 
 for dir in "${dirs[@]}"; do

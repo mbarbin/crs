@@ -1,0 +1,42 @@
+(library
+ (name crs_expect_tests)
+ (public_name crs-tests.expect-tests)
+ (inline_tests)
+ (flags
+  :standard
+  -w
+  +a-4-40-41-42-44-45-48-66
+  -warn-error
+  +a
+  -open
+  Base
+  -open
+  Fpath_base
+  -open
+  Expect_test_helpers_base)
+ (libraries
+  base
+  cr_comment
+  crs_parser
+  expect_test_helpers_core.expect_test_helpers_base
+  file-rewriter
+  fpath
+  fpath-base
+  loc
+  patdiff.expect_test_patdiff
+  vcs)
+ (instrumentation
+  (backend bisect_ppx))
+ (lint
+  (pps ppx_js_style -check-doc-comments))
+ (preprocess
+  (pps
+   -unused-code-warnings=force
+   ppx_compare
+   ppx_enumerate
+   ppx_expect
+   ppx_hash
+   ppx_here
+   ppx_let
+   ppx_sexp_conv
+   ppx_sexp_value)))
