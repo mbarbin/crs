@@ -46,6 +46,9 @@
    * - Use [Vcs] instead of [Hg].
 *)
 
+let cr_pattern_egrep = File_parser.cr_pattern_egrep
+let parse_file = File_parser.parse_file
+
 let grep ~vcs ~repo_root ~below =
   let files_to_grep = Vcs.ls_files vcs ~repo_root ~below in
   let stdin =
@@ -70,7 +73,7 @@ let grep ~vcs ~repo_root ~below =
               ; "-E"
               ; "-l"
               ; "--binary-files=without-match"
-              ; File_parser.cr_pattern_egrep
+              ; cr_pattern_egrep
               ]))
     in
     let exit_code, stdout = Shexp_process.eval ~context process in
@@ -84,5 +87,5 @@ let grep ~vcs ~repo_root ~below =
         (Vcs.Repo_root.append repo_root path_in_repo |> Absolute_path.to_string)
       |> Vcs.File_contents.create
     in
-    File_parser.extract ~path:path_in_repo ~file_contents)
+    parse_file ~path:path_in_repo ~file_contents)
 ;;

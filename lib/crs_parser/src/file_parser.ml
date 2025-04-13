@@ -246,8 +246,11 @@ let condense_whitespace =
   fun s -> Regex.rewrite_exn regex ~template:" " s
 ;;
 
-let extract ~path ~(file_contents : Vcs.File_contents.t) =
+let parse_file ~path ~(file_contents : Vcs.File_contents.t) =
   let file_contents = (file_contents :> string) in
+  let file_cache =
+    lazy (Loc.File_cache.create ~path:(Vcs.Path_in_repo.to_fpath path) ~file_contents)
+  in
   let ms = Regex.get_matches_exn cr_regex file_contents in
   let pos_2d =
     lazy
@@ -257,10 +260,14 @@ let extract ~path ~(file_contents : Vcs.File_contents.t) =
   List.filter_map ms ~f:(fun m ->
     let open Option.Let_syntax in
     let cr_start, _ = Regex.Match.get_pos_exn ~sub m in
-    let%map start_index, _end_index, content =
+    let%map start_index, end_index, content =
       find_comment_bounds file_contents cr_start
     in
+    let file_cache = Lazy.force file_cache in
     let start_line, start_col = Lazy.force pos_2d start_index in
+    let start_position = Loc.Offset.to_position start_index ~file_cache in
+    let stop_position = Loc.Offset.to_position (end_index + 1) ~file_cache in
+    let whole_loc = Loc.create (start_position, stop_position) in
     let header = Header_parser.parse ~content in
     let digest_of_condensed_content =
       Cr_comment.Digest_hex.create (condense_whitespace content)
@@ -270,6 +277,7 @@ let extract ~path ~(file_contents : Vcs.File_contents.t) =
       ~content
       ~start_line
       ~start_col
+      ~whole_loc
       ~header
       ~digest_of_condensed_content)
 ;;

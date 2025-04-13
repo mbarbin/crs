@@ -46,6 +46,19 @@
   * - Use [Vcs] instead of [Hg].
 *)
 
+(** This pattern is exposed to speed up the extraction of CR comments across a
+    repository. First we do an over estimation of files that may contain comments
+    using this pattern, and then parse them with this module. *)
+val cr_pattern_egrep : string
+
+(** Parse all comments from a file. Comments that look like cr but are somewhat
+    invalid are still returned as errors, so we can alert the user rather than
+    simply ignoring them. *)
+val parse_file
+  :  path:Vcs.Path_in_repo.t
+  -> file_contents:Vcs.File_contents.t
+  -> Cr_comment.t list
+
 val grep
   :  vcs:[> Vcs.Trait.ls_files ] Vcs.t
   -> repo_root:Vcs.Repo_root.t

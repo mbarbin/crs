@@ -77,17 +77,18 @@ module Due : sig
 end
 
 module Digest_hex : sig
-  type t [@@deriving compare, sexp_of]
+  type t [@@deriving compare, equal, sexp_of]
 
+  val to_string : t -> string
   val create : string -> t
 end
 
 module Header : sig
   (** [reported_by] is [user] in [CR user...].
 
-      [for_] is [user2] in [CR user1 for user2: ...]. It is none since
-      the part with the [for user2] is optional. *)
-  type t [@@deriving compare, sexp_of]
+      [for_] is [user2] in [CR user1 for user2: ...]. It is none
+      since the part with the [for user2] is optional. *)
+  type t [@@deriving equal, sexp_of]
 
   val reported_by : t -> Vcs.User_handle.t
   val for_ : t -> Vcs.User_handle.t option
@@ -95,30 +96,36 @@ module Header : sig
   val due : t -> Due.t
 end
 
-type t [@@deriving sexp_of]
+type t [@@deriving equal, sexp_of]
 
-val hash : t -> int
+(** {1 Getters} *)
+
 val path : t -> Vcs.Path_in_repo.t
 val content : t -> string
 val start_line : t -> int
 val start_col : t -> int
+val whole_loc : t -> Loc.t
+val kind : t -> Kind.t
 val due : t -> Due.t
-val is_xcr : t -> bool
 val work_on : t -> Due.t
+val header : t -> Header.t Or_error.t
+
+(** {1 Print} *)
+
 val to_string : t -> include_content:bool -> string
 
 (** Sorts and prints a list of crs separated by whitespace (if needed). *)
 val print_list : crs:t list -> include_content:bool -> unit
 
-module Structurally_compared : sig
-  type nonrec t = t [@@deriving compare, sexp_of]
-end
+(** {1 Sort} *)
 
 module For_sorted_output : sig
   type nonrec t = t [@@deriving compare]
 end
 
 val sort : t list -> t list
+
+(** {1 Private} *)
 
 module Private : sig
   type header := Header.t
@@ -137,6 +144,7 @@ module Private : sig
     -> content:string
     -> start_line:int
     -> start_col:int
+    -> whole_loc:Loc.t
     -> header:header Or_error.t
     -> digest_of_condensed_content:Digest_hex.t
     -> t

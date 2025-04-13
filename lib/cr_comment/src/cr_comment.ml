@@ -71,8 +71,9 @@
 *)
 
 module Digest_hex = struct
-  type t = string [@@deriving compare, sexp_of]
+  type t = string [@@deriving compare, equal, sexp_of]
 
+  let to_string t = t
   let create str = str |> Stdlib.Digest.string |> Stdlib.Digest.to_hex
 end
 
@@ -92,17 +93,13 @@ module Due = struct
 end
 
 module Header = struct
-  (* [reported_by] is [user] in [CR user...].
-
-     [for_] is [user2] in [CR user1 for user2: ...]. It is none since
-     the part with the [for yser2] is optional. *)
   type t =
     { reported_by : Vcs.User_handle.t
     ; for_ : Vcs.User_handle.t option
     ; kind : Kind.t
     ; due : Due.t
     }
-  [@@deriving compare, sexp_of]
+  [@@deriving equal, sexp_of]
 
   let create ~reported_by ~for_ ~kind ~due = { reported_by; for_; kind; due }
   let reported_by t = t.reported_by
@@ -122,18 +119,29 @@ type t =
   ; content : string
   ; start_line : int
   ; start_col : int
+  ; whole_loc : Loc.t
   ; header : Header.t Or_error.t
   ; digest_of_condensed_content : Digest_hex.t
   }
-[@@deriving compare, sexp_of]
+[@@deriving equal, sexp_of]
 
 let path t = t.path
 let content t = t.content
 let start_line t = t.start_line
 let start_col t = t.start_col
+let whole_loc t = t.whole_loc
+let header t = t.header
 
-let create ~path ~content ~start_line ~start_col ~header ~digest_of_condensed_content =
-  { path; content; start_line; start_col; header; digest_of_condensed_content }
+let create
+      ~path
+      ~content
+      ~start_line
+      ~start_col
+      ~whole_loc
+      ~header
+      ~digest_of_condensed_content
+  =
+  { path; content; start_line; start_col; whole_loc; header; digest_of_condensed_content }
 ;;
 
 module For_sorted_output : sig
@@ -150,8 +158,6 @@ end = struct
       if c <> 0 then c else Int.compare t1.start_col t2.start_col)
   ;;
 end
-
-let hash (t : t) = Hashtbl.hash t
 
 let reindented_content t =
   let indent = String.make (t.start_col + 2) ' ' in
@@ -179,10 +185,6 @@ let reindented_content t =
   | Ok deindented_lines -> String.concat deindented_lines ~sep:"\n"
 ;;
 
-module Structurally_compared = struct
-  type nonrec t = t [@@deriving compare, sexp_of]
-end
-
 let sort ts = List.sort ts ~compare:For_sorted_output.compare
 
 let due t =
@@ -191,13 +193,10 @@ let due t =
   | Ok p -> p.due
 ;;
 
-let is_xcr t =
+let kind t =
   match t.header with
-  | Error _ -> false
-  | Ok p ->
-    (match p.kind with
-     | CR -> false
-     | XCR -> true)
+  | Error _ -> Kind.CR
+  | Ok p -> p.kind
 ;;
 
 let work_on t : Due.t =
@@ -228,7 +227,7 @@ let print ~include_delim cr ~include_content =
 ;;
 
 let print_list ~crs ~include_content =
-  let crs = List.sort crs ~compare:For_sorted_output.compare in
+  let crs = sort crs in
   let include_delim = ref false in
   List.iter crs ~f:(fun cr ->
     print ~include_delim:!include_delim cr ~include_content;

@@ -53,7 +53,7 @@
 
 val cr_pattern_egrep : string
 
-val extract
+val parse_file
   :  path:Vcs.Path_in_repo.t
   -> file_contents:Vcs.File_contents.t
   -> Cr_comment.t list
