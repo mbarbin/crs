@@ -97,6 +97,16 @@ module Header : sig
 
   val kind : t -> Kind.t
   val due : t -> Due.t
+
+  module With_loc : sig
+    val reported_by : t -> Vcs.User_handle.t Loc.Txt.t
+    val for_ : t -> Vcs.User_handle.t Loc.Txt.t option
+    val kind : t -> Kind.t Loc.Txt.t
+
+    (** When the cr is due [Now], there is no keyword to attach a location to.
+        Conventionally, we return the location of the cr kind in this case. *)
+    val due : t -> Due.t Loc.Txt.t
+  end
 end
 
 type t [@@deriving equal, sexp_of]
@@ -154,10 +164,10 @@ module Private : sig
 
   module Header : sig
     val create
-      :  reported_by:Vcs.User_handle.t
-      -> for_:Vcs.User_handle.t option
-      -> kind:Kind.t
-      -> due:Due.t
+      :  reported_by:Vcs.User_handle.t Loc.Txt.t
+      -> for_:Vcs.User_handle.t Loc.Txt.t option
+      -> kind:Kind.t Loc.Txt.t
+      -> due:Due.t Loc.Txt.t
       -> header
   end
 
