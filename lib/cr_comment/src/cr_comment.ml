@@ -110,12 +110,6 @@ module Header = struct
   let due t = t.due
 end
 
-(* [content] is the text of the CR with comment markers removed from
-   the beginning and end (if applicable).
-
-   The [whole_loc] is suitable for removal of the entire CR comment.
-   It includes the comments boundaries from [path] as well. *)
-
 type t =
   { path : Vcs.Path_in_repo.t
   ; content : string
