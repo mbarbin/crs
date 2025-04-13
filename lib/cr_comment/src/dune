@@ -10,10 +10,8 @@
   -open
   Base
   -open
-  Fpath_base
-  -open
   Stdio)
- (libraries base fpath fpath-base loc re2 shexp.process stdio vcs)
+ (libraries base fpath loc stdio vcs)
  (lint
   (pps ppx_js_style -allow-let-operators -check-doc-comments))
  (preprocess
