@@ -19,7 +19,8 @@
 
 (package
  (name crs)
- (synopsis "A tool to manipulate code review comments embedded in source code")
+ (synopsis
+  "A tool to manipulate code review comments embedded in source code")
  (depends
   (ocaml
    (>= 5.2))
@@ -110,6 +111,10 @@
    (>= 0.2.2))
   (loc
    (>= 0.2.2))
+  (patdiff
+   (and
+    (>= v0.17)
+    (< v0.18)))
   (pplumbing
    (>= 0.0.9))
   (ppx_compare
@@ -186,6 +191,10 @@
    (and
     (>= v0.17)
     (< v0.18)))
+  (bisect_ppx
+   (and
+    :with-dev-setup
+    (>= 2.8.3)))
   (cmdlang
    (>= 0.0.9))
   (crs
@@ -202,6 +211,10 @@
    (>= 0.2.2))
   (loc
    (>= 0.2.2))
+  (patdiff
+   (and
+    (>= v0.17)
+    (< v0.18)))
   (pplumbing
    (>= 0.0.9))
   (ppx_compare
