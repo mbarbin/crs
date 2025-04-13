@@ -106,9 +106,6 @@ module Processed = struct
   [@@deriving compare, sexp_of]
 end
 
-let cr_pattern_re2 = "\\bX?CR[-v: \\t]"
-let cr_pattern_egrep = cr_pattern_re2
-
 (* [content] is the text of the CR with comment markers removed from
    the beginning and end (if applicable).
 
@@ -145,7 +142,89 @@ end = struct
   ;;
 end
 
-let cr_regex = Regex.create_exn cr_pattern_re2
+let hash (t : t) = Hashtbl.hash t
+
+let reindented_content t =
+  let indent = String.make (t.start_col + 2) ' ' in
+  let str = content t in
+  let lines = String.split str ~on:'\n' in
+  let lines =
+    lines
+    |> List.rev
+    |> List.drop_while ~f:(String.for_all ~f:Char.is_whitespace)
+    |> List.rev
+  in
+  match
+    Result.try_with (fun () ->
+      List.mapi lines ~f:(fun i s ->
+        match String.chop_prefix s ~prefix:indent with
+        | None ->
+          if String.is_prefix indent ~prefix:s
+          then ""
+          else if i = 0
+          then "  " ^ s
+          else raise Stdlib.Exit
+        | Some s -> "  " ^ s))
+  with
+  | (exception Stdlib.Exit) | Error _ -> str
+  | Ok deindented_lines -> String.concat deindented_lines ~sep:"\n"
+;;
+
+module Structurally_compared = struct
+  type nonrec t = t [@@deriving compare, sexp_of]
+end
+
+let sort ts = List.sort ts ~compare:For_sorted_output.compare
+
+let due t =
+  match t.processed with
+  | Error _ -> Due.Now
+  | Ok p -> p.due
+;;
+
+let is_xcr t =
+  match t.processed with
+  | Error _ -> false
+  | Ok p ->
+    (match p.kind with
+     | CR -> false
+     | XCR -> true)
+;;
+
+let work_on t : Due.t =
+  match t.processed with
+  | Error _ -> Now
+  | Ok p ->
+    (match p.kind with
+     | XCR -> Now
+     | CR -> p.due)
+;;
+
+let to_string t ~include_content =
+  let file_str =
+    Printf.sprintf
+      "%s:%d:%d:"
+      (Vcs.Path_in_repo.to_string (path t))
+      (start_line t)
+      (start_col t)
+  in
+  let contents = if include_content then [ reindented_content t; "" ] else [ "" ] in
+  String.concat ~sep:"\n" (file_str :: contents)
+;;
+
+let print ~include_delim cr ~include_content =
+  let str = to_string cr ~include_content in
+  let nl = if include_delim && include_content then "\n" else "" in
+  print_string (Printf.sprintf "%s%s" nl str)
+;;
+
+let print_list ~crs ~include_content =
+  let crs = List.sort crs ~compare:For_sorted_output.compare in
+  let include_delim = ref false in
+  List.iter crs ~f:(fun cr ->
+    print ~include_delim:!include_delim cr ~include_content;
+    include_delim := true)
+;;
 
 let slice_after contents last_excluded_index =
   (* the longest suffix not containing [last_excluded_index] *)
@@ -306,90 +385,6 @@ let index_to_2d_pos file_contents =
       | Some (newline_index, line_num) -> line_num, index - newline_index)
 ;;
 
-let hash (t : t) = Hashtbl.hash t
-
-let reindented_content t =
-  let indent = String.make (t.start_col + 2) ' ' in
-  let str = content t in
-  let lines = String.split str ~on:'\n' in
-  let lines =
-    lines
-    |> List.rev
-    |> List.drop_while ~f:(String.for_all ~f:Char.is_whitespace)
-    |> List.rev
-  in
-  match
-    Result.try_with (fun () ->
-      List.mapi lines ~f:(fun i s ->
-        match String.chop_prefix s ~prefix:indent with
-        | None ->
-          if String.is_prefix indent ~prefix:s
-          then ""
-          else if i = 0
-          then "  " ^ s
-          else raise Stdlib.Exit
-        | Some s -> "  " ^ s))
-  with
-  | (exception Stdlib.Exit) | Error _ -> str
-  | Ok deindented_lines -> String.concat deindented_lines ~sep:"\n"
-;;
-
-module Structurally_compared = struct
-  type nonrec t = t [@@deriving compare, sexp_of]
-end
-
-let sort ts = List.sort ts ~compare:For_sorted_output.compare
-
-let due t =
-  match t.processed with
-  | Error _ -> Due.Now
-  | Ok p -> p.due
-;;
-
-let is_xcr t =
-  match t.processed with
-  | Error _ -> false
-  | Ok p ->
-    (match p.kind with
-     | CR -> false
-     | XCR -> true)
-;;
-
-let work_on t : Due.t =
-  match t.processed with
-  | Error _ -> Now
-  | Ok p ->
-    (match p.kind with
-     | XCR -> Now
-     | CR -> p.due)
-;;
-
-let to_string t ~include_content =
-  let file_str =
-    Printf.sprintf
-      "%s:%d:%d:"
-      (Vcs.Path_in_repo.to_string (path t))
-      (start_line t)
-      (start_col t)
-  in
-  let contents = if include_content then [ reindented_content t; "" ] else [ "" ] in
-  String.concat ~sep:"\n" (file_str :: contents)
-;;
-
-let print ~include_delim cr ~include_content =
-  let str = to_string cr ~include_content in
-  let nl = if include_delim && include_content then "\n" else "" in
-  print_string (Printf.sprintf "%s%s" nl str)
-;;
-
-let print_list ~crs ~include_content =
-  let crs = List.sort crs ~compare:For_sorted_output.compare in
-  let include_delim = ref false in
-  List.iter crs ~f:(fun cr ->
-    print ~include_delim:!include_delim cr ~include_content;
-    include_delim := true)
-;;
-
 (* -------------------------------------------------------------------------- *)
 (*  Matching                                                                  *)
 (* -------------------------------------------------------------------------- *)
@@ -489,6 +484,10 @@ end = struct
     | exn -> Or_error.error "could not process CR" (content, exn) [%sexp_of: string * exn]
   ;;
 end
+
+let cr_pattern_re2 = "\\bX?CR[-v: \\t]"
+let cr_pattern_egrep = cr_pattern_re2
+let cr_regex = Regex.create_exn cr_pattern_re2
 
 let condense_whitespace =
   let regex = Regex.create_exn "\\s+" in
