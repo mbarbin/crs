@@ -20,6 +20,7 @@ depends: [
   "fpath-base" {>= "0.2.2"}
   "loc" {>= "0.2.2"}
   "patdiff" {>= "v0.17" & < "v0.18"}
+  "pp" {>= "2.0.0"}
   "pplumbing" {>= "0.0.9"}
   "ppx_compare" {>= "v0.17" & < "v0.18"}
   "ppx_enumerate" {>= "v0.17" & < "v0.18"}
@@ -34,7 +35,10 @@ depends: [
   "re2" {>= "v0.17" & < "v0.18"}
   "shexp" {>= "v0.17" & < "v0.18"}
   "stdio" {>= "v0.17" & < "v0.18"}
+  "textutils" {>= "v0.17" & < "v0.18"}
   "vcs" {>= "0.0.9"}
+  "vcs-base" {>= "0.0.9"}
+  "vcs-git-blocking" {>= "0.0.9"}
   "sherlodoc" {with-doc & >= "0.2"}
   "odoc" {with-doc}
 ]

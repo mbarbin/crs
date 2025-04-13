@@ -10,14 +10,35 @@
   -open
   Base
   -open
+  Fpath_base
+  -open
   Stdio
   -open
+  Vcs_base
+  -open
   Cmdlang)
- (libraries base cmdlang cr_comment crs_parser stdio)
+ (libraries
+  base
+  cmdlang
+  cr_comment
+  crs_parser
+  file-rewriter
+  fpath
+  fpath-base
+  loc
+  pp
+  pplumbing.err
+  pplumbing.pp-tty
+  stdio
+  textutils.ascii_table
+  unix
+  vcs
+  vcs-base
+  vcs-git-blocking)
  (instrumentation
   (backend bisect_ppx))
  (lint
-  (pps ppx_js_style -check-doc-comments))
+  (pps ppx_js_style -allow-let-operators -check-doc-comments))
  (preprocess
   (pps
    -unused-code-warnings=force
