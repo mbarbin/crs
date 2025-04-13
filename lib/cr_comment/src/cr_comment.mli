@@ -110,6 +110,12 @@ val due : t -> Due.t
 val work_on : t -> Due.t
 val header : t -> Header.t Or_error.t
 
+(** This digest is computed such that changes in positions in a file,
+    or changes in whitespaces are ignored. It may be used by
+    downstream system to detect that two crs are equivalent, which in
+    turn may affect when/where a cr is active. *)
+val digest_ignoring_minor_text_changes : t -> Digest_hex.t
+
 (** {1 Print} *)
 
 val to_string : t -> string

@@ -134,6 +134,8 @@ let create ~path ~content ~whole_loc ~header ~digest_of_condensed_content =
   { path; content; whole_loc; header; digest_of_condensed_content }
 ;;
 
+let digest_ignoring_minor_text_changes t = t.digest_of_condensed_content
+
 module For_sorted_output : sig
   type nonrec t = t [@@deriving compare]
 end = struct
