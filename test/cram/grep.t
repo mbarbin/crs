@@ -41,6 +41,8 @@ If we grep from there, there is no CR in the tree.
 
   $ crs grep --sexp
 
+  $ crs grep --summary
+
 Now let's add some CRs.
 
   $ echo -e "(* $CR user1: Hey, this is a code review comment *)" >> hello
@@ -101,3 +103,10 @@ There's also an option to display the results as summary tables.
   ├──────────┼─────┼──────┼──────┼───────┤
   │ user1    │   1 │    1 │    1 │     3 │
   └──────────┴─────┴──────┴──────┴───────┘
+
+Summary tables may not be displayed as sexps.
+
+  $ crs grep --summary --sexp
+  Error: The flags [sexp] and [summary] are exclusive.
+  Hint: Please choose one.
+  [124]

@@ -105,16 +105,11 @@ module Type = struct
 end
 
 module Key = struct
-  module T = struct
-    type t =
-      { reporter : Vcs.User_handle.t
-      ; for_ : Vcs.User_handle.t option
-      }
-    [@@deriving compare, sexp_of]
-  end
-
-  include T
-  include Comparable.Make (T)
+  type t =
+    { reporter : Vcs.User_handle.t
+    ; for_ : Vcs.User_handle.t option
+    }
+  [@@deriving compare]
 
   let of_header (h : Cr_comment.Header.t) =
     { reporter = Cr_comment.Header.reported_by h; for_ = Cr_comment.Header.for_ h }
