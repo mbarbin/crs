@@ -79,7 +79,7 @@ let grep ~vcs ~repo_root ~below =
     let exit_code, stdout = Shexp_process.eval ~context process in
     match exit_code with
     | 0 | 123 -> stdout |> String.split_lines |> List.map ~f:Vcs.Path_in_repo.v
-    | _ -> raise_s [%sexp "xargs process failed", { exit_code : int }]
+    | _ -> raise_s [%sexp "xargs process failed", { exit_code : int }] [@coverage off]
   in
   List.concat_map files_to_grep ~f:(fun path_in_repo ->
     let file_contents =

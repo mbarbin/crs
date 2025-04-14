@@ -28,7 +28,30 @@ let main =
          (Param.validated_string (module Fpath))
          ~docv:"PATH"
          ~doc:"Only grep below the supplied path."
-     and sexp = Arg.flag [ "sexp" ] ~doc:"Print the CRs as sexps on stdout." in
+     and sexp = Arg.flag [ "sexp" ] ~doc:"Print the CRs as sexps on stdout."
+     and summary =
+       Arg.flag
+         [ "summary" ]
+         ~doc:
+           "This flags causes the command to print CR counts in summary tables rather \
+            than printing each CR individually. This is not compatible with $(b,sexp)."
+     in
+     let () =
+       if sexp && summary
+       then
+         Err.raise
+           ~exit_code:Err.Exit_code.cli_error
+           Pp.O.
+             [ Pp.text "The flags "
+               ++ Pp_tty.kwd (module String) "sexp"
+               ++ Pp.text " and "
+               ++ Pp_tty.kwd (module String) "summary"
+               ++ Pp.text " are exclusive."
+             ]
+           ~hints:[ Pp.text "Please choose one." ] [@coverage off]
+       (* This is exercised in tests, however there is an issue regarding
+          out-edge of raising functions in bisect_ppx. TBD. *)
+     in
      let vcs = Vcs_git_blocking.create () in
      let cwd = Unix.getcwd () |> Absolute_path.v in
      let repo_root = Common_helpers.find_enclosing_repo_root vcs ~from:cwd in
@@ -42,5 +65,13 @@ let main =
      then
        List.iter crs ~f:(fun cr ->
          print_endline (Sexp.to_string_hum [%sexp (cr : Cr_comment.t)]))
+     else if summary
+     then (
+       let by_type = Summary_table.By_type.make crs |> Summary_table.By_type.to_string in
+       let summary = Summary_table.make crs |> Summary_table.to_string in
+       let tables =
+         List.filter [ by_type; summary ] ~f:(fun t -> not (String.is_empty t))
+       in
+       print_string (String.concat ~sep:"\n" tables))
      else Cr_comment.print_list ~crs)
 ;;

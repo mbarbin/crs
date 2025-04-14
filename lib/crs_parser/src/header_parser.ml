@@ -82,7 +82,7 @@ let comment_regex =
        ; optional
            (seq [ "[-v]"; named_group "due" (alt [ "\\d{6}"; "soon"; "someday" ]) ])
        ; some whitespace
-       ; named_group "from_user" word
+       ; named_group "reported_by" word
        ; optional
            (seq [ some whitespace; "for"; some whitespace; named_group "for" word ])
        ; any whitespace
@@ -110,23 +110,22 @@ let parse ~file_cache ~content_start_offset ~content =
       | None -> None
       | Some v -> Some (v, get_match_loc_exn ~sub m)
     in
-    let%bind reported_by =
-      match get "from_user" with
-      | None -> Or_error.error "Couldn't parse username" content String.sexp_of_t
-      | Some (reported_by, loc) ->
-        return { Loc.Txt.txt = Vcs.User_handle.v reported_by; loc }
+    let reported_by =
+      match get "reported_by" with
+      | None -> assert false (* Mandatory in the [comment_regexp]. *)
+      | Some (reported_by, loc) -> { Loc.Txt.txt = Vcs.User_handle.v reported_by; loc }
     in
-    let%bind kind =
+    let kind =
       match get "cr_kind" with
-      | None -> Or_error.error "Couldn't parse cr kind" content String.sexp_of_t
+      | None -> assert false (* Mandatory in the [comment_regexp]. *)
       | Some (kind, loc) ->
-        let%bind txt =
+        let txt =
           match kind with
-          | "CR" -> return Cr_comment.Kind.CR
-          | "XCR" -> return Cr_comment.Kind.XCR
-          | _ -> Or_error.error "Couldn't parse cr kind" kind String.sexp_of_t
+          | "CR" -> Cr_comment.Kind.CR
+          | "XCR" -> Cr_comment.Kind.XCR
+          | _ -> assert false (* Cannot be parsed according to the regexp. *)
         in
-        return { Loc.Txt.txt; loc }
+        { Loc.Txt.txt; loc }
     in
     let for_ =
       Option.map (get "for") ~f:(fun (user, loc) ->
