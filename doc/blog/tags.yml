@@ -2,3 +2,8 @@ hello:
   label: Hello
   permalink: /hello
   description: Hello tag description
+
+ci:
+  label: CI
+  permalink: /ci
+  description: Integration to CI pipelines
