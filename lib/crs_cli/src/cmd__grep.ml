@@ -1,5 +1,5 @@
 (********************************************************************************)
-(*  crs - A tool to manipulate code review comments embedded in source code     *)
+(*  crs - A tool for managing code review comments embedded in source code      *)
 (*  Copyright (C) 2024-2025 Mathieu Barbin <mathieu.barbin@gmail.com>           *)
 (*                                                                              *)
 (*  This file is part of crs.                                                   *)
@@ -42,5 +42,5 @@ let main =
      then
        List.iter crs ~f:(fun cr ->
          print_endline (Sexp.to_string_hum [%sexp (cr : Cr_comment.t)]))
-     else print_endline "Table not implemented")
+     else Cr_comment.print_list ~crs)
 ;;

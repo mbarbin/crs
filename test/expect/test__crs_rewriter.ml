@@ -1,5 +1,5 @@
 (********************************************************************************)
-(*  crs - A tool to manipulate code review comments embedded in source code     *)
+(*  crs - A tool for managing code review comments embedded in source code      *)
 (*  Copyright (C) 2024-2025 Mathieu Barbin <mathieu.barbin@gmail.com>           *)
 (*                                                                              *)
 (*  This file is part of crs.                                                   *)

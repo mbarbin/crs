@@ -22,7 +22,7 @@
 (package
  (name crs)
  (synopsis
-  "A tool to manipulate code review comments embedded in source code")
+  "A tool for managing code review comments embedded in source code")
  (depends
   (ocaml
    (>= 5.2))
