@@ -52,10 +52,32 @@ build: [
 dev-repo: "git+https://github.com/mbarbin/crs.git"
 description: """\
 
-A longer description for the package.
+The [crs] package provides libraries and a CLI to help manage code
+review comments embedded directly in source code using a specialized
+syntax.
 
-It can span multiple lines!
+With [crs] you can locate, parse, and manipulate these comments
+easily, and perform tasks such as systematically updating comments
+across multiple files, changing their priority, marking them as
+resolved, modifying reporter or assignee information, and more.
+
+This tool can be used during development or integrated into your CI
+pipeline. For example, you can use [crs] to ensure no unresolved
+comments remain before merging a pull request or releasing a new
+version of your software.
+
+Beyond its standalone functionality, [crs] is intended to serve as a
+sharable building block for more comprehensive code review systems and
+workflows.
+
+The [crs] projects builds upon ideas from [iron], a code review system
+built by Jane Street and released as open source in 2016-2017. We
+deeply appreciate Jane Street’s willingness to share [iron], which has
+provided a valuable starting point for exploring and advancing these
+ideas.
+
+[iron]: https://github.com/janestreet/iron
 
 """
-tags: [ "this" "that" ]
+tags: [ "code-review" ]
 x-maintenance-intent: [ "(latest)" ]
