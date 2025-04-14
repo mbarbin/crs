@@ -42,5 +42,5 @@ let main =
      then
        List.iter crs ~f:(fun cr ->
          print_endline (Sexp.to_string_hum [%sexp (cr : Cr_comment.t)]))
-     else print_endline "Table not implemented")
+     else Cr_comment.print_list ~crs)
 ;;
