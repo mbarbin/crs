@@ -28,7 +28,7 @@ let find_enclosing_repo_root vcs ~from =
         [ Pp.text "Failed to locate enclosing repo root from '"
           ++ Pp_tty.path (module Absolute_path) from
           ++ Pp.text "'."
-        ]
+        ] [@coverage off]
 ;;
 
 let relativize ~repo_root ~cwd ~path =
@@ -43,5 +43,5 @@ let relativize ~repo_root ~cwd ~path =
         [ Pp.text "Path "
           ++ Pp_tty.path (module Absolute_path) path
           ++ Pp.text " is not in repo."
-        ]
+        ] [@coverage off]
 ;;

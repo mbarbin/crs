@@ -45,13 +45,26 @@ If we grep from there, there is no CR in the tree.
 
 Now let's add some CRs.
 
-  $ echo -e "(* $CR user1: Hey, this is a code review comment *)" >> hello
+  $ echo -e "(* $CR user1 for user2: Hey, this is a code review comment *)" >> hello
 
   $ echo -e "(* ${XCR} user1: Fix this. Edit: Done. *)" >> foo/a.txt
 
+  $ echo -e "(* ${CR}-someday user1: Reconsider if/when updating to the new version. *)" >> foo/b.txt
+
   $ echo -e "(* ${CR}-soon user1: Hey, this is a code review comment *)" >> foo/bar/b.txt
 
-And grep for them.
+To avoid ignoring CRs that are unintentionally invalid, the tool will
+recognized comments that look like CRs, but flag them as invalid.
+
+  $ echo -e "(* ${CR}-user: Hey, I'm trying to use CR, it's cool! *)" >> foo/bar/c.txt
+
+  $ echo -e "(* ${CR} : Hey, this comment look like a CR but it's not quite one. *)" >> foo/bar/d.txt
+
+  $ ocaml-vcs add hello
+  $ ocaml-vcs add foo
+  $ rev1=$(ocaml-vcs commit -m "CRs")
+
+Now let's grep for the CRs.
 
 A basic [sexp] output is available.
 
@@ -60,14 +73,32 @@ A basic [sexp] output is available.
    (header (Ok ((kind XCR) (due Now) (reported_by user1) (for_ ()))))
    (digest_of_condensed_content 262c4b02b87f666df980367786893523)
    (content "XCR user1: Fix this. Edit: Done. "))
+  ((path foo/b.txt) (whole_loc _)
+   (header (Ok ((kind CR) (due Someday) (reported_by user1) (for_ ()))))
+   (digest_of_condensed_content 7559cebcfe10fd5644d85ee54c35b98c)
+   (content
+    "CR-someday user1: Reconsider if/when updating to the new version. "))
   ((path foo/bar/b.txt) (whole_loc _)
    (header (Ok ((kind CR) (due Soon) (reported_by user1) (for_ ()))))
    (digest_of_condensed_content 3005cc8ff9fb95e8701310f3b15f1673)
    (content "CR-soon user1: Hey, this is a code review comment "))
+  ((path foo/bar/c.txt) (whole_loc _)
+   (header
+    (Error
+     ("Invalid CR comment" "CR-user: Hey, I'm trying to use CR, it's cool! ")))
+   (digest_of_condensed_content 59de0cbac075472487591f107b23706c)
+   (content "CR-user: Hey, I'm trying to use CR, it's cool! "))
+  ((path foo/bar/d.txt) (whole_loc _)
+   (header
+    (Error
+     ("Invalid CR comment"
+      "CR : Hey, this comment look like a CR but it's not quite one. ")))
+   (digest_of_condensed_content c03a43e4e1040fd99f1cd3dbdcc5bd50)
+   (content "CR : Hey, this comment look like a CR but it's not quite one. "))
   ((path hello) (whole_loc _)
-   (header (Ok ((kind CR) (due Now) (reported_by user1) (for_ ()))))
-   (digest_of_condensed_content 1c65b0067541949bf40979567396b403)
-   (content "CR user1: Hey, this is a code review comment "))
+   (header (Ok ((kind CR) (due Now) (reported_by user1) (for_ (user2)))))
+   (digest_of_condensed_content 46184503e2b9027e05e1ac2899a4e8b3)
+   (content "CR user1 for user2: Hey, this is a code review comment "))
 
 The default is to print them, visually separated.
 
@@ -75,34 +106,56 @@ The default is to print them, visually separated.
   File "foo/a.txt", line 2, characters 3-41:
     XCR user1: Fix this. Edit: Done. 
   
+  File "foo/b.txt", line 1, characters 3-74:
+    CR-someday user1: Reconsider if/when updating to the new version. 
+  
   File "foo/bar/b.txt", line 2, characters 3-58:
     CR-soon user1: Hey, this is a code review comment 
   
-  File "hello", line 2, characters 3-53:
-    CR user1: Hey, this is a code review comment 
+  File "foo/bar/c.txt", line 1, characters 3-55:
+    CR-user: Hey, I'm trying to use CR, it's cool! 
+  
+  File "foo/bar/d.txt", line 1, characters 3-70:
+    CR : Hey, this comment look like a CR but it's not quite one. 
+  
+  File "hello", line 2, characters 3-63:
+    CR user1 for user2: Hey, this is a code review comment 
 
 You may restrict the search to a subdirectory only.
 
   $ crs grep --below ./foo/bar
   File "foo/bar/b.txt", line 2, characters 3-58:
     CR-soon user1: Hey, this is a code review comment 
+  
+  File "foo/bar/c.txt", line 1, characters 3-55:
+    CR-user: Hey, I'm trying to use CR, it's cool! 
+  
+  File "foo/bar/d.txt", line 1, characters 3-70:
+    CR : Hey, this comment look like a CR but it's not quite one. 
+
+  $ crs grep --below /tmp
+  Error: Path "/tmp" is not in repo.
+  [123]
 
 There's also an option to display the results as summary tables.
 
   $ crs grep --summary
-  ┌──────┬───────┐
-  │ type │ count │
-  ├──────┼───────┤
-  │ CR   │     1 │
-  │ XCR  │     1 │
-  │ Soon │     1 │
-  └──────┴───────┘
+  ┌─────────┬───────┐
+  │ type    │ count │
+  ├─────────┼───────┤
+  │ Invalid │     2 │
+  │ CR      │     1 │
+  │ XCR     │     1 │
+  │ Soon    │     1 │
+  │ Someday │     1 │
+  └─────────┴───────┘
   
-  ┌──────────┬─────┬──────┬──────┬───────┐
-  │ reporter │ CRs │ XCRs │ Soon │ Total │
-  ├──────────┼─────┼──────┼──────┼───────┤
-  │ user1    │   1 │    1 │    1 │     3 │
-  └──────────┴─────┴──────┴──────┴───────┘
+  ┌──────────┬───────┬─────┬──────┬──────┬─────────┬───────┐
+  │ reporter │ for   │ CRs │ XCRs │ Soon │ Someday │ Total │
+  ├──────────┼───────┼─────┼──────┼──────┼─────────┼───────┤
+  │ user1    │       │     │    1 │    1 │       1 │     3 │
+  │ user1    │ user2 │   1 │      │      │         │     1 │
+  └──────────┴───────┴─────┴──────┴──────┴─────────┴───────┘
 
 Summary tables may not be displayed as sexps.
 

@@ -173,6 +173,11 @@ let () =
   ()
 ;;
 
+let () =
+  (* $CR user1 for user2: Message *)
+  ()
+;;
+
 (* $XCR jdoe: This other message *)
 let () = ()
 
@@ -192,11 +197,16 @@ let () = ()
             ~text:" for assignee")));
   [%expect
     {|
-    -1,11 +1,11
+    -1,16 +1,16
 
       let () =
     -|  (* $CR user1: Message *)
     +|  (* $CR user1 for assignee: Message *)
+        ()
+      ;;
+
+      let () =
+        (* $CR user1 for user2: Message *)
         ()
       ;;
 
@@ -206,7 +216,8 @@ let () = ()
 
     -|(* $CR user1: This third message *)
     +|(* $CR user1 for assignee: This third message *)
-      let () = () |}];
+      let () = ()
+    |}];
   ()
 ;;
 

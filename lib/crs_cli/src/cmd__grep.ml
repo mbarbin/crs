@@ -48,7 +48,9 @@ let main =
                ++ Pp_tty.kwd (module String) "summary"
                ++ Pp.text " are exclusive."
              ]
-           ~hints:[ Pp.text "Please choose one." ]
+           ~hints:[ Pp.text "Please choose one." ] [@coverage off]
+       (* This is exercised in tests, however there is an issue regarding
+          out-edge of raising functions in bisect_ppx. TBD. *)
      in
      let vcs = Vcs_git_blocking.create () in
      let cwd = Unix.getcwd () |> Absolute_path.v in

@@ -2,6 +2,7 @@
 
 ### Added
 
+- Improve tests coverage (@mbarbin).
 - New flag `crs grep --summary` to display information as summary tables (@mbarbin).
 
 ### Changed
