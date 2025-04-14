@@ -22,6 +22,7 @@ depends: [
   "fpath" {>= "0.7.3"}
   "fpath-base" {>= "0.2.2"}
   "loc" {>= "0.2.2"}
+  "mdx" {>= "2.4"}
   "patdiff" {>= "v0.17" & < "v0.18"}
   "pp" {>= "2.0.0"}
   "pplumbing" {>= "0.0.9"}
@@ -43,8 +44,8 @@ depends: [
   "vcs-base" {>= "0.0.11"}
   "vcs-cli" {>= "0.0.11"}
   "vcs-git-blocking" {>= "0.0.11"}
+  "odoc" {with-doc & >= "2.4.4"}
   "sherlodoc" {with-doc & >= "0.2"}
-  "odoc" {with-doc}
 ]
 build: [
   ["dune" "subst"] {dev}

@@ -15,6 +15,8 @@
 
 (documentation "https://mbarbin.github.io/crs/")
 
+(using mdx 0.4)
+
 (implicit_transitive_deps false)
 
 (package
@@ -239,6 +241,8 @@
    (>= 0.2.2))
   (loc
    (>= 0.2.2))
+  (mdx
+   (>= 2.4))
   (patdiff
    (and
     (>= v0.17)
@@ -310,6 +314,10 @@
    (>= 0.0.11))
   (vcs-git-blocking
    (>= 0.0.11))
+  (odoc
+   (and
+    :with-doc
+    (>= 2.4.4)))
   (sherlodoc
    (and
     :with-doc
