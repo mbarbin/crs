@@ -67,21 +67,37 @@ A basic [sexp] output is available.
    (digest_of_condensed_content 1c65b0067541949bf40979567396b403)
    (content "CR user1: Hey, this is a code review comment "))
 
-The default is to print them, visually separated. Here we tweak the output to
-avoid risking having actual CRs in this file.
+The default is to print them, visually separated.
 
-  $ crs grep | sed -e 's/ CR/ $CR/g' -e 's/ XCR/ $XCR/g'
+  $ crs grep
   File "foo/a.txt", line 2, characters 3-41:
-    $XCR user1: Fix this. Edit: Done. 
+    XCR user1: Fix this. Edit: Done. 
   
   File "foo/bar/b.txt", line 2, characters 3-58:
-    $CR-soon user1: Hey, this is a code review comment 
+    CR-soon user1: Hey, this is a code review comment 
   
   File "hello", line 2, characters 3-53:
-    $CR user1: Hey, this is a code review comment 
+    CR user1: Hey, this is a code review comment 
 
 You may restrict the search to a subdirectory only.
 
   $ crs grep --below ./foo/bar
   File "foo/bar/b.txt", line 2, characters 3-58:
     CR-soon user1: Hey, this is a code review comment 
+
+There's also an option to display the results as summary tables.
+
+  $ crs grep --summary
+  ┌──────┬───────┐
+  │ type │ count │
+  ├──────┼───────┤
+  │ CR   │     1 │
+  │ XCR  │     1 │
+  │ Soon │     1 │
+  └──────┴───────┘
+  
+  ┌──────────┬─────┬──────┬──────┬───────┐
+  │ reporter │ CRs │ XCRs │ Soon │ Total │
+  ├──────────┼─────┼──────┼──────┼───────┤
+  │ user1    │   1 │    1 │    1 │     3 │
+  └──────────┴─────┴──────┴──────┴───────┘
