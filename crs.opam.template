@@ -16,7 +16,7 @@ version of your software.
 
 Beyond its standalone functionality, [crs] is intended to serve as a
 sharable building block for more comprehensive code review systems and
-workflows.
+collaborative workflows.
 
 The [crs] projects builds upon ideas from [iron], a code review system
 built by Jane Street and released as open source in 2016-2017. We

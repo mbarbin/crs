@@ -14,4 +14,4 @@ The primary goal of **crs** is to make it easy to locate, parse, and manipulate 
 
 This tool is designed to be flexible and can be used during development or integrated into your CI pipeline. For example, you can use **crs** to ensure no unresolved comments remain before merging a pull request or releasing a new version of your software.
 
-Beyond its standalone functionality, **crs** is intended to serve as a sharable building block for more comprehensive code review systems and workflows.
+Beyond its standalone functionality, **crs** is intended to serve as a sharable building block for more comprehensive code review systems and collaborative workflows.
