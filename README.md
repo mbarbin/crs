@@ -41,7 +41,7 @@ CRs are embedded into the source code using the comment syntax of the language i
 
 > **Note:** In this example, we’ve added a dollar sign (`$`) before `CR` to prevent this file from triggering an actual CR match in the review system we use to maintain this project. This ensures the example remains purely illustrative!
 
-## Projects Goals
+## Project Goals
 
 The primary goal of **crs** is to make it easy to locate, parse, and manipulate these comments. It offers ergonomic tools for tasks such as systematically updating comments across multiple files, changing their priority, marking them as resolved, modifying reporter or assignee information, and more.
 
