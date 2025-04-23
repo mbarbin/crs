@@ -11,6 +11,8 @@
 
 ### Fixed
 
+- Dispose of `Shexp_process.Context` in crs parser (@mbarbin).
+
 ### Removed
 
 ## 0.0.20250414 (2025-04-14)

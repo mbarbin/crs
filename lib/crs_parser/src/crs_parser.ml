@@ -77,6 +77,7 @@ let grep ~vcs ~repo_root ~below =
               ]))
     in
     let exit_code, stdout = Shexp_process.eval ~context process in
+    Shexp_process.Context.dispose context;
     match exit_code with
     | 0 | 123 -> stdout |> String.split_lines |> List.map ~f:Vcs.Path_in_repo.v
     | _ -> raise_s [%sexp "xargs process failed", { exit_code : int }] [@coverage off]
