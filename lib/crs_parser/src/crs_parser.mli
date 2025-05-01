@@ -60,7 +60,7 @@ val parse_file
   -> Cr_comment.t list
 
 val grep
-  :  vcs:[> Vcs.Trait.ls_files ] Vcs.t
+  :  vcs:< Vcs.Trait.ls_files ; .. > Vcs.t
   -> repo_root:Vcs.Repo_root.t
   -> below:Vcs.Path_in_repo.t
   -> Cr_comment.t list

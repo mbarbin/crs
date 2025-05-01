@@ -24,7 +24,7 @@
 (** Find enclosing repo or raise an error compatible with the command handler in
     use. *)
 val find_enclosing_repo_root
-  :  [> Vcs.Trait.file_system ] Vcs.t
+  :  < Vcs.Trait.file_system ; .. > Vcs.t
   -> from:Absolute_path.t
   -> Vcs.Repo_root.t
 
