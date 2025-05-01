@@ -30,9 +30,9 @@ depends: [
   "shexp" {>= "v0.17" & < "v0.18"}
   "stdio" {>= "v0.17" & < "v0.18"}
   "textutils" {>= "v0.17" & < "v0.18"}
-  "vcs" {>= "0.0.11"}
-  "vcs-base" {>= "0.0.11"}
-  "vcs-git-blocking" {>= "0.0.11"}
+  "vcs" {>= "0.0.12"}
+  "vcs-base" {>= "0.0.12"}
+  "vcs-git-unix" {>= "0.0.12"}
   "odoc" {with-doc}
 ]
 build: [

@@ -52,7 +52,7 @@ let main =
        (* This is exercised in tests, however there is an issue regarding
           out-edge of raising functions in bisect_ppx. TBD. *)
      in
-     let vcs = Vcs_git_blocking.create () in
+     let vcs = Vcs_git_unix.create () in
      let cwd = Unix.getcwd () |> Absolute_path.v in
      let repo_root = Common_helpers.find_enclosing_repo_root vcs ~from:cwd in
      let below =
