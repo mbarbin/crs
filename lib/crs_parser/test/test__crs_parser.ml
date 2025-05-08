@@ -741,8 +741,8 @@ this as part of our tests. *)
 
     File "my_file.ml", lines 28-30, characters 0-165:
       CR and let us look at invalid comments as well. The exact behavior for
-       their intentation is less of a priority since they are invalid in the
-       first place.
+      their intentation is less of a priority since they are invalid in the
+      first place.
 
     File "my_file.ml", lines 32-33, characters 0-61:
     CR-user but still we include

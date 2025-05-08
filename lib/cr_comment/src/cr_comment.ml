@@ -174,7 +174,7 @@ let reindented_content t =
       | Error _ ->
         let start = Loc.start t.whole_loc in
         (* The len of the indentation is a heuristic in this case. *)
-        start.pos_cnum - start.pos_bol + 2
+        start.pos_cnum - start.pos_bol + 3
       | Ok h ->
         let start = Loc.start h.kind.loc in
         start.pos_cnum - start.pos_bol
