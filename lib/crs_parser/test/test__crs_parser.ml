@@ -31,7 +31,7 @@ let test file_contents =
     |> String.substr_replace_all ~pattern:"$XCR" ~with_:"XCR"
     |> Vcs.File_contents.create
   in
-  let crs = Crs_parser.parse_file ~path ~file_contents in
+  let crs = Crs_parser.parse_file ~path ~file_contents |> Cr_comment.sort in
   List.iter crs ~f:(fun t ->
     Ref.set_temporarily Loc.include_sexp_of_locs true ~f:(fun () ->
       print_s [%sexp (t : Cr_comment.t)]))
@@ -222,6 +222,70 @@ let () = ()
      (digest_of_condensed_content cc821c3436b2583715a2df4236a786c4)
      (content
       "CR-202601 user: You would presumably only include the year and month. "))
+    |}];
+  ()
+;;
+
+let%expect_test "CRs on the same line" =
+  (* This is an older use case that allowed dates in CRs. Keeping as monitoring
+     test for now - whether to keep supporting this functionality is to be
+     determined and left as future work. *)
+  test
+    {|
+(* $CR user: A first CR *) let () = () (* $CR user: Followed by another. *)
+let () = ()
+
+|};
+  [%expect
+    {|
+    ((path my_file.ml)
+     (whole_loc (
+       (start my_file.ml:1:0)
+       (stop  my_file.ml:1:25)))
+     (header (
+       Ok (
+         (kind (
+           (txt CR)
+           (loc (
+             (start my_file.ml:1:3)
+             (stop  my_file.ml:1:5)))))
+         (due (
+           (txt Now)
+           (loc (
+             (start my_file.ml:1:3)
+             (stop  my_file.ml:1:5)))))
+         (reported_by (
+           (txt user)
+           (loc (
+             (start my_file.ml:1:6)
+             (stop  my_file.ml:1:10)))))
+         (for_ ()))))
+     (digest_of_condensed_content 8a363f8a9de735e7e5b5d4b403a3d448)
+     (content "CR user: A first CR "))
+    ((path my_file.ml)
+     (whole_loc (
+       (start my_file.ml:1:38)
+       (stop  my_file.ml:1:73)))
+     (header (
+       Ok (
+         (kind (
+           (txt CR)
+           (loc (
+             (start my_file.ml:1:41)
+             (stop  my_file.ml:1:43)))))
+         (due (
+           (txt Now)
+           (loc (
+             (start my_file.ml:1:41)
+             (stop  my_file.ml:1:43)))))
+         (reported_by (
+           (txt user)
+           (loc (
+             (start my_file.ml:1:44)
+             (stop  my_file.ml:1:48)))))
+         (for_ ()))))
+     (digest_of_condensed_content a88c4ae0ef4bd82d5532f797c745402d)
+     (content "CR user: Followed by another. "))
     |}];
   ()
 ;;
