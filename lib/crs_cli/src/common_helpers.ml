@@ -43,5 +43,5 @@ let relativize ~repo_root ~cwd ~path =
         [ Pp.text "Path "
           ++ Pp_tty.path (module Absolute_path) path
           ++ Pp.text " is not in repo."
-        ] [@coverage off]
+        ]
 ;;

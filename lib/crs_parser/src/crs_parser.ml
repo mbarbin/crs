@@ -80,7 +80,11 @@ let grep ~vcs ~repo_root ~below =
     Shexp_process.Context.dispose context;
     match exit_code with
     | 0 | 123 -> stdout |> String.split_lines |> List.map ~f:Vcs.Path_in_repo.v
-    | _ -> raise_s [%sexp "xargs process failed", { exit_code : int }] [@coverage off]
+    | _ ->
+      raise
+        (Err.E
+           (Err.create
+              [ Pp.text "xargs process failed"; Err.sexp [%sexp { exit_code : int }] ]))
   in
   List.concat_map files_to_grep ~f:(fun path_in_repo ->
     let file_contents =

@@ -49,6 +49,8 @@ Now let's add some CRs.
 
   $ echo -e "(* ${XCR} user1: Fix this. Edit: Done. *)" >> foo/a.txt
 
+  $ echo -e "/* $CR user1 for user3: Hey, this is a code review comment */" >> foo/foo.c
+
   $ echo -e "(* ${CR}-someday user1: Reconsider if/when updating to the new version. *)" >> foo/b.txt
 
   $ echo -e "(* ${CR}-soon user1: Hey, this is a code review comment *)" >> foo/bar/b.txt
@@ -71,67 +73,74 @@ A basic [sexp] output is available.
   $ crs grep --sexp
   ((path foo/a.txt) (whole_loc _)
    (header (Ok ((kind XCR) (due Now) (reported_by user1) (for_ ()))))
-   (digest_of_condensed_content 262c4b02b87f666df980367786893523)
-   (content "XCR user1: Fix this. Edit: Done. "))
+   (digest_of_condensed_content 9dce8eceb787a95abf3fccb037d164ea)
+   (content "XCR user1: Fix this. Edit: Done."))
   ((path foo/b.txt) (whole_loc _)
    (header (Ok ((kind CR) (due Someday) (reported_by user1) (for_ ()))))
-   (digest_of_condensed_content 7559cebcfe10fd5644d85ee54c35b98c)
+   (digest_of_condensed_content 22722b7a3948f75ec004a651d97d02bb)
    (content
-    "CR-someday user1: Reconsider if/when updating to the new version. "))
+    "CR-someday user1: Reconsider if/when updating to the new version."))
   ((path foo/bar/b.txt) (whole_loc _)
    (header (Ok ((kind CR) (due Soon) (reported_by user1) (for_ ()))))
-   (digest_of_condensed_content 3005cc8ff9fb95e8701310f3b15f1673)
-   (content "CR-soon user1: Hey, this is a code review comment "))
+   (digest_of_condensed_content 8b683d9bff5df08ee3642df3cf2426ce)
+   (content "CR-soon user1: Hey, this is a code review comment"))
   ((path foo/bar/c.txt) (whole_loc _)
    (header
     (Error
-     ("Invalid CR comment" "CR-user: Hey, I'm trying to use CR, it's cool! ")))
-   (digest_of_condensed_content 59de0cbac075472487591f107b23706c)
-   (content "CR-user: Hey, I'm trying to use CR, it's cool! "))
+     ("Invalid CR comment" "CR-user: Hey, I'm trying to use CR, it's cool!")))
+   (digest_of_condensed_content 49a84095611ebd8cb3f83e4546e67533)
+   (content "CR-user: Hey, I'm trying to use CR, it's cool!"))
   ((path foo/bar/d.txt) (whole_loc _)
    (header
     (Error
      ("Invalid CR comment"
-      "CR : Hey, this comment look like a CR but it's not quite one. ")))
-   (digest_of_condensed_content c03a43e4e1040fd99f1cd3dbdcc5bd50)
-   (content "CR : Hey, this comment look like a CR but it's not quite one. "))
+      "CR : Hey, this comment look like a CR but it's not quite one.")))
+   (digest_of_condensed_content d8a25b0acac6d3a23ff4f4c1e4c990a3)
+   (content "CR : Hey, this comment look like a CR but it's not quite one."))
+  ((path foo/foo.c) (whole_loc _)
+   (header (Ok ((kind CR) (due Now) (reported_by user1) (for_ (user3)))))
+   (digest_of_condensed_content 4721a5c5f8a37bdcb9e065268bbd0153)
+   (content "CR user1 for user3: Hey, this is a code review comment"))
   ((path hello) (whole_loc _)
    (header (Ok ((kind CR) (due Now) (reported_by user1) (for_ (user2)))))
-   (digest_of_condensed_content 46184503e2b9027e05e1ac2899a4e8b3)
-   (content "CR user1 for user2: Hey, this is a code review comment "))
+   (digest_of_condensed_content 970aabfe0c3d4ec5707918edd3f01a8a)
+   (content "CR user1 for user2: Hey, this is a code review comment"))
 
 The default is to print them, visually separated.
 
   $ crs grep
   File "foo/a.txt", line 2, characters 3-41:
-    XCR user1: Fix this. Edit: Done. 
+    XCR user1: Fix this. Edit: Done.
   
   File "foo/b.txt", line 1, characters 3-74:
-    CR-someday user1: Reconsider if/when updating to the new version. 
+    CR-someday user1: Reconsider if/when updating to the new version.
   
   File "foo/bar/b.txt", line 2, characters 3-58:
-    CR-soon user1: Hey, this is a code review comment 
+    CR-soon user1: Hey, this is a code review comment
   
   File "foo/bar/c.txt", line 1, characters 3-55:
-    CR-user: Hey, I'm trying to use CR, it's cool! 
+    CR-user: Hey, I'm trying to use CR, it's cool!
   
   File "foo/bar/d.txt", line 1, characters 3-70:
-    CR : Hey, this comment look like a CR but it's not quite one. 
+    CR : Hey, this comment look like a CR but it's not quite one.
+  
+  File "foo/foo.c", line 1, characters 3-63:
+    CR user1 for user3: Hey, this is a code review comment
   
   File "hello", line 2, characters 3-63:
-    CR user1 for user2: Hey, this is a code review comment 
+    CR user1 for user2: Hey, this is a code review comment
 
 You may restrict the search to a subdirectory only.
 
   $ crs grep --below ./foo/bar
   File "foo/bar/b.txt", line 2, characters 3-58:
-    CR-soon user1: Hey, this is a code review comment 
+    CR-soon user1: Hey, this is a code review comment
   
   File "foo/bar/c.txt", line 1, characters 3-55:
-    CR-user: Hey, I'm trying to use CR, it's cool! 
+    CR-user: Hey, I'm trying to use CR, it's cool!
   
   File "foo/bar/d.txt", line 1, characters 3-70:
-    CR : Hey, this comment look like a CR but it's not quite one. 
+    CR : Hey, this comment look like a CR but it's not quite one.
 
   $ crs grep --below /tmp
   Error: Path "/tmp" is not in repo.
@@ -144,7 +153,7 @@ There's also an option to display the results as summary tables.
   │ type    │ count │
   ├─────────┼───────┤
   │ Invalid │     2 │
-  │ CR      │     1 │
+  │ CR      │     2 │
   │ XCR     │     1 │
   │ Soon    │     1 │
   │ Someday │     1 │
@@ -155,6 +164,7 @@ There's also an option to display the results as summary tables.
   ├──────────┼───────┼─────┼──────┼──────┼─────────┼───────┤
   │ user1    │       │     │    1 │    1 │       1 │     3 │
   │ user1    │ user2 │   1 │      │      │         │     1 │
+  │ user1    │ user3 │   1 │      │      │         │     1 │
   └──────────┴───────┴─────┴──────┴──────┴─────────┴───────┘
 
 Summary tables may not be displayed as sexps.
@@ -163,3 +173,18 @@ Summary tables may not be displayed as sexps.
   Error: The flags [sexp] and [summary] are exclusive.
   Hint: Please choose one.
   [124]
+
+The grep strategy involves a first filtering of the files based on a regexp
+matching. This involves running [xargs]. Let's cover for some failures there.
+
+  $ cat > xargs <<EOF
+  > #!/bin/bash -e
+  > echo "Hello Fake xargs"
+  > exit 42
+  > EOF
+  $ chmod +x ./xargs
+
+  $ PATH=".:$PATH" crs grep
+  Error: xargs process failed
+  (exit_code 42)
+  [123]

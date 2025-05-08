@@ -2,18 +2,24 @@
 
 ### Added
 
-- Improve tests coverage (@mbarbin).
-- New flag `crs grep --summary` to display information as summary tables (@mbarbin).
+- Improve tests coverage (#8, #11, @mbarbin).
+- New flag `crs grep --summary` to display information as summary tables (#8, @mbarbin).
 
 ### Changed
+
+- Strip the ending of CR content (#11, @mbarbin).
+- Include the leading '-' char in due's `Loc.t` (e.g. in "CR-soon") (#11, @mbarbin).
 
 ### Deprecated
 
 ### Fixed
 
-- Dispose of `Shexp_process.Context` in crs parser (@mbarbin).
+- Fix reindentation when printing CRs (#11, @mbarbin).
+- Dispose of `Shexp_process.Context` in crs parser (6a584f, @mbarbin).
 
 ### Removed
+
+- Remove support for 'v' separator in CR comment (#11, @mbarbin).
 
 ## 0.0.20250414 (2025-04-14)
 

@@ -70,6 +70,7 @@
    * - Rename [Processed] to [Header].
    * - Remove support for printing crs without their content.
    * - Compute positions and offsets with [Loc].
+   * - Some minor changes to the [reindented] content rendering.
 *)
 
 module Digest_hex = struct
@@ -95,13 +96,19 @@ module Due = struct
 end
 
 module Header = struct
-  type t =
-    { kind : Kind.t Loc.Txt.t
-    ; due : Due.t Loc.Txt.t
-    ; reported_by : Vcs.User_handle.t Loc.Txt.t
-    ; for_ : Vcs.User_handle.t Loc.Txt.t option
-    }
-  [@@deriving equal, sexp_of]
+  module T = struct
+    [@@@coverage off]
+
+    type t =
+      { kind : Kind.t Loc.Txt.t
+      ; due : Due.t Loc.Txt.t
+      ; reported_by : Vcs.User_handle.t Loc.Txt.t
+      ; for_ : Vcs.User_handle.t Loc.Txt.t option
+      }
+    [@@deriving equal, sexp_of]
+  end
+
+  include T
 
   module With_loc = struct
     let reported_by t = t.reported_by
@@ -117,14 +124,20 @@ module Header = struct
   let due t = t.due.txt
 end
 
-type t =
-  { path : Vcs.Path_in_repo.t
-  ; whole_loc : Loc.t
-  ; header : Header.t Or_error.t
-  ; digest_of_condensed_content : Digest_hex.t
-  ; content : string
-  }
-[@@deriving equal, sexp_of]
+module T = struct
+  [@@@coverage off]
+
+  type t =
+    { path : Vcs.Path_in_repo.t
+    ; whole_loc : Loc.t
+    ; header : Header.t Or_error.t
+    ; digest_of_condensed_content : Digest_hex.t
+    ; content : string
+    }
+  [@@deriving equal, sexp_of]
+end
+
+include T
 
 let path t = t.path
 let content t = t.content
@@ -155,30 +168,33 @@ end = struct
 end
 
 let reindented_content t =
-  let start = Loc.start t.whole_loc in
-  let indent = String.make (start.pos_cnum - start.pos_bol + 2) ' ' in
-  let str = content t in
-  let lines = String.split str ~on:'\n' in
-  let lines =
-    lines
-    |> List.rev
-    |> List.drop_while ~f:(String.for_all ~f:Char.is_whitespace)
-    |> List.rev
+  let indent =
+    let len =
+      match t.header with
+      | Error _ ->
+        let start = Loc.start t.whole_loc in
+        (* The len of the indentation is a heuristic in this case. *)
+        start.pos_cnum - start.pos_bol + 3
+      | Ok h ->
+        let start = Loc.start h.kind.loc in
+        start.pos_cnum - start.pos_bol
+    in
+    String.make len ' '
   in
+  let str = t.content in
+  let lines = String.split str ~on:'\n' in
   match
-    Result.try_with (fun () ->
-      List.mapi lines ~f:(fun i s ->
+    List.mapi lines ~f:(fun i s ->
+      let s = String.rstrip s in
+      if String.is_empty s
+      then ""
+      else (
         match String.chop_prefix s ~prefix:indent with
-        | None ->
-          if String.is_prefix indent ~prefix:s
-          then ""
-          else if i = 0
-          then "  " ^ s
-          else raise Stdlib.Exit
+        | None -> if i = 0 then "  " ^ s else raise Stdlib.Exit
         | Some s -> "  " ^ s))
   with
-  | (exception Stdlib.Exit) | Error _ -> str
-  | Ok deindented_lines -> String.concat deindented_lines ~sep:"\n"
+  | exception Stdlib.Exit -> str
+  | deindented_lines -> String.concat deindented_lines ~sep:"\n"
 ;;
 
 let sort ts = List.sort ts ~compare:For_sorted_output.compare

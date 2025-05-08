@@ -51,6 +51,8 @@
    * - Replace [is_xcr] by a variant type [Kind.t].
    * - Make [reported_by] mandatory.
    * - Rename [Processed] to [Header].
+   * - Remove support for 'v' separator in CR comment
+   * - Include the leading '-' char in due's [Loc.t].
 *)
 
 module Regex = Re2
@@ -79,8 +81,7 @@ let comment_regex =
     (seq
        [ any whitespace
        ; named_group "cr_kind" "X?CR"
-       ; optional
-           (seq [ "[-v]"; named_group "due" (alt [ "\\d{6}"; "soon"; "someday" ]) ])
+       ; optional (named_group "due" (seq [ "-"; alt [ "\\d{6}"; "soon"; "someday" ] ]))
        ; some whitespace
        ; named_group "reported_by" word
        ; optional
@@ -134,13 +135,17 @@ let parse ~file_cache ~content_start_offset ~content =
     let due =
       match get "due" with
       | None -> { Loc.Txt.txt = Cr_comment.Due.Now; loc = kind.loc }
-      | Some ("soon", loc) -> { Loc.Txt.txt = Cr_comment.Due.Soon; loc }
-      | Some ("someday", loc) -> { Loc.Txt.txt = Cr_comment.Due.Someday; loc }
+      | Some ("-soon", loc) -> { Loc.Txt.txt = Cr_comment.Due.Soon; loc }
+      | Some ("-someday", loc) -> { Loc.Txt.txt = Cr_comment.Due.Someday; loc }
       | Some (_, loc) ->
         (* dated CR -> CR-someday *)
         { Loc.Txt.txt = Cr_comment.Due.Someday; loc }
     in
     return (Cr_comment.Private.Header.create ~kind ~due ~reported_by ~for_)
   with
-  | exn -> Or_error.error "could not process CR" (content, exn) [%sexp_of: string * exn]
+  | exn ->
+    Or_error.error
+      "could not process CR"
+      (content, exn)
+      [%sexp_of: string * exn] [@coverage off]
 ;;

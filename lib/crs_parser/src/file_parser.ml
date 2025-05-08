@@ -50,6 +50,7 @@
    * - Remove support for attributes.
    * - Remove assignee computation (left as external work).
    * - Compute positions and offsets with [Loc].
+   * - Strip the ending of CR content.
 *)
 
 module Regex = Re2
@@ -240,6 +241,7 @@ let parse_file ~path ~(file_contents : Vcs.File_contents.t) =
     let%map start_index, end_index, content =
       find_comment_bounds file_contents cr_start
     in
+    let content = String.rstrip content in
     let file_cache = Lazy.force file_cache in
     let start_position = Loc.Offset.to_position start_index ~file_cache in
     let stop_position = Loc.Offset.to_position (end_index + 1) ~file_cache in
