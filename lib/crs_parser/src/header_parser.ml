@@ -51,6 +51,8 @@
    * - Replace [is_xcr] by a variant type [Kind.t].
    * - Make [reported_by] mandatory.
    * - Rename [Processed] to [Header].
+   * - Remove support for 'v' separator in CR comment
+   * - Include the leading '-' char in due's [Loc.t].
 *)
 
 module Regex = Re2
