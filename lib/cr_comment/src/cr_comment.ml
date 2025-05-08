@@ -171,12 +171,6 @@ let reindented_content t =
   let indent = String.make (start.pos_cnum - start.pos_bol + 2) ' ' in
   let str = t.content in
   let lines = String.split str ~on:'\n' in
-  let lines =
-    lines
-    |> List.rev
-    |> List.drop_while ~f:(String.for_all ~f:Char.is_whitespace)
-    |> List.rev
-  in
   match
     Result.try_with (fun () ->
       List.mapi lines ~f:(fun i s ->
