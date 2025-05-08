@@ -14,6 +14,7 @@
 
 ### Fixed
 
+- Fix reindentation when printing CRs (@mbarbin).
 - Dispose of `Shexp_process.Context` in crs parser (@mbarbin).
 
 ### Removed
