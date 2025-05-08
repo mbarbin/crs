@@ -687,6 +687,30 @@ as comments that are not.
 
 
 *)
+
+(*   $CR user: What happens when the subsequent lines
+   are not lined up with the leading CR keyword?
+*)
+
+(* $CR and let us look at invalid comments as well. The exact behavior for
+   their intentation is less of a priority since they are invalid in the
+   first place. *)
+
+(* $CR-user but still we include
+this as part of our tests. *)
+
+(* $CR user: Let's add a couple with trailing spaces    
+        
+   at the end of some lines.
+   
+   Hello multiple paragraphs.
+
+      {v
+         With possibly some lines whose indentation exceeds the indentation
+         of other surrounding lines.
+       v}
+
+   user2: Hi! Good tests, good times. *)
 |};
   [%expect
     {|
@@ -704,12 +728,39 @@ as comments that are not.
     CR user: As well
     as comments that are not.
 
-    File "my_file.ml", lines 14-23, characters 0-180:
+    File "my_file.ml", lines 14-22, characters 0-180:
       CR user: At some point we changed the parser to strips the end
       of CR comments.
 
       So it shouldn't matter how many blank lines are present at the
       end of the comment.
+
+    File "my_file.ml", lines 24-26, characters 0-104:
+    CR user: What happens when the subsequent lines
+       are not lined up with the leading CR keyword?
+
+    File "my_file.ml", lines 28-30, characters 0-165:
+      CR and let us look at invalid comments as well. The exact behavior for
+       their intentation is less of a priority since they are invalid in the
+       first place.
+
+    File "my_file.ml", lines 32-33, characters 0-61:
+    CR-user but still we include
+    this as part of our tests.
+
+    File "my_file.ml", lines 35-47, characters 0-302:
+      CR user: Let's add a couple with trailing spaces
+
+      at the end of some lines.
+
+      Hello multiple paragraphs.
+
+         {v
+            With possibly some lines whose indentation exceeds the indentation
+            of other surrounding lines.
+          v}
+
+      user2: Hi! Good tests, good times.
     |}];
   ()
 ;;
