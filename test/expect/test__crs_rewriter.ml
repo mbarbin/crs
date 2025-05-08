@@ -293,6 +293,11 @@ let () = ()
 
 (* $CR-someday user1: This third message *)
 let () = ()
+
+let () =
+  (* $CR-soon user1: Message *)
+  ()
+;;
 |}
   in
   test file_contents ~f:(fun ~crs ~file_rewriter ->
@@ -310,7 +315,7 @@ let () = ()
                ~text:"-soon"))));
   [%expect
     {|
-    -1,16 +1,16
+    -1,21 +1,21
 
       let () =
     -|  (* $CR user1: Message *)
@@ -329,6 +334,11 @@ let () = ()
 
       (* $CR-someday user1: This third message *)
       let () = ()
+
+      let () =
+        (* $CR-soon user1: Message *)
+        ()
+      ;;
     |}];
   ()
 ;;

@@ -141,5 +141,9 @@ let parse ~file_cache ~content_start_offset ~content =
     in
     return (Cr_comment.Private.Header.create ~kind ~due ~reported_by ~for_)
   with
-  | exn -> Or_error.error "could not process CR" (content, exn) [%sexp_of: string * exn]
+  | exn ->
+    Or_error.error
+      "could not process CR"
+      (content, exn)
+      [%sexp_of: string * exn] [@coverage off]
 ;;

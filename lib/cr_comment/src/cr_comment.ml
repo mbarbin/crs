@@ -95,13 +95,19 @@ module Due = struct
 end
 
 module Header = struct
-  type t =
-    { kind : Kind.t Loc.Txt.t
-    ; due : Due.t Loc.Txt.t
-    ; reported_by : Vcs.User_handle.t Loc.Txt.t
-    ; for_ : Vcs.User_handle.t Loc.Txt.t option
-    }
-  [@@deriving equal, sexp_of]
+  module T = struct
+    [@@@coverage off]
+
+    type t =
+      { kind : Kind.t Loc.Txt.t
+      ; due : Due.t Loc.Txt.t
+      ; reported_by : Vcs.User_handle.t Loc.Txt.t
+      ; for_ : Vcs.User_handle.t Loc.Txt.t option
+      }
+    [@@deriving equal, sexp_of]
+  end
+
+  include T
 
   module With_loc = struct
     let reported_by t = t.reported_by
@@ -117,14 +123,20 @@ module Header = struct
   let due t = t.due.txt
 end
 
-type t =
-  { path : Vcs.Path_in_repo.t
-  ; whole_loc : Loc.t
-  ; header : Header.t Or_error.t
-  ; digest_of_condensed_content : Digest_hex.t
-  ; content : string
-  }
-[@@deriving equal, sexp_of]
+module T = struct
+  [@@@coverage off]
+
+  type t =
+    { path : Vcs.Path_in_repo.t
+    ; whole_loc : Loc.t
+    ; header : Header.t Or_error.t
+    ; digest_of_condensed_content : Digest_hex.t
+    ; content : string
+    }
+  [@@deriving equal, sexp_of]
+end
+
+include T
 
 let path t = t.path
 let content t = t.content
@@ -157,7 +169,7 @@ end
 let reindented_content t =
   let start = Loc.start t.whole_loc in
   let indent = String.make (start.pos_cnum - start.pos_bol + 2) ' ' in
-  let str = content t in
+  let str = t.content in
   let lines = String.split str ~on:'\n' in
   let lines =
     lines

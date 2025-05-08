@@ -21,6 +21,26 @@
 
 let path = Vcs.Path_in_repo.v "my_file.ml"
 
+module Getters = struct
+  type t =
+    { path : Vcs.Path_in_repo.t
+    ; content : string
+    ; kind : Cr_comment.Kind.t
+    ; due : Cr_comment.Due.t
+    ; work_on : Cr_comment.Due.t
+    }
+  [@@deriving sexp_of]
+
+  let of_cr cr =
+    { path = Cr_comment.path cr
+    ; content = Cr_comment.content cr
+    ; kind = Cr_comment.kind cr
+    ; due = Cr_comment.due cr
+    ; work_on = Cr_comment.work_on cr
+    }
+  ;;
+end
+
 let test file_contents =
   let file_contents =
     (* In this test we want to avoid test CRs to be mistaken for actual CRs,
@@ -34,7 +54,8 @@ let test file_contents =
   let crs = Crs_parser.parse_file ~path ~file_contents |> Cr_comment.sort in
   List.iter crs ~f:(fun t ->
     Ref.set_temporarily Loc.include_sexp_of_locs true ~f:(fun () ->
-      print_s [%sexp (t : Cr_comment.t)]))
+      let getters = Getters.of_cr t in
+      print_s [%sexp { raw = (t : Cr_comment.t); getters : Getters.t }]))
 ;;
 
 let%expect_test "non commented CR" =
@@ -53,13 +74,20 @@ let%expect_test "invalid syntax CR" =
 |};
   [%expect
     {|
-    ((path my_file.ml)
-     (whole_loc (
-       (start my_file.ml:1:0)
-       (stop  my_file.ml:2:0)))
-     (header (Error ("Invalid CR comment" "CR ")))
-     (digest_of_condensed_content 2df7d9b304674cd4ce376be6534aa33c)
-     (content "CR "))
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:1:0)
+         (stop  my_file.ml:2:0)))
+       (header (Error ("Invalid CR comment" "CR ")))
+       (digest_of_condensed_content 2df7d9b304674cd4ce376be6534aa33c)
+       (content "CR ")))
+     (getters (
+       (path    my_file.ml)
+       (content "CR ")
+       (kind    CR)
+       (due     Now)
+       (work_on Now))))
     |}];
   ()
 ;;
@@ -71,30 +99,37 @@ let%expect_test "empty CR" =
 |};
   [%expect
     {|
-    ((path my_file.ml)
-     (whole_loc (
-       (start my_file.ml:1:0)
-       (stop  my_file.ml:2:0)))
-     (header (
-       Ok (
-         (kind (
-           (txt CR)
-           (loc (
-             (start my_file.ml:1:3)
-             (stop  my_file.ml:1:5)))))
-         (due (
-           (txt Now)
-           (loc (
-             (start my_file.ml:1:3)
-             (stop  my_file.ml:1:5)))))
-         (reported_by (
-           (txt user)
-           (loc (
-             (start my_file.ml:1:6)
-             (stop  my_file.ml:1:10)))))
-         (for_ ()))))
-     (digest_of_condensed_content 24aa6eaab5d3e6bdbad82e1d3c30ee5c)
-     (content "CR user: "))
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:1:0)
+         (stop  my_file.ml:2:0)))
+       (header (
+         Ok (
+           (kind (
+             (txt CR)
+             (loc (
+               (start my_file.ml:1:3)
+               (stop  my_file.ml:1:5)))))
+           (due (
+             (txt Now)
+             (loc (
+               (start my_file.ml:1:3)
+               (stop  my_file.ml:1:5)))))
+           (reported_by (
+             (txt user)
+             (loc (
+               (start my_file.ml:1:6)
+               (stop  my_file.ml:1:10)))))
+           (for_ ()))))
+       (digest_of_condensed_content 24aa6eaab5d3e6bdbad82e1d3c30ee5c)
+       (content "CR user: ")))
+     (getters (
+       (path    my_file.ml)
+       (content "CR user: ")
+       (kind    CR)
+       (due     Now)
+       (work_on Now))))
     |}];
   ()
 ;;
@@ -105,57 +140,212 @@ let%expect_test "CR soon, someday" =
 (* $CR-soon user: Some text *)
 let () = ()
 (* $CR-someday user: Some text *)
+let () = ()
+(* $CR-soon user1 for user2: Some text *)
+let () = ()
+(* $CR-someday user1 for user2: Some text *)
+let () = ()
+(* $XCR-soon user: Some text *)
+let () = ()
+(* $XCR-someday user: Some text *)
+let () = ()
 |};
   [%expect
     {|
-    ((path my_file.ml)
-     (whole_loc (
-       (start my_file.ml:1:0)
-       (stop  my_file.ml:1:29)))
-     (header (
-       Ok (
-         (kind (
-           (txt CR)
-           (loc (
-             (start my_file.ml:1:3)
-             (stop  my_file.ml:1:5)))))
-         (due (
-           (txt Soon)
-           (loc (
-             (start my_file.ml:1:5)
-             (stop  my_file.ml:1:10)))))
-         (reported_by (
-           (txt user)
-           (loc (
-             (start my_file.ml:1:11)
-             (stop  my_file.ml:1:15)))))
-         (for_ ()))))
-     (digest_of_condensed_content 4219a06e2fd5ff693e3b986894502550)
-     (content "CR-soon user: Some text "))
-    ((path my_file.ml)
-     (whole_loc (
-       (start my_file.ml:3:0)
-       (stop  my_file.ml:4:0)))
-     (header (
-       Ok (
-         (kind (
-           (txt CR)
-           (loc (
-             (start my_file.ml:3:3)
-             (stop  my_file.ml:3:5)))))
-         (due (
-           (txt Someday)
-           (loc (
-             (start my_file.ml:3:5)
-             (stop  my_file.ml:3:13)))))
-         (reported_by (
-           (txt user)
-           (loc (
-             (start my_file.ml:3:14)
-             (stop  my_file.ml:3:18)))))
-         (for_ ()))))
-     (digest_of_condensed_content a195a2478aff6278dcf18f5c7d690323)
-     (content "CR-someday user: Some text "))
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:1:0)
+         (stop  my_file.ml:1:29)))
+       (header (
+         Ok (
+           (kind (
+             (txt CR)
+             (loc (
+               (start my_file.ml:1:3)
+               (stop  my_file.ml:1:5)))))
+           (due (
+             (txt Soon)
+             (loc (
+               (start my_file.ml:1:5)
+               (stop  my_file.ml:1:10)))))
+           (reported_by (
+             (txt user)
+             (loc (
+               (start my_file.ml:1:11)
+               (stop  my_file.ml:1:15)))))
+           (for_ ()))))
+       (digest_of_condensed_content 4219a06e2fd5ff693e3b986894502550)
+       (content "CR-soon user: Some text ")))
+     (getters (
+       (path    my_file.ml)
+       (content "CR-soon user: Some text ")
+       (kind    CR)
+       (due     Soon)
+       (work_on Soon))))
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:3:0)
+         (stop  my_file.ml:3:32)))
+       (header (
+         Ok (
+           (kind (
+             (txt CR)
+             (loc (
+               (start my_file.ml:3:3)
+               (stop  my_file.ml:3:5)))))
+           (due (
+             (txt Someday)
+             (loc (
+               (start my_file.ml:3:5)
+               (stop  my_file.ml:3:13)))))
+           (reported_by (
+             (txt user)
+             (loc (
+               (start my_file.ml:3:14)
+               (stop  my_file.ml:3:18)))))
+           (for_ ()))))
+       (digest_of_condensed_content a195a2478aff6278dcf18f5c7d690323)
+       (content "CR-someday user: Some text ")))
+     (getters (
+       (path    my_file.ml)
+       (content "CR-someday user: Some text ")
+       (kind    CR)
+       (due     Someday)
+       (work_on Someday))))
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:5:0)
+         (stop  my_file.ml:5:40)))
+       (header (
+         Ok (
+           (kind (
+             (txt CR)
+             (loc (
+               (start my_file.ml:5:3)
+               (stop  my_file.ml:5:5)))))
+           (due (
+             (txt Soon)
+             (loc (
+               (start my_file.ml:5:5)
+               (stop  my_file.ml:5:10)))))
+           (reported_by (
+             (txt user1)
+             (loc (
+               (start my_file.ml:5:11)
+               (stop  my_file.ml:5:16)))))
+           (for_ ((
+             (txt user2)
+             (loc (
+               (start my_file.ml:5:21)
+               (stop  my_file.ml:5:26)))))))))
+       (digest_of_condensed_content a67b07faad9bff5fb10f5071921707fb)
+       (content "CR-soon user1 for user2: Some text ")))
+     (getters (
+       (path    my_file.ml)
+       (content "CR-soon user1 for user2: Some text ")
+       (kind    CR)
+       (due     Soon)
+       (work_on Soon))))
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:7:0)
+         (stop  my_file.ml:7:43)))
+       (header (
+         Ok (
+           (kind (
+             (txt CR)
+             (loc (
+               (start my_file.ml:7:3)
+               (stop  my_file.ml:7:5)))))
+           (due (
+             (txt Someday)
+             (loc (
+               (start my_file.ml:7:5)
+               (stop  my_file.ml:7:13)))))
+           (reported_by (
+             (txt user1)
+             (loc (
+               (start my_file.ml:7:14)
+               (stop  my_file.ml:7:19)))))
+           (for_ ((
+             (txt user2)
+             (loc (
+               (start my_file.ml:7:24)
+               (stop  my_file.ml:7:29)))))))))
+       (digest_of_condensed_content 9543a34a83fd0ccbd7a48693f273c1c9)
+       (content "CR-someday user1 for user2: Some text ")))
+     (getters (
+       (path    my_file.ml)
+       (content "CR-someday user1 for user2: Some text ")
+       (kind    CR)
+       (due     Someday)
+       (work_on Someday))))
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:9:0)
+         (stop  my_file.ml:9:30)))
+       (header (
+         Ok (
+           (kind (
+             (txt XCR)
+             (loc (
+               (start my_file.ml:9:3)
+               (stop  my_file.ml:9:6)))))
+           (due (
+             (txt Soon)
+             (loc (
+               (start my_file.ml:9:6)
+               (stop  my_file.ml:9:11)))))
+           (reported_by (
+             (txt user)
+             (loc (
+               (start my_file.ml:9:12)
+               (stop  my_file.ml:9:16)))))
+           (for_ ()))))
+       (digest_of_condensed_content 4bc41a5d1da4eb6c3b3f24bdff854d7b)
+       (content "XCR-soon user: Some text ")))
+     (getters (
+       (path    my_file.ml)
+       (content "XCR-soon user: Some text ")
+       (kind    XCR)
+       (due     Soon)
+       (work_on Now))))
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:11:0)
+         (stop  my_file.ml:11:33)))
+       (header (
+         Ok (
+           (kind (
+             (txt XCR)
+             (loc (
+               (start my_file.ml:11:3)
+               (stop  my_file.ml:11:6)))))
+           (due (
+             (txt Someday)
+             (loc (
+               (start my_file.ml:11:6)
+               (stop  my_file.ml:11:14)))))
+           (reported_by (
+             (txt user)
+             (loc (
+               (start my_file.ml:11:15)
+               (stop  my_file.ml:11:19)))))
+           (for_ ()))))
+       (digest_of_condensed_content f301e1cb8d2d1d8651c0541b2c4b5a0c)
+       (content "XCR-someday user: Some text ")))
+     (getters (
+       (path    my_file.ml)
+       (content "XCR-someday user: Some text ")
+       (kind    XCR)
+       (due     Someday)
+       (work_on Now))))
     |}];
   ()
 ;;
@@ -178,50 +368,73 @@ let () = ()
 |};
   [%expect
     {|
-    ((path my_file.ml)
-     (whole_loc (
-       (start my_file.ml:1:0)
-       (stop  my_file.ml:1:77)))
-     (header (
-       Error (
-         "Invalid CR comment"
-         "CR-2026-01-31 user: This CR has a due date, by not correctly specified. ")))
-     (digest_of_condensed_content 1f9be944b3383d5ee336d876ec1a0568)
-     (content
-      "CR-2026-01-31 user: This CR has a due date, by not correctly specified. "))
-    ((path my_file.ml)
-     (whole_loc (
-       (start my_file.ml:4:0)
-       (stop  my_file.ml:4:47)))
-     (header (
-       Error ("Invalid CR comment" "CR-20260131 user: This is not it either.. ")))
-     (digest_of_condensed_content 268498d73e27329e7a10a2740442d95f)
-     (content "CR-20260131 user: This is not it either.. "))
-    ((path my_file.ml)
-     (whole_loc (
-       (start my_file.ml:7:0)
-       (stop  my_file.ml:7:75)))
-     (header (
-       Ok (
-         (kind (
-           (txt CR)
-           (loc (
-             (start my_file.ml:7:3)
-             (stop  my_file.ml:7:5)))))
-         (due (
-           (txt Someday)
-           (loc (
-             (start my_file.ml:7:5)
-             (stop  my_file.ml:7:12)))))
-         (reported_by (
-           (txt user)
-           (loc (
-             (start my_file.ml:7:13)
-             (stop  my_file.ml:7:17)))))
-         (for_ ()))))
-     (digest_of_condensed_content cc821c3436b2583715a2df4236a786c4)
-     (content
-      "CR-202601 user: You would presumably only include the year and month. "))
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:1:0)
+         (stop  my_file.ml:1:77)))
+       (header (
+         Error (
+           "Invalid CR comment"
+           "CR-2026-01-31 user: This CR has a due date, by not correctly specified. ")))
+       (digest_of_condensed_content 1f9be944b3383d5ee336d876ec1a0568)
+       (content
+        "CR-2026-01-31 user: This CR has a due date, by not correctly specified. ")))
+     (getters (
+       (path my_file.ml)
+       (content
+        "CR-2026-01-31 user: This CR has a due date, by not correctly specified. ")
+       (kind    CR)
+       (due     Now)
+       (work_on Now))))
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:4:0)
+         (stop  my_file.ml:4:47)))
+       (header (
+         Error ("Invalid CR comment" "CR-20260131 user: This is not it either.. ")))
+       (digest_of_condensed_content 268498d73e27329e7a10a2740442d95f)
+       (content "CR-20260131 user: This is not it either.. ")))
+     (getters (
+       (path my_file.ml)
+       (content "CR-20260131 user: This is not it either.. ")
+       (kind    CR)
+       (due     Now)
+       (work_on Now))))
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:7:0)
+         (stop  my_file.ml:7:75)))
+       (header (
+         Ok (
+           (kind (
+             (txt CR)
+             (loc (
+               (start my_file.ml:7:3)
+               (stop  my_file.ml:7:5)))))
+           (due (
+             (txt Someday)
+             (loc (
+               (start my_file.ml:7:5)
+               (stop  my_file.ml:7:12)))))
+           (reported_by (
+             (txt user)
+             (loc (
+               (start my_file.ml:7:13)
+               (stop  my_file.ml:7:17)))))
+           (for_ ()))))
+       (digest_of_condensed_content cc821c3436b2583715a2df4236a786c4)
+       (content
+        "CR-202601 user: You would presumably only include the year and month. ")))
+     (getters (
+       (path my_file.ml)
+       (content
+        "CR-202601 user: You would presumably only include the year and month. ")
+       (kind    CR)
+       (due     Someday)
+       (work_on Someday))))
     |}];
   ()
 ;;
@@ -238,54 +451,68 @@ let () = ()
 |};
   [%expect
     {|
-    ((path my_file.ml)
-     (whole_loc (
-       (start my_file.ml:1:0)
-       (stop  my_file.ml:1:25)))
-     (header (
-       Ok (
-         (kind (
-           (txt CR)
-           (loc (
-             (start my_file.ml:1:3)
-             (stop  my_file.ml:1:5)))))
-         (due (
-           (txt Now)
-           (loc (
-             (start my_file.ml:1:3)
-             (stop  my_file.ml:1:5)))))
-         (reported_by (
-           (txt user)
-           (loc (
-             (start my_file.ml:1:6)
-             (stop  my_file.ml:1:10)))))
-         (for_ ()))))
-     (digest_of_condensed_content 8a363f8a9de735e7e5b5d4b403a3d448)
-     (content "CR user: A first CR "))
-    ((path my_file.ml)
-     (whole_loc (
-       (start my_file.ml:1:38)
-       (stop  my_file.ml:1:73)))
-     (header (
-       Ok (
-         (kind (
-           (txt CR)
-           (loc (
-             (start my_file.ml:1:41)
-             (stop  my_file.ml:1:43)))))
-         (due (
-           (txt Now)
-           (loc (
-             (start my_file.ml:1:41)
-             (stop  my_file.ml:1:43)))))
-         (reported_by (
-           (txt user)
-           (loc (
-             (start my_file.ml:1:44)
-             (stop  my_file.ml:1:48)))))
-         (for_ ()))))
-     (digest_of_condensed_content a88c4ae0ef4bd82d5532f797c745402d)
-     (content "CR user: Followed by another. "))
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:1:0)
+         (stop  my_file.ml:1:25)))
+       (header (
+         Ok (
+           (kind (
+             (txt CR)
+             (loc (
+               (start my_file.ml:1:3)
+               (stop  my_file.ml:1:5)))))
+           (due (
+             (txt Now)
+             (loc (
+               (start my_file.ml:1:3)
+               (stop  my_file.ml:1:5)))))
+           (reported_by (
+             (txt user)
+             (loc (
+               (start my_file.ml:1:6)
+               (stop  my_file.ml:1:10)))))
+           (for_ ()))))
+       (digest_of_condensed_content 8a363f8a9de735e7e5b5d4b403a3d448)
+       (content "CR user: A first CR ")))
+     (getters (
+       (path    my_file.ml)
+       (content "CR user: A first CR ")
+       (kind    CR)
+       (due     Now)
+       (work_on Now))))
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:1:38)
+         (stop  my_file.ml:1:73)))
+       (header (
+         Ok (
+           (kind (
+             (txt CR)
+             (loc (
+               (start my_file.ml:1:41)
+               (stop  my_file.ml:1:43)))))
+           (due (
+             (txt Now)
+             (loc (
+               (start my_file.ml:1:41)
+               (stop  my_file.ml:1:43)))))
+           (reported_by (
+             (txt user)
+             (loc (
+               (start my_file.ml:1:44)
+               (stop  my_file.ml:1:48)))))
+           (for_ ()))))
+       (digest_of_condensed_content a88c4ae0ef4bd82d5532f797c745402d)
+       (content "CR user: Followed by another. ")))
+     (getters (
+       (path    my_file.ml)
+       (content "CR user: Followed by another. ")
+       (kind    CR)
+       (due     Now)
+       (work_on Now))))
     |}];
   ()
 ;;
