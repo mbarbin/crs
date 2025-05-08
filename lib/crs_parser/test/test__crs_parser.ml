@@ -517,7 +517,7 @@ let () = ()
   ()
 ;;
 
-let%expect_test "indentation" =
+let%expect_test "digest_ignoring_minor_text_changes" =
   let parse file_contents =
     let file_contents =
       file_contents
@@ -601,6 +601,71 @@ end
     +|File "my_file.ml", lines 3-4, characters 4-153:
         CR user1: We want to be able to compute a digest for the message that is stable
          across indentation changes such as across a refactoring.
+    |}];
+  ()
+;;
+
+let%expect_test "reindentation" =
+  let test file_contents =
+    let file_contents =
+      file_contents
+      |> String.strip
+      |> String.substr_replace_all ~pattern:"$CR" ~with_:"CR"
+      |> String.substr_replace_all ~pattern:"$XCR" ~with_:"XCR"
+      |> Vcs.File_contents.create
+    in
+    let crs = Crs_parser.parse_file ~path ~file_contents in
+    Cr_comment.print_list ~crs
+  in
+  test "";
+  [%expect {||}];
+  test
+    {|
+(* $CR user: A comment that fits on one line. *)
+
+(* $CR user: Let us consider a comment
+   that spans multiple lines.
+
+   For the sake of testing, we'll monitor
+   comments that are correctly indented.
+*)
+
+(* $CR user: As well
+as comments that are not.
+*)
+
+(* $CR user: At some point we changed the parser to strips the end
+   of CR comments.
+
+   So it shouldn't matter how many blank lines are present at the
+   end of the comment.
+
+
+
+*)
+|};
+  [%expect
+    {|
+    File "my_file.ml", line 1, characters 0-47:
+      CR user: A comment that fits on one line.
+
+    File "my_file.ml", lines 3-8, characters 0-154:
+      CR user: Let us consider a comment
+       that spans multiple lines.
+
+       For the sake of testing, we'll monitor
+       comments that are correctly indented.
+
+    File "my_file.ml", lines 10-12, characters 0-48:
+    CR user: As well
+    as comments that are not.
+
+    File "my_file.ml", lines 14-23, characters 0-180:
+      CR user: At some point we changed the parser to strips the end
+       of CR comments.
+
+       So it shouldn't matter how many blank lines are present at the
+       end of the comment.
     |}];
   ()
 ;;
