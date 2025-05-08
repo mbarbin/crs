@@ -25,7 +25,7 @@ depends: [
   "mdx" {>= "2.4"}
   "patdiff" {>= "v0.17" & < "v0.18"}
   "pp" {>= "2.0.0"}
-  "pplumbing" {>= "0.0.11"}
+  "pplumbing" {>= "0.0.12"}
   "ppx_compare" {>= "v0.17" & < "v0.18"}
   "ppx_enumerate" {>= "v0.17" & < "v0.18"}
   "ppx_expect" {>= "v0.17" & < "v0.18"}
