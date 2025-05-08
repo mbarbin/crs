@@ -39,18 +39,18 @@ let main =
      let () =
        if sexp && summary
        then
-         Err.raise
-           ~exit_code:Err.Exit_code.cli_error
-           Pp.O.
-             [ Pp.text "The flags "
-               ++ Pp_tty.kwd (module String) "sexp"
-               ++ Pp.text " and "
-               ++ Pp_tty.kwd (module String) "summary"
-               ++ Pp.text " are exclusive."
-             ]
-           ~hints:[ Pp.text "Please choose one." ] [@coverage off]
-       (* This is exercised in tests, however there is an issue regarding
-          out-edge of raising functions in bisect_ppx. TBD. *)
+         raise
+           (Err.E
+              (Err.create
+                 ~exit_code:Err.Exit_code.cli_error
+                 Pp.O.
+                   [ Pp.text "The flags "
+                     ++ Pp_tty.kwd (module String) "sexp"
+                     ++ Pp.text " and "
+                     ++ Pp_tty.kwd (module String) "summary"
+                     ++ Pp.text " are exclusive."
+                   ]
+                 ~hints:[ Pp.text "Please choose one." ] [@coverage off]))
      in
      let vcs = Vcs_git_unix.create () in
      let cwd = Unix.getcwd () |> Absolute_path.v in
