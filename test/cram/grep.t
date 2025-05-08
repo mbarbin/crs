@@ -173,3 +173,18 @@ Summary tables may not be displayed as sexps.
   Error: The flags [sexp] and [summary] are exclusive.
   Hint: Please choose one.
   [124]
+
+The grep strategy involves a first filtering of the files based on a regexp
+matching. This involves running [xargs]. Let's cover for some failures there.
+
+  $ cat > xargs <<EOF
+  > #!/bin/bash -e
+  > echo "Hello Fake xargs"
+  > exit 42
+  > EOF
+  $ chmod +x ./xargs
+
+  $ PATH=".:$PATH" crs grep
+  Error: xargs process failed
+  (exit_code 42)
+  [123]

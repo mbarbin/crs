@@ -13,7 +13,18 @@
   Fpath_base
   -open
   Stdio)
- (libraries base cr_comment fpath fpath-base loc re2 shexp.process stdio vcs)
+ (libraries
+  base
+  cr_comment
+  fpath
+  fpath-base
+  loc
+  pp
+  pplumbing.err
+  re2
+  shexp.process
+  stdio
+  vcs)
  (instrumentation
   (backend bisect_ppx))
  (lint
