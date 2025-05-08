@@ -49,6 +49,8 @@ Now let's add some CRs.
 
   $ echo -e "(* ${XCR} user1: Fix this. Edit: Done. *)" >> foo/a.txt
 
+  $ echo -e "/* $CR user1 for user3: Hey, this is a code review comment */" >> foo/foo.c
+
   $ echo -e "(* ${CR}-someday user1: Reconsider if/when updating to the new version. *)" >> foo/b.txt
 
   $ echo -e "(* ${CR}-soon user1: Hey, this is a code review comment *)" >> foo/bar/b.txt
@@ -95,6 +97,10 @@ A basic [sexp] output is available.
       "CR : Hey, this comment look like a CR but it's not quite one. ")))
    (digest_of_condensed_content c03a43e4e1040fd99f1cd3dbdcc5bd50)
    (content "CR : Hey, this comment look like a CR but it's not quite one. "))
+  ((path foo/foo.c) (whole_loc _)
+   (header (Ok ((kind CR) (due Now) (reported_by user1) (for_ (user3)))))
+   (digest_of_condensed_content 85b70b82b0b81cb14f7b69b833f7ef6a)
+   (content "CR user1 for user3: Hey, this is a code review comment "))
   ((path hello) (whole_loc _)
    (header (Ok ((kind CR) (due Now) (reported_by user1) (for_ (user2)))))
    (digest_of_condensed_content 46184503e2b9027e05e1ac2899a4e8b3)
@@ -117,6 +123,9 @@ The default is to print them, visually separated.
   
   File "foo/bar/d.txt", line 1, characters 3-70:
     CR : Hey, this comment look like a CR but it's not quite one. 
+  
+  File "foo/foo.c", line 1, characters 3-63:
+    CR user1 for user3: Hey, this is a code review comment 
   
   File "hello", line 2, characters 3-63:
     CR user1 for user2: Hey, this is a code review comment 
@@ -144,7 +153,7 @@ There's also an option to display the results as summary tables.
   │ type    │ count │
   ├─────────┼───────┤
   │ Invalid │     2 │
-  │ CR      │     1 │
+  │ CR      │     2 │
   │ XCR     │     1 │
   │ Soon    │     1 │
   │ Someday │     1 │
@@ -155,6 +164,7 @@ There's also an option to display the results as summary tables.
   ├──────────┼───────┼─────┼──────┼──────┼─────────┼───────┤
   │ user1    │       │     │    1 │    1 │       1 │     3 │
   │ user1    │ user2 │   1 │      │      │         │     1 │
+  │ user1    │ user3 │   1 │      │      │         │     1 │
   └──────────┴───────┴─────┴──────┴──────┴─────────┴───────┘
 
 Summary tables may not be displayed as sexps.
