@@ -96,15 +96,35 @@ module Header : sig
   val for_ : t -> Vcs.User_handle.t option
 
   val kind : t -> Kind.t
+
+  (** This returns the syntactic due class if present [CR-soon] or [CR-someday].
+      If there is no due specifier, this returns [Now]. *)
   val due : t -> Due.t
 
   module With_loc : sig
+    (** These getters allows you to access the position of each elements of the
+        CR header. This is meant for tools processing CRs automatically, such
+        as CR comment rewriters. *)
+
+    (** The location includes the entire reporter username, without the
+        surrounding spaces. *)
     val reported_by : t -> Vcs.User_handle.t Loc.Txt.t
+
+    (** The location includes the entire assignee username, if it is present,
+        without the surround spaces. In particular, the location does not
+        include the ["for"] keyword itself. *)
     val for_ : t -> Vcs.User_handle.t Loc.Txt.t option
+
+    (** The location includes the entire keyword ["CR"] or ["XCR"] depending on
+        the case. It stops right before the following char, that being a space
+        or a ['-'] (and thus does not include it). *)
     val kind : t -> Kind.t Loc.Txt.t
 
-    (** When the cr is due [Now], there is no keyword to attach a location to.
-        Conventionally, we return the location of the cr kind in this case. *)
+    (** When the CR is due [Soon] or [Someday], the location returned includes
+        the leading dash, as well as the due keyword. For example, the
+        location will include ["-soon"] for a [CR-soon]. When the cr is due
+        [Now], there is no keyword to attach a location to. Conventionally, we
+        return the location of the cr [kind] in this case. *)
     val due : t -> Due.t Loc.Txt.t
   end
 end

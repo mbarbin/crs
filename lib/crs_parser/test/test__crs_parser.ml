@@ -122,7 +122,7 @@ let () = ()
          (due (
            (txt Soon)
            (loc (
-             (start my_file.ml:1:6)
+             (start my_file.ml:1:5)
              (stop  my_file.ml:1:10)))))
          (reported_by (
            (txt user)
@@ -146,7 +146,7 @@ let () = ()
          (due (
            (txt Someday)
            (loc (
-             (start my_file.ml:3:6)
+             (start my_file.ml:3:5)
              (stop  my_file.ml:3:13)))))
          (reported_by (
            (txt user)
@@ -211,7 +211,7 @@ let () = ()
          (due (
            (txt Someday)
            (loc (
-             (start my_file.ml:7:6)
+             (start my_file.ml:7:5)
              (stop  my_file.ml:7:12)))))
          (reported_by (
            (txt user)

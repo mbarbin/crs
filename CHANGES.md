@@ -7,6 +7,8 @@
 
 ### Changed
 
+- Include the leading '-' char in due's `Loc.t` (e.g. in "CR-soon") (@mbarbin).
+
 ### Deprecated
 
 ### Fixed
@@ -14,6 +16,8 @@
 - Dispose of `Shexp_process.Context` in crs parser (@mbarbin).
 
 ### Removed
+
+- Remove support for 'v' separator in CR comment (@mbarbin).
 
 ## 0.0.20250414 (2025-04-14)
 

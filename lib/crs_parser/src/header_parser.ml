@@ -79,8 +79,7 @@ let comment_regex =
     (seq
        [ any whitespace
        ; named_group "cr_kind" "X?CR"
-       ; optional
-           (seq [ "[-v]"; named_group "due" (alt [ "\\d{6}"; "soon"; "someday" ]) ])
+       ; optional (named_group "due" (seq [ "-"; alt [ "\\d{6}"; "soon"; "someday" ] ]))
        ; some whitespace
        ; named_group "reported_by" word
        ; optional
@@ -134,8 +133,8 @@ let parse ~file_cache ~content_start_offset ~content =
     let due =
       match get "due" with
       | None -> { Loc.Txt.txt = Cr_comment.Due.Now; loc = kind.loc }
-      | Some ("soon", loc) -> { Loc.Txt.txt = Cr_comment.Due.Soon; loc }
-      | Some ("someday", loc) -> { Loc.Txt.txt = Cr_comment.Due.Someday; loc }
+      | Some ("-soon", loc) -> { Loc.Txt.txt = Cr_comment.Due.Soon; loc }
+      | Some ("-someday", loc) -> { Loc.Txt.txt = Cr_comment.Due.Someday; loc }
       | Some (_, loc) ->
         (* dated CR -> CR-someday *)
         { Loc.Txt.txt = Cr_comment.Due.Someday; loc }
