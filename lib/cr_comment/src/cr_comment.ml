@@ -172,19 +172,18 @@ let reindented_content t =
   let str = t.content in
   let lines = String.split str ~on:'\n' in
   match
-    Result.try_with (fun () ->
-      List.mapi lines ~f:(fun i s ->
-        match String.chop_prefix s ~prefix:indent with
-        | None ->
-          if String.is_prefix indent ~prefix:s
-          then ""
-          else if i = 0
-          then "  " ^ s
-          else raise Stdlib.Exit
-        | Some s -> "  " ^ s))
+    List.mapi lines ~f:(fun i s ->
+      match String.chop_prefix s ~prefix:indent with
+      | None ->
+        if String.is_prefix indent ~prefix:s
+        then ""
+        else if i = 0
+        then "  " ^ s
+        else raise Stdlib.Exit
+      | Some s -> "  " ^ s)
   with
-  | (exception Stdlib.Exit) | Error _ -> str
-  | Ok deindented_lines -> String.concat deindented_lines ~sep:"\n"
+  | exception Stdlib.Exit -> str
+  | deindented_lines -> String.concat deindented_lines ~sep:"\n"
 ;;
 
 let sort ts = List.sort ts ~compare:For_sorted_output.compare
