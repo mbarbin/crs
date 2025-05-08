@@ -92,6 +92,50 @@ let%expect_test "invalid syntax CR" =
   ()
 ;;
 
+let%expect_test "multiple spaces CR" =
+  (* Although this should be eventually rejected by a crs linter, having
+     multiple spaces leading the the CR is allowed. *)
+  test
+    {|
+(*  $CR user: Blah. *)
+|};
+  [%expect
+    {|
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:1:0)
+         (stop  my_file.ml:2:0)))
+       (header (
+         Ok (
+           (kind (
+             (txt CR)
+             (loc (
+               (start my_file.ml:1:4)
+               (stop  my_file.ml:1:6)))))
+           (due (
+             (txt Now)
+             (loc (
+               (start my_file.ml:1:4)
+               (stop  my_file.ml:1:6)))))
+           (reported_by (
+             (txt user)
+             (loc (
+               (start my_file.ml:1:7)
+               (stop  my_file.ml:1:11)))))
+           (for_ ()))))
+       (digest_of_condensed_content a007fb66426c28df02a46d3edf88b6a8)
+       (content "CR user: Blah.")))
+     (getters (
+       (path    my_file.ml)
+       (content "CR user: Blah.")
+       (kind    CR)
+       (due     Now)
+       (work_on Now))))
+    |}];
+  ()
+;;
+
 let%expect_test "empty CR" =
   test
     {|
@@ -584,14 +628,14 @@ end
     {|
     File "my_file.ml", lines 2-3, characters 2-149:
       CR user1: We want to be able to compute a digest for the message that is stable across
-       indentation changes such as across a refactoring.
+      indentation changes such as across a refactoring.
     |}];
   print_endline cr2_reindented;
   [%expect
     {|
     File "my_file.ml", lines 3-4, characters 4-153:
       CR user1: We want to be able to compute a digest for the message that is stable
-       across indentation changes such as across a refactoring.
+      across indentation changes such as across a refactoring.
     |}];
   Expect_test_patdiff.print_patdiff cr1_reindented cr2_reindented;
   [%expect
@@ -600,7 +644,7 @@ end
     -|File "my_file.ml", lines 2-3, characters 2-149:
     +|File "my_file.ml", lines 3-4, characters 4-153:
         CR user1: We want to be able to compute a digest for the message that is stable
-         across indentation changes such as across a refactoring.
+        across indentation changes such as across a refactoring.
     |}];
   ()
 ;;
@@ -651,10 +695,10 @@ as comments that are not.
 
     File "my_file.ml", lines 3-8, characters 0-154:
       CR user: Let us consider a comment
-       that spans multiple lines.
+      that spans multiple lines.
 
-       For the sake of testing, we'll monitor
-       comments that are correctly indented.
+      For the sake of testing, we'll monitor
+      comments that are correctly indented.
 
     File "my_file.ml", lines 10-12, characters 0-48:
     CR user: As well
@@ -662,10 +706,10 @@ as comments that are not.
 
     File "my_file.ml", lines 14-23, characters 0-180:
       CR user: At some point we changed the parser to strips the end
-       of CR comments.
+      of CR comments.
 
-       So it shouldn't matter how many blank lines are present at the
-       end of the comment.
+      So it shouldn't matter how many blank lines are present at the
+      end of the comment.
     |}];
   ()
 ;;

@@ -70,6 +70,7 @@
    * - Rename [Processed] to [Header].
    * - Remove support for printing crs without their content.
    * - Compute positions and offsets with [Loc].
+   * - Some minor changes to the [reindented] content rendering.
 *)
 
 module Digest_hex = struct
@@ -167,20 +168,29 @@ end = struct
 end
 
 let reindented_content t =
-  let start = Loc.start t.whole_loc in
-  let indent = String.make (start.pos_cnum - start.pos_bol + 2) ' ' in
+  let indent =
+    let len =
+      match t.header with
+      | Error _ ->
+        let start = Loc.start t.whole_loc in
+        start.pos_cnum - start.pos_bol + 2
+      | Ok h ->
+        let start = Loc.start h.kind.loc in
+        start.pos_cnum - start.pos_bol
+    in
+    String.make len ' '
+  in
   let str = t.content in
   let lines = String.split str ~on:'\n' in
   match
     List.mapi lines ~f:(fun i s ->
-      match String.chop_prefix s ~prefix:indent with
-      | None ->
-        if String.is_prefix indent ~prefix:s
-        then ""
-        else if i = 0
-        then "  " ^ s
-        else raise Stdlib.Exit
-      | Some s -> "  " ^ s)
+      let s = String.rstrip s in
+      if String.is_empty s
+      then ""
+      else (
+        match String.chop_prefix s ~prefix:indent with
+        | None -> if i = 0 then "  " ^ s else raise Stdlib.Exit
+        | Some s -> "  " ^ s))
   with
   | exception Stdlib.Exit -> str
   | deindented_lines -> String.concat deindented_lines ~sep:"\n"
