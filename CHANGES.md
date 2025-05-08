@@ -7,6 +7,7 @@
 
 ### Changed
 
+- Strip the ending of CR content (@mbarbin).
 - Include the leading '-' char in due's `Loc.t` (e.g. in "CR-soon") (@mbarbin).
 
 ### Deprecated
