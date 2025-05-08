@@ -160,6 +160,72 @@ let () = ()
   ()
 ;;
 
+let%expect_test "Dated CRs" =
+  (* This is an older use case that allowed dates in CRs. Keeping as monitoring
+     test for now - whether to keep supporting this functionality is to be
+     determined and left as future work. *)
+  test
+    {|
+(* $CR-2026-01-31 user: This CR has a due date, by not correctly specified. *)
+let () = ()
+
+(* $CR-20260131 user: This is not it either.. *)
+let () = ()
+
+(* $CR-202601 user: You would presumably only include the year and month. *)
+let () = ()
+
+|};
+  [%expect
+    {|
+    ((path my_file.ml)
+     (whole_loc (
+       (start my_file.ml:1:0)
+       (stop  my_file.ml:1:77)))
+     (header (
+       Error (
+         "Invalid CR comment"
+         "CR-2026-01-31 user: This CR has a due date, by not correctly specified. ")))
+     (digest_of_condensed_content 1f9be944b3383d5ee336d876ec1a0568)
+     (content
+      "CR-2026-01-31 user: This CR has a due date, by not correctly specified. "))
+    ((path my_file.ml)
+     (whole_loc (
+       (start my_file.ml:4:0)
+       (stop  my_file.ml:4:47)))
+     (header (
+       Error ("Invalid CR comment" "CR-20260131 user: This is not it either.. ")))
+     (digest_of_condensed_content 268498d73e27329e7a10a2740442d95f)
+     (content "CR-20260131 user: This is not it either.. "))
+    ((path my_file.ml)
+     (whole_loc (
+       (start my_file.ml:7:0)
+       (stop  my_file.ml:7:75)))
+     (header (
+       Ok (
+         (kind (
+           (txt CR)
+           (loc (
+             (start my_file.ml:7:3)
+             (stop  my_file.ml:7:5)))))
+         (due (
+           (txt Someday)
+           (loc (
+             (start my_file.ml:7:6)
+             (stop  my_file.ml:7:12)))))
+         (reported_by (
+           (txt user)
+           (loc (
+             (start my_file.ml:7:13)
+             (stop  my_file.ml:7:17)))))
+         (for_ ()))))
+     (digest_of_condensed_content cc821c3436b2583715a2df4236a786c4)
+     (content
+      "CR-202601 user: You would presumably only include the year and month. "))
+    |}];
+  ()
+;;
+
 let%expect_test "indentation" =
   let parse file_contents =
     let file_contents =
