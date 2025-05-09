@@ -375,7 +375,7 @@ let () = ()
           (match Cr_comment.Header.With_loc.due p with
            | { txt = Now | Someday; loc = _ } -> ()
            | { txt = Soon; loc } ->
-             File_rewriter.replace file_rewriter ~range:(Loc.range loc) ~text:"-someday"))));
+             File_rewriter.replace file_rewriter ~range:(Loc.range loc) ~text:"someday"))));
   [%expect
     {|
     -1,19 +1,19
@@ -432,7 +432,12 @@ let () = ()
         match Cr_comment.Header.With_loc.due p with
         | { txt = Now; loc = _ } -> ()
         | { txt = Soon | Someday; loc } ->
-          File_rewriter.remove file_rewriter ~range:(Loc.range loc))));
+          File_rewriter.remove
+            file_rewriter
+            ~range:
+              { start = Loc.stop_offset (Cr_comment.Header.With_loc.kind p).loc
+              ; stop = Loc.stop_offset loc
+              })));
   [%expect
     {|
     -1,19 +1,19

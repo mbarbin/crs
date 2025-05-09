@@ -120,11 +120,12 @@ module Header : sig
         or a ['-'] (and thus does not include it). *)
     val kind : t -> Kind.t Loc.Txt.t
 
-    (** When the CR is due [Soon] or [Someday], the location returned includes
-        the leading dash, as well as the due keyword. For example, the
-        location will include ["-soon"] for a [CR-soon]. When the cr is due
-        [Now], there is no keyword to attach a location to. Conventionally, we
-        return the location of the cr [kind] in this case. *)
+    (** When the CR is due [Soon] or [Someday], the location returned starts
+        right after the dash separator (but does not include it), and contains
+        the entire due keyword. For example, the location will include
+        ["soon"] for a [CR-soon]. When the cr is due [Now], there is no
+        keyword to attach a location to : conventionally, we return instead
+        the location of the cr [kind] in this case. *)
     val due : t -> Due.t Loc.Txt.t
   end
 end

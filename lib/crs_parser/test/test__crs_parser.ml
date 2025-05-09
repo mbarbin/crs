@@ -211,7 +211,7 @@ let () = ()
            (due (
              (txt Soon)
              (loc (
-               (start my_file.ml:1:5)
+               (start my_file.ml:1:6)
                (stop  my_file.ml:1:10)))))
            (reported_by (
              (txt user)
@@ -242,7 +242,7 @@ let () = ()
            (due (
              (txt Someday)
              (loc (
-               (start my_file.ml:3:5)
+               (start my_file.ml:3:6)
                (stop  my_file.ml:3:13)))))
            (reported_by (
              (txt user)
@@ -273,7 +273,7 @@ let () = ()
            (due (
              (txt Soon)
              (loc (
-               (start my_file.ml:5:5)
+               (start my_file.ml:5:6)
                (stop  my_file.ml:5:10)))))
            (reported_by (
              (txt user1)
@@ -308,7 +308,7 @@ let () = ()
            (due (
              (txt Someday)
              (loc (
-               (start my_file.ml:7:5)
+               (start my_file.ml:7:6)
                (stop  my_file.ml:7:13)))))
            (reported_by (
              (txt user1)
@@ -343,7 +343,7 @@ let () = ()
            (due (
              (txt Soon)
              (loc (
-               (start my_file.ml:9:6)
+               (start my_file.ml:9:7)
                (stop  my_file.ml:9:11)))))
            (reported_by (
              (txt user)
@@ -374,7 +374,7 @@ let () = ()
            (due (
              (txt Someday)
              (loc (
-               (start my_file.ml:11:6)
+               (start my_file.ml:11:7)
                (stop  my_file.ml:11:14)))))
            (reported_by (
              (txt user)
@@ -461,7 +461,7 @@ let () = ()
            (due (
              (txt Someday)
              (loc (
-               (start my_file.ml:7:5)
+               (start my_file.ml:7:6)
                (stop  my_file.ml:7:12)))))
            (reported_by (
              (txt user)
