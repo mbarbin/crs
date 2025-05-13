@@ -21,7 +21,7 @@
 
 let main =
   Command.make
-    ~summary:"Grep for CRs in the tree"
+    ~summary:"Grep for CRs in the tree."
     (let%map_open.Command below =
        Arg.named_opt
          [ "below" ]
@@ -73,5 +73,5 @@ let main =
          List.filter [ by_type; summary ] ~f:(fun t -> not (String.is_empty t))
        in
        print_string (String.concat ~sep:"\n" tables))
-     else Cr_comment.print_list ~crs)
+     else Cr_comment.print_list crs)
 ;;

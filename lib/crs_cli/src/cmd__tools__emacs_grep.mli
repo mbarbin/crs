@@ -20,7 +20,3 @@
 (*_*******************************************************************************)
 
 val main : unit Command.t
-
-module Private : sig
-  val grep_cmd : unit Command.t
-end

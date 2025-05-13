@@ -9,7 +9,7 @@ Welcome to **crs**, a project that provides libraries and a command-line interfa
 
 ### A Quick Example of a Code Review Comment (CR)
 
-Code review comments, or **CRs** (pronounced "C-R"), are a way to embed actionable feedback directly into source code. A CR starts with the letters `CR`, followed by the name of the reporting user, a colon, and the comment text. For example, here’s a CR left by *alice*:
+Code review comments, or **CRs** (pronounced "C"-"R"-z), are a way to embed actionable feedback directly into source code. A CR starts with the letters `CR`, followed by the name of the reporting user, a colon, and the comment text. For example, here’s a CR left by *alice*:
 
 ```txt
 CR alice: Add a quick example of a CR comment in the project's home page!

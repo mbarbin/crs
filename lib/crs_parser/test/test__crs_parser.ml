@@ -659,7 +659,7 @@ let%expect_test "reindentation" =
       |> Vcs.File_contents.create
     in
     let crs = Crs_parser.parse_file ~path ~file_contents in
-    Cr_comment.print_list ~crs
+    Cr_comment.print_list crs
   in
   test "";
   [%expect {||}];

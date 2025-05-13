@@ -21,6 +21,29 @@
 
 let main =
   Command.group
-    ~summary:"A tool for managing code review comments embedded in source code"
-    [ "grep", Cmd__grep.main ]
+    ~summary:"A tool for managing code review comments embedded in source code."
+    ~readme:(fun () ->
+      {|
+The primary goal of $(b,crs) is to make it easy to locate, parse, and manipulate special code review comments called 'CRs' (pronouned "C"-"R"-z), embedded directly in source code.
+
+This CLI aims to offer ergonomic helpers for tasks such as systematically updating comments across multiple files, changing their priority, marking them as resolved, modifying reporter or assignee information, and more.
+
+Main commands include:
+
+- $(b,grep): grep-search and print CRs found in the current repository.
+
+- $(b,tools): a collection of more specific commands, for example to facilitate the integration with other tools (editors, etc).
+
+For more information, use the $(b,--help) flag on a subcommand.
+|})
+    [ "grep", Cmd__grep.main
+    ; ( "tools"
+      , Command.group
+          ~summary:"Useful utils to integrate with other tools."
+          [ "emacs-grep", Cmd__tools__emacs_grep.main ] )
+    ]
 ;;
+
+module Private = struct
+  let grep_cmd = Cmd__grep.main
+end
