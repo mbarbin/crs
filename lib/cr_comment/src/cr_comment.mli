@@ -160,8 +160,12 @@ val digest_ignoring_minor_text_changes : t -> Digest_hex.t
 (** Show the CR with a line showing the file position. *)
 val to_string : t -> string
 
-(** Sorts and prints a list of crs, visually separated if needed. *)
-val print_list : crs:t list -> unit
+(** Sorts and output to the supplied channel, a list of crs  visually separated
+    if needed. *)
+val output_list : t list -> oc:Out_channel.t -> unit
+
+(** A wrapper for {!output_list} that prints to [stdout]. *)
+val print_list : t list -> unit
 
 (** {1 Sort} *)
 

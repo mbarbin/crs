@@ -224,19 +224,21 @@ let to_string t =
   String.concat ~sep:"\n" [ Loc.to_string t.whole_loc; reindented_content t; "" ]
 ;;
 
-let print ~include_delim cr =
+let output_one ~include_delim cr ~oc =
   let str = to_string cr in
   let nl = if include_delim then "\n" else "" in
-  print_string (Printf.sprintf "%s%s" nl str)
+  Out_channel.output_string oc (Printf.sprintf "%s%s" nl str)
 ;;
 
-let print_list ~crs =
+let output_list crs ~oc =
   let crs = sort crs in
   let include_delim = ref false in
   List.iter crs ~f:(fun cr ->
-    print ~include_delim:!include_delim cr;
+    output_one ~include_delim:!include_delim cr ~oc;
     include_delim := true)
 ;;
+
+let print_list crs = output_list crs ~oc:Stdlib.stdout
 
 module Private = struct
   module Header = Header
