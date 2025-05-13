@@ -21,7 +21,7 @@
 
 let main =
   Command.make
-    ~summary:"Grep for CRs in the tree"
+    ~summary:"Grep for CRs in the tree."
     (let%map_open.Command below =
        Arg.named_opt
          [ "below" ]

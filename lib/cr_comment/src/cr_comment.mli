@@ -160,11 +160,17 @@ val digest_ignoring_minor_text_changes : t -> Digest_hex.t
 (** Show the CR with a line showing the file position. *)
 val to_string : t -> string
 
-(** Sorts and output to the supplied channel, a list of crs  visually separated
-    if needed. *)
+(** [reindented_content t] is similar to {!content}, but reseting the
+    indentation of the actual CR to a normalized amount, to print multiple CRs
+    together in a more unified fashion. This is used by [crs grep] for
+    example. *)
+val reindented_content : t -> string
+
+(** Sorts the supplied list of crs and outputs it to the supplied out channel,
+    separated by newline characters. *)
 val output_list : t list -> oc:Out_channel.t -> unit
 
-(** A wrapper for {!output_list} that prints to [stdout]. *)
+(** A convenient wrapper for {!output_list} that prints to [stdout]. *)
 val print_list : t list -> unit
 
 (** {1 Sort} *)
