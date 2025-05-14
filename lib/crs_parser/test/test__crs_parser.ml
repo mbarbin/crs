@@ -484,9 +484,6 @@ let () = ()
 ;;
 
 let%expect_test "CRs on the same line" =
-  (* This is an older use case that allowed dates in CRs. Keeping as monitoring
-     test for now - whether to keep supporting this functionality is to be
-     determined and left as future work. *)
   test
     {|
 (* $CR user: A first CR *) let () = () (* $CR user: Followed by another. *)
