@@ -1,15 +1,14 @@
-## 0.0.2025XXXX (unreleased)
+## 0.0.20250515 (2025-05-15)
 
 ### Added
 
+- Create a crs grep mode for Emacs to be shipped with the main opam pkg (#13, @mbarbin).
 - Improve tests coverage (#8, #11, @mbarbin).
 - New flag `crs grep --summary` to display information as summary tables (#8, @mbarbin).
 
 ### Changed
 
 - Strip the ending of CR content (#11, @mbarbin).
-
-### Deprecated
 
 ### Fixed
 
