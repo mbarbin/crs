@@ -39,7 +39,7 @@ let loc_to_string loc ~repo_root ~below ~path_display_mode =
   let path =
     match (path_display_mode : Path_display_mode.t) with
     | Absolute ->
-      Vcs.Repo_root.append repo_root fname |> (Absolute_path.to_string [@coverage off])
+      (Vcs.Repo_root.append repo_root fname |> Absolute_path.to_string) [@coverage off]
     | Relative_to_cwd ->
       (match
          Relative_path.chop_prefix (Vcs.Path_in_repo.to_relative_path fname) ~prefix:below

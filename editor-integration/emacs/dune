@@ -1,0 +1,5 @@
+(install
+ (package crs)
+ (section share_root)
+ (files
+  (crs-grep.el as emacs/site-lisp/crs-grep.el)))
