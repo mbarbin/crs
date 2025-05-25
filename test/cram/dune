@@ -1,5 +1,5 @@
 (cram
  (package crs-tests)
  (deps
-  (package vcs-cli)
+  (package volgo-vcs)
   %{bin:crs}))

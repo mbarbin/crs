@@ -14,7 +14,7 @@
   -open
   Stdio
   -open
-  Vcs_base
+  Volgo_base
   -open
   Cmdlang)
  (libraries
@@ -32,9 +32,8 @@
   stdio
   textutils.ascii_table
   unix
-  vcs
-  vcs-base
-  vcs-git-unix)
+  volgo-base
+  volgo-git-unix)
  (instrumentation
   (backend bisect_ppx))
  (lint

@@ -10,8 +10,10 @@
   -open
   Base
   -open
-  Stdio)
- (libraries base fpath loc stdio vcs)
+  Stdio
+  -open
+  Volgo)
+ (libraries base fpath loc stdio volgo)
  (instrumentation
   (backend bisect_ppx))
  (lint

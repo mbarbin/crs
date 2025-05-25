@@ -52,7 +52,7 @@ let main =
                    ]
                  ~hints:[ Pp.text "Please choose one." ] [@coverage off]))
      in
-     let vcs = Vcs_git_unix.create () in
+     let vcs = Volgo_git_unix.create () in
      let cwd = Unix.getcwd () |> Absolute_path.v in
      let repo_root = Common_helpers.find_enclosing_repo_root vcs ~from:cwd in
      let below =
