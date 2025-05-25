@@ -1,3 +1,17 @@
+## 0.0.2025XXXX (unreleased)
+
+### Added
+
+### Changed
+
+- Update from `vcs` to `volgo` library (@mbarbin).
+
+### Deprecated
+
+### Fixed
+
+### Removed
+
 ## 0.0.20250515 (2025-05-15)
 
 ### Added
