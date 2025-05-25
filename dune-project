@@ -90,12 +90,12 @@
    (and
     (>= v0.17)
     (< v0.18)))
-  (vcs
-   (>= 0.0.13))
-  (vcs-base
-   (>= 0.0.13))
-  (vcs-git-unix
-   (>= 0.0.13))))
+  (volgo
+   (>= 0.0.16))
+  (volgo-base
+   (>= 0.0.16))
+  (volgo-git-unix
+   (>= 0.0.16))))
 
 (package
  (name crs-tests)
@@ -190,14 +190,14 @@
    (and
     (>= v0.17)
     (< v0.18)))
-  (vcs
-   (>= 0.0.13))
-  (vcs-base
-   (>= 0.0.13))
-  (vcs-cli
-   (>= 0.0.13))
-  (vcs-git-unix
-   (>= 0.0.13))
+  (volgo
+   (>= 0.0.16))
+  (volgo-base
+   (>= 0.0.16))
+  (volgo-git-unix
+   (>= 0.0.16))
+  (volgo-vcs
+   (>= 0.0.16))
   (sherlodoc
    (and
     :with-doc
@@ -306,14 +306,14 @@
    (and
     (>= v0.17)
     (< v0.18)))
-  (vcs
-   (>= 0.0.13))
-  (vcs-base
-   (>= 0.0.13))
-  (vcs-cli
-   (>= 0.0.13))
-  (vcs-git-unix
-   (>= 0.0.13))
+  (volgo
+   (>= 0.0.16))
+  (volgo-base
+   (>= 0.0.16))
+  (volgo-git-unix
+   (>= 0.0.16))
+  (volgo-vcs
+   (>= 0.0.16))
   (odoc
    (and
     :with-doc

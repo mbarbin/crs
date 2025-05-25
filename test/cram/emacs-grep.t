@@ -1,8 +1,8 @@
 First we need to setup a repo in a way that satisfies the test environment. This
 includes specifics required by the GitHub Actions environment.
 
-  $ ocaml-vcs init -q .
-  $ ocaml-vcs set-user-config --user.name "Test User" --user.email "test@example.com"
+  $ volgo-vcs init -q .
+  $ volgo-vcs set-user-config --user.name "Test User" --user.email "test@example.com"
 
 To make sure the CRs are not mistaken for actual cr comments in this
 file, we make use of some trick.
@@ -29,13 +29,13 @@ Let's add some files to the tree.
   > Some contents in this file too.
   > EOF
 
-  $ ocaml-vcs add hello
-  $ ocaml-vcs add foo
-  $ rev0=$(ocaml-vcs commit -m "Initial commit")
+  $ volgo-vcs add hello
+  $ volgo-vcs add foo
+  $ rev0=$(volgo-vcs commit -m "Initial commit")
 
 Making sure the branch name is deterministic.
 
-  $ ocaml-vcs rename-current-branch main
+  $ volgo-vcs rename-current-branch main
 
 If we grep from there, there is no CR in the tree.
 
@@ -53,9 +53,9 @@ Now let's add some CRs.
 
   $ echo -e "(* ${CR}-soon user1: Hey, this is a code review comment *)" >> foo/bar/b.txt
 
-  $ ocaml-vcs add hello
-  $ ocaml-vcs add foo
-  $ rev1=$(ocaml-vcs commit -m "CRs")
+  $ volgo-vcs add hello
+  $ volgo-vcs add foo
+  $ rev1=$(volgo-vcs commit -m "CRs")
 
 Now let's grep for the CRs.
 

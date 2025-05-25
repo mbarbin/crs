@@ -10,7 +10,9 @@
   -open
   Base
   -open
-  Expect_test_helpers_base)
+  Expect_test_helpers_base
+  -open
+  Volgo)
  (libraries
   base
   cr_comment
@@ -19,7 +21,7 @@
   fpath
   loc
   patdiff.expect_test_patdiff
-  vcs)
+  volgo)
  (inline_tests)
  (instrumentation
   (backend bisect_ppx))

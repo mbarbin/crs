@@ -12,7 +12,9 @@
   -open
   Fpath_base
   -open
-  Stdio)
+  Stdio
+  -open
+  Volgo)
  (libraries
   base
   cr_comment
@@ -24,7 +26,7 @@
   re2
   shexp.process
   stdio
-  vcs)
+  volgo)
  (instrumentation
   (backend bisect_ppx))
  (lint
