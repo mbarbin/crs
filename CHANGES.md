@@ -4,7 +4,7 @@
 
 ### Changed
 
-- Update from `vcs` to `volgo` library (@mbarbin).
+- Update from `vcs` to `volgo` library (#14, @mbarbin).
 
 ### Deprecated
 
