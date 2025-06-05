@@ -1,18 +1,12 @@
-## 0.0.2025XXXX (unreleased)
+## 0.0.20250605 (2025-06-05)
 
 ### Added
 
-- Add support for Mercurial repos in the CLI via `volgo-hg-unix` (@mbarbin).
+- Add support for Mercurial repos in the CLI via `volgo-hg-unix` (#15, @mbarbin).
 
 ### Changed
 
 - Update from `vcs` to `volgo` library (#14, @mbarbin).
-
-### Deprecated
-
-### Fixed
-
-### Removed
 
 ## 0.0.20250515 (2025-05-15)
 
