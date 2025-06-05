@@ -96,9 +96,10 @@ By default the file paths are displayed relative to the command's $(b,cwd).
          ~doc:"Specify how the paths are displayed."
          ~default:Relative_to_cwd
      in
-     let vcs = Volgo_git_unix.create () in
      let cwd = Unix.getcwd () |> Absolute_path.v in
-     let repo_root = Common_helpers.find_enclosing_repo_root vcs ~from:cwd in
+     let { Enclosing_repo.vcs_kind = _; repo_root; vcs } =
+       Common_helpers.find_enclosing_repo ~from:cwd
+     in
      let below =
        Common_helpers.relativize ~repo_root ~cwd ~path:(Relative_path.empty :> Fpath.t)
      in

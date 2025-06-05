@@ -19,18 +19,28 @@
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
 
-(** For use in the rest of the files in this directory. *)
+(** This application works from within a Git or Mercurial repository.
 
-(** Find enclosing repo or raise an error compatible with the command handler in
-    use. *)
-val find_enclosing_repo : from:Absolute_path.t -> Enclosing_repo.t
+    This module specifies which functionality the rest of the application relies
+    on, by defining the specific set of traits that are required. We make use of
+    the [volgo] library for this. *)
 
-(** When supplying path arguments that are aimed to designate paths in repo,
-    we need to resolve them according to where the [repo_root] is in relation
-    to the cwd. We interpret relative paths as relative to the cwd from which
-    the program started. *)
-val relativize
-  :  repo_root:Vcs.Repo_root.t
-  -> cwd:Absolute_path.t
-  -> path:Fpath.t
-  -> Vcs.Path_in_repo.t
+module Vcs_kind : sig
+  (** The kind of vcs supported by the cli. *)
+  type t =
+    [ `Git
+    | `Hg
+    ]
+end
+
+(** The specific list of traits that must be implemented by a vcs backend in
+    order for it to be used by the cli. *)
+type vcs = < Vcs.Trait.file_system ; Vcs.Trait.ls_files > Vcs.t
+
+(** A type to represent the vcs found when walking up from within a directory
+    located inside a repo. *)
+type t =
+  { vcs_kind : Vcs_kind.t
+  ; repo_root : Vcs.Repo_root.t
+  ; vcs : vcs
+  }
