@@ -2,6 +2,8 @@
 
 ### Added
 
+- Add support for Mercurial repos in the CLI via `volgo-hg-unix` (@mbarbin).
+
 ### Changed
 
 - Update from `vcs` to `volgo` library (#14, @mbarbin).

@@ -19,39 +19,17 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-let find_enclosing_repo ~from =
-  let vcs_git = Volgo_git_unix.create () in
-  match
-    Vcs.find_enclosing_repo_root
-      vcs_git
-      ~from
-      ~store:[ Fsegment.dot_git, `Git; Fsegment.dot_hg, `Hg ]
-  with
-  | Some ((`Git as vcs_kind), repo_root) ->
-    { Enclosing_repo.vcs_kind; repo_root; vcs = (vcs_git :> Enclosing_repo.vcs) }
-  | Some ((`Hg as vcs_kind), repo_root) ->
-    let vcs_hg = Volgo_hg_unix.create () in
-    { Enclosing_repo.vcs_kind; repo_root; vcs = (vcs_hg :> Enclosing_repo.vcs) }
-  | None ->
-    Err.raise
-      Pp.O.
-        [ Pp.text "Failed to locate enclosing repo root from '"
-          ++ Pp_tty.path (module Absolute_path) from
-          ++ Pp.text "'."
-        ] [@coverage off]
-;;
+module Vcs_kind = struct
+  type t =
+    [ `Git
+    | `Hg
+    ]
+end
 
-let relativize ~repo_root ~cwd ~path =
-  let path = Absolute_path.relativize ~root:cwd path in
-  match
-    Absolute_path.chop_prefix path ~prefix:(repo_root |> Vcs.Repo_root.to_absolute_path)
-  with
-  | Some relative_path -> Vcs.Path_in_repo.of_relative_path relative_path
-  | None ->
-    Err.raise
-      Pp.O.
-        [ Pp.text "Path "
-          ++ Pp_tty.path (module Absolute_path) path
-          ++ Pp.text " is not in repo."
-        ]
-;;
+type vcs = < Vcs.Trait.file_system ; Vcs.Trait.ls_files > Vcs.t
+
+type t =
+  { vcs_kind : Vcs_kind.t
+  ; repo_root : Vcs.Repo_root.t
+  ; vcs : vcs
+  }

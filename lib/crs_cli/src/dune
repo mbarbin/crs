@@ -33,7 +33,8 @@
   textutils.ascii_table
   unix
   volgo-base
-  volgo-git-unix)
+  volgo-git-unix
+  volgo-hg-unix)
  (instrumentation
   (backend bisect_ppx))
  (lint

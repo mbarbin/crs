@@ -95,6 +95,8 @@
   (volgo-base
    (>= 0.0.17))
   (volgo-git-unix
+   (>= 0.0.17))
+  (volgo-hg-unix
    (>= 0.0.17))))
 
 (package
@@ -195,6 +197,8 @@
   (volgo-base
    (>= 0.0.17))
   (volgo-git-unix
+   (>= 0.0.17))
+  (volgo-hg-unix
    (>= 0.0.17))
   (volgo-vcs
    (>= 0.0.17))
@@ -311,6 +315,8 @@
   (volgo-base
    (>= 0.0.17))
   (volgo-git-unix
+   (>= 0.0.17))
+  (volgo-hg-unix
    (>= 0.0.17))
   (volgo-vcs
    (>= 0.0.17))

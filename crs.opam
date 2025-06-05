@@ -33,6 +33,7 @@ depends: [
   "volgo" {>= "0.0.17"}
   "volgo-base" {>= "0.0.17"}
   "volgo-git-unix" {>= "0.0.17"}
+  "volgo-hg-unix" {>= "0.0.17"}
   "odoc" {with-doc}
 ]
 build: [
