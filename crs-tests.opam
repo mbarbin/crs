@@ -36,10 +36,10 @@ depends: [
   "shexp" {>= "v0.17" & < "v0.18"}
   "stdio" {>= "v0.17" & < "v0.18"}
   "textutils" {>= "v0.17" & < "v0.18"}
-  "volgo" {>= "0.0.16"}
-  "volgo-base" {>= "0.0.16"}
-  "volgo-git-unix" {>= "0.0.16"}
-  "volgo-vcs" {>= "0.0.16"}
+  "volgo" {>= "0.0.17"}
+  "volgo-base" {>= "0.0.17"}
+  "volgo-git-unix" {>= "0.0.17"}
+  "volgo-vcs" {>= "0.0.17"}
   "sherlodoc" {with-doc & >= "0.2"}
   "odoc" {with-doc}
 ]
