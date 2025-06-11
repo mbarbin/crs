@@ -67,13 +67,13 @@
   (textutils
    (>= v0.17))
   (volgo
-   (>= 0.0.17))
+   (>= 0.0.18))
   (volgo-base
-   (>= 0.0.17))
+   (>= 0.0.18))
   (volgo-git-unix
-   (>= 0.0.17))
+   (>= 0.0.18))
   (volgo-hg-unix
-   (>= 0.0.17))))
+   (>= 0.0.18))))
 
 (package
  (name crs-tests)
@@ -138,15 +138,15 @@
   (textutils
    (>= v0.17))
   (volgo
-   (>= 0.0.17))
+   (>= 0.0.18))
   (volgo-base
-   (>= 0.0.17))
+   (>= 0.0.18))
   (volgo-git-unix
-   (>= 0.0.17))
+   (>= 0.0.18))
   (volgo-hg-unix
-   (>= 0.0.17))
+   (>= 0.0.18))
   (volgo-vcs
-   (>= 0.0.17))
+   (>= 0.0.18))
   (sherlodoc
    (and
     :with-doc
@@ -225,15 +225,15 @@
   (textutils
    (>= v0.17))
   (volgo
-   (>= 0.0.17))
+   (>= 0.0.18))
   (volgo-base
-   (>= 0.0.17))
+   (>= 0.0.18))
   (volgo-git-unix
-   (>= 0.0.17))
+   (>= 0.0.18))
   (volgo-hg-unix
-   (>= 0.0.17))
+   (>= 0.0.18))
   (volgo-vcs
-   (>= 0.0.17))
+   (>= 0.0.18))
   (odoc
    (and
     :with-doc

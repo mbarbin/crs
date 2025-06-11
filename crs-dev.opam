@@ -40,11 +40,11 @@ depends: [
   "shexp" {>= "v0.17"}
   "stdio" {>= "v0.17"}
   "textutils" {>= "v0.17"}
-  "volgo" {>= "0.0.17"}
-  "volgo-base" {>= "0.0.17"}
-  "volgo-git-unix" {>= "0.0.17"}
-  "volgo-hg-unix" {>= "0.0.17"}
-  "volgo-vcs" {>= "0.0.17"}
+  "volgo" {>= "0.0.18"}
+  "volgo-base" {>= "0.0.18"}
+  "volgo-git-unix" {>= "0.0.18"}
+  "volgo-hg-unix" {>= "0.0.18"}
+  "volgo-vcs" {>= "0.0.18"}
   "odoc" {with-doc & >= "2.4.4"}
   "sherlodoc" {with-doc & >= "0.2"}
 ]
