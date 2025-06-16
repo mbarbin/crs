@@ -19,6 +19,7 @@ depends: [
   "fpath" {>= "0.7.3"}
   "fpath-base" {>= "0.3.1"}
   "loc" {>= "0.2.2"}
+  "pageantty" {>= "0.0.2"}
   "patdiff" {>= "v0.17"}
   "pp" {>= "2.0.0"}
   "pplumbing" {>= "0.0.14"}
