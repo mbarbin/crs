@@ -62,17 +62,21 @@ let main =
        | Some path -> Common_helpers.relativize ~repo_root ~cwd ~path
      in
      let crs = Crs_parser.grep ~vcs ~repo_root ~below in
-     if sexp
-     then
-       List.iter crs ~f:(fun cr ->
-         print_endline (Sexp.to_string_hum [%sexp (cr : Cr_comment.t)]))
-     else if summary
-     then (
-       let by_type = Summary_table.By_type.make crs |> Summary_table.By_type.to_string in
-       let summary = Summary_table.make crs |> Summary_table.to_string in
-       let tables =
-         List.filter [ by_type; summary ] ~f:(fun t -> not (String.is_empty t))
-       in
-       print_string (String.concat ~sep:"\n" tables))
-     else Cr_comment.print_list crs)
+     Git_pager.run ~f:(fun git_pager ->
+       let oc = Git_pager.write_end git_pager in
+       if sexp
+       then
+         List.iter crs ~f:(fun cr ->
+           Out_channel.output_line oc (Sexp.to_string_hum [%sexp (cr : Cr_comment.t)]))
+       else if summary
+       then (
+         let by_type =
+           Summary_table.By_type.make crs |> Summary_table.By_type.to_string
+         in
+         let summary = Summary_table.make crs |> Summary_table.to_string in
+         let tables =
+           List.filter [ by_type; summary ] ~f:(fun t -> not (String.is_empty t))
+         in
+         Out_channel.output_string oc (String.concat ~sep:"\n" tables))
+       else Cr_comment.output_list crs ~oc))
 ;;
