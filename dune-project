@@ -91,6 +91,8 @@
    (>= v0.17))
   (cmdlang
    (>= 0.0.9))
+  conf-git
+  conf-hg
   (crs
    (= :version))
   (expect_test_helpers_core
@@ -176,6 +178,8 @@
     (>= 2.8.3)))
   (cmdlang
    (>= 0.0.9))
+  conf-git
+  conf-hg
   (crs
    (= :version))
   (crs-tests
