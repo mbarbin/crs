@@ -201,6 +201,8 @@ matching. This involves running [xargs]. Let's cover for some failures there.
 
   $ cat > xargs <<EOF
   > #!/bin/bash -e
+  > # Read and discard all stdin to avoid broken pipe
+  > cat > /dev/null
   > echo "Hello Fake xargs"
   > exit 42
   > EOF
