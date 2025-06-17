@@ -146,6 +146,24 @@ You may restrict the search to a subdirectory only.
   Error: Path "/tmp" is not in repo.
   [123]
 
+  $ crs grep --below not-a-directory
+  Context:
+  (Vcs.ls_files
+   (repo_root
+    $TESTCASE_ROOT)
+   (below not-a-directory))
+  ((prog git) (args (ls-files --full-name)) (exit_status Unknown)
+   (cwd
+    $TESTCASE_ROOT/not-a-directory)
+   (stdout "") (stderr ""))
+  Error:
+  (Unix.Unix_error "No such file or directory" chdir
+   $TESTCASE_ROOT/not-a-directory)
+  [123]
+
+  $ mkdir empty-directory
+  $ crs grep --below empty-directory
+
 There's also an option to display the results as summary tables.
 
   $ crs grep --summary
