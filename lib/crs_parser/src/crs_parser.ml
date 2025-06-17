@@ -91,80 +91,83 @@ module Exit_status = struct
 end
 
 let grep ~vcs ~repo_root ~below =
-  let files_to_grep = Vcs.ls_files vcs ~repo_root ~below in
-  let stdin_text =
-    files_to_grep |> List.map ~f:Vcs.Path_in_repo.to_string |> String.concat ~sep:"\n"
-  in
   let files_to_grep =
-    let stdout_ref = ref "<Unknown>" in
-    let stderr_ref = ref "<Unknown>" in
-    match
-      let prog =
-        match Lazy.force find_xargs with
-        | Some prog -> prog
-        | None -> failwith "Cannot find xargs in PATH" [@coverage off]
+    match Vcs.ls_files vcs ~repo_root ~below with
+    | [] -> []
+    | _ :: _ as files_to_grep ->
+      let stdin_text =
+        files_to_grep |> List.map ~f:Vcs.Path_in_repo.to_string |> String.concat ~sep:"\n"
       in
-      let stdin_reader, stdin_writer = Spawn.safe_pipe () in
-      let stdout_reader, stdout_writer = Spawn.safe_pipe () in
-      let stderr_reader, stderr_writer = Spawn.safe_pipe () in
-      let pid =
-        Spawn.spawn
-          ~cwd:(Path (Vcs.Repo_root.to_string repo_root))
-          ~prog
-          ~argv:
-            [ "xargs"
-            ; "-r"
-            ; "-d"
-            ; "\n"
-            ; "grep"
-            ; "--no-messages"
-            ; "-E"
-            ; "-l"
-            ; "--binary-files=without-match"
-            ; cr_pattern_egrep
-            ]
-          ~stdin:stdin_reader
-          ~stdout:stdout_writer
-          ~stderr:stderr_writer
-          ()
-      in
-      Unix.close stdin_reader;
-      Unix.close stdout_writer;
-      Unix.close stderr_writer;
-      let () =
-        let stdin_oc = Unix.out_channel_of_descr stdin_writer in
-        Out_channel.output_string stdin_oc stdin_text;
-        Out_channel.flush stdin_oc;
-        Unix.close stdin_writer
-      in
-      let stdout = read_all_from_fd stdout_reader in
-      stdout_ref := stdout;
-      let stderr = read_all_from_fd stderr_reader in
-      stderr_ref := stderr;
-      let pid', process_status = waitpid_non_intr pid in
-      assert (pid = pid');
-      match process_status with
-      | Unix.WEXITED (0 | 123) -> `Output stdout
-      | Unix.WEXITED n -> `Exit_status (`Exited n)
-      | Unix.WSIGNALED n -> `Exit_status (`Signaled n) [@coverage off]
-      | Unix.WSTOPPED n -> `Exit_status (`Stopped n) [@coverage off]
-    with
-    | `Output stdout -> stdout |> String.split_lines |> List.map ~f:Vcs.Path_in_repo.v
-    | `Exit_status exit_status ->
-      let stdout = !stdout_ref in
-      let stderr = !stderr_ref in
-      raise
-        (Err.E
-           (Err.create
-              [ Pp.text "Process xargs exited abnormally."
-              ; Err.sexp
-                  [%sexp
-                    { exit_status : Exit_status.t; stdout : string; stderr : string }]
-              ]))
-    | exception exn ->
-      raise
-        (Err.E (Err.create [ Pp.text "Error while running xargs process."; Err.exn exn ]))
-      [@coverage off]
+      let stdout_ref = ref "<Unknown>" in
+      let stderr_ref = ref "<Unknown>" in
+      (match
+         let prog =
+           match Lazy.force find_xargs with
+           | Some prog -> prog
+           | None -> failwith "Cannot find xargs in PATH" [@coverage off]
+         in
+         let stdin_reader, stdin_writer = Spawn.safe_pipe () in
+         let stdout_reader, stdout_writer = Spawn.safe_pipe () in
+         let stderr_reader, stderr_writer = Spawn.safe_pipe () in
+         let pid =
+           Spawn.spawn
+             ~cwd:(Path (Vcs.Repo_root.to_string repo_root))
+             ~prog
+             ~argv:
+               [ "xargs"
+               ; "-r"
+               ; "-d"
+               ; "\n"
+               ; "grep"
+               ; "--no-messages"
+               ; "-E"
+               ; "-l"
+               ; "--binary-files=without-match"
+               ; cr_pattern_egrep
+               ]
+             ~stdin:stdin_reader
+             ~stdout:stdout_writer
+             ~stderr:stderr_writer
+             ()
+         in
+         Unix.close stdin_reader;
+         Unix.close stdout_writer;
+         Unix.close stderr_writer;
+         let () =
+           let stdin_oc = Unix.out_channel_of_descr stdin_writer in
+           Out_channel.output_string stdin_oc stdin_text;
+           Out_channel.flush stdin_oc;
+           Unix.close stdin_writer
+         in
+         let stdout = read_all_from_fd stdout_reader in
+         stdout_ref := stdout;
+         let stderr = read_all_from_fd stderr_reader in
+         stderr_ref := stderr;
+         let pid', process_status = waitpid_non_intr pid in
+         assert (pid = pid');
+         match process_status with
+         | Unix.WEXITED (0 | 123) -> `Output stdout
+         | Unix.WEXITED n -> `Exit_status (`Exited n)
+         | Unix.WSIGNALED n -> `Exit_status (`Signaled n) [@coverage off]
+         | Unix.WSTOPPED n -> `Exit_status (`Stopped n) [@coverage off]
+       with
+       | `Output stdout -> stdout |> String.split_lines |> List.map ~f:Vcs.Path_in_repo.v
+       | `Exit_status exit_status ->
+         let stdout = !stdout_ref in
+         let stderr = !stderr_ref in
+         raise
+           (Err.E
+              (Err.create
+                 [ Pp.text "Process xargs exited abnormally."
+                 ; Err.sexp
+                     [%sexp
+                       { exit_status : Exit_status.t; stdout : string; stderr : string }]
+                 ]))
+       | exception exn ->
+         raise
+           (Err.E
+              (Err.create [ Pp.text "Error while running xargs process."; Err.exn exn ]))
+         [@coverage off])
   in
   List.concat_map files_to_grep ~f:(fun path_in_repo ->
     let file_contents =
