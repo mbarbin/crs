@@ -24,7 +24,6 @@
   pp
   pplumbing.err
   re
-  re2
   spawn
   stdio
   unix
