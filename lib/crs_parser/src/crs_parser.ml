@@ -90,13 +90,17 @@ module Exit_status = struct
   [@@deriving sexp_of]
 end
 
+let null_separator = String.make 1 (Char.of_int_exn 0)
+
 let grep ~vcs ~repo_root ~below =
   let files_to_grep =
     match Vcs.ls_files vcs ~repo_root ~below with
     | [] -> []
     | _ :: _ as files_to_grep ->
       let stdin_text =
-        files_to_grep |> List.map ~f:Vcs.Path_in_repo.to_string |> String.concat ~sep:"\n"
+        files_to_grep
+        |> List.map ~f:Vcs.Path_in_repo.to_string
+        |> String.concat ~sep:null_separator
       in
       let stdout_ref = ref "<Unknown>" in
       let stderr_ref = ref "<Unknown>" in
@@ -115,9 +119,7 @@ let grep ~vcs ~repo_root ~below =
              ~prog
              ~argv:
                [ "xargs"
-               ; "-r"
-               ; "-d"
-               ; "\n"
+               ; "-0"
                ; "grep"
                ; "--no-messages"
                ; "-E"
