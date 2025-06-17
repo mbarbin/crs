@@ -42,49 +42,120 @@
    *
    * - Migrate to this file only the part that relates to grepping versioned files.
    * - Remove dependency to [Core] - make small adjustments to use [Base] instead.
-   * - Remove dependency to [Async] - replace by [Shexp] and [Stdio].
+   * - Remove dependency to [Async] - replace by [Spawn] and [Stdio].
    * - Use [Vcs] instead of [Hg].
 *)
+
+module Unix = UnixLabels
 
 let cr_pattern_egrep = File_parser.cr_pattern_egrep
 let parse_file = File_parser.parse_file
 
+let rec waitpid_non_intr pid =
+  try Unix.waitpid ~mode:[] pid with
+  | Unix.Unix_error (EINTR, _, _) -> waitpid_non_intr pid [@coverage off]
+;;
+
+let read_all_from_fd fd =
+  let out = In_channel.input_all (Unix.in_channel_of_descr fd) in
+  Unix.close fd;
+  out
+;;
+
+let find_executable ~path ~executable_basename =
+  let rec loop = function
+    | [] -> (None [@coverage off])
+    | path :: rest ->
+      let fn = Stdlib.Filename.concat path executable_basename in
+      if Stdlib.Sys.file_exists fn then Some fn else loop rest
+  in
+  loop (String.split path ~on:':')
+;;
+
+let find_xargs =
+  lazy
+    (match Stdlib.Sys.getenv_opt "PATH" with
+     | None -> None [@coverage off]
+     | Some path -> find_executable ~path ~executable_basename:"xargs")
+;;
+
+module Exit_status = struct
+  [@@@coverage off]
+
+  type t =
+    [ `Exited of int
+    | `Signaled of int
+    | `Stopped of int
+    ]
+  [@@deriving sexp_of]
+end
+
 let grep ~vcs ~repo_root ~below =
   let files_to_grep = Vcs.ls_files vcs ~repo_root ~below in
-  let stdin =
+  let stdin_text =
     files_to_grep |> List.map ~f:Vcs.Path_in_repo.to_string |> String.concat ~sep:"\n"
   in
   let files_to_grep =
-    let context =
-      Shexp_process.Context.create ~cwd:(Path (Vcs.Repo_root.to_string repo_root)) ()
-    in
-    let process =
-      Shexp_process.pipe
-        (Shexp_process.echo stdin)
-        (Shexp_process.capture
-           [ Stdout ]
-           (Shexp_process.call_exit_code
-              [ "xargs"
-              ; "-r"
-              ; "-d"
-              ; "\n"
-              ; "grep"
-              ; "--no-messages"
-              ; "-E"
-              ; "-l"
-              ; "--binary-files=without-match"
-              ; cr_pattern_egrep
-              ]))
-    in
-    let exit_code, stdout = Shexp_process.eval ~context process in
-    Shexp_process.Context.dispose context;
-    match exit_code with
-    | 0 | 123 -> stdout |> String.split_lines |> List.map ~f:Vcs.Path_in_repo.v
-    | _ ->
+    match
+      let prog =
+        match Lazy.force find_xargs with
+        | Some prog -> prog
+        | None -> failwith "Cannot find xargs in PATH" [@coverage off]
+      in
+      let stdin_reader, stdin_writer = Spawn.safe_pipe () in
+      let stdout_reader, stdout_writer = Spawn.safe_pipe () in
+      let stderr_reader, stderr_writer = Spawn.safe_pipe () in
+      let pid =
+        Spawn.spawn
+          ~cwd:(Path (Vcs.Repo_root.to_string repo_root))
+          ~prog
+          ~argv:
+            [ "xargs"
+            ; "-r"
+            ; "-d"
+            ; "\n"
+            ; "grep"
+            ; "--no-messages"
+            ; "-E"
+            ; "-l"
+            ; "--binary-files=without-match"
+            ; cr_pattern_egrep
+            ]
+          ~stdin:stdin_reader
+          ~stdout:stdout_writer
+          ~stderr:stderr_writer
+          ()
+      in
+      Unix.close stdin_reader;
+      Unix.close stdout_writer;
+      Unix.close stderr_writer;
+      let () =
+        let stdin_oc = Unix.out_channel_of_descr stdin_writer in
+        Out_channel.output_string stdin_oc stdin_text;
+        Out_channel.flush stdin_oc;
+        Unix.close stdin_writer
+      in
+      let stdout = read_all_from_fd stdout_reader in
+      let (_ : string) = read_all_from_fd stderr_reader in
+      let pid', process_status = waitpid_non_intr pid in
+      assert (pid = pid');
+      match process_status with
+      | Unix.WEXITED (0 | 123) -> `Output stdout
+      | Unix.WEXITED n -> `Exited n
+      | Unix.WSIGNALED n -> `Signaled n [@coverage off]
+      | Unix.WSTOPPED n -> `Stopped n [@coverage off]
+    with
+    | `Output stdout -> stdout |> String.split_lines |> List.map ~f:Vcs.Path_in_repo.v
+    | (`Exited _ | `Signaled _ | `Stopped _) as exit_status ->
       raise
         (Err.E
            (Err.create
-              [ Pp.text "xargs process failed"; Err.sexp [%sexp { exit_code : int }] ]))
+              [ Pp.text "Process xargs exited abnormally."
+              ; Err.sexp [%sexp { exit_status : Exit_status.t }]
+              ]))
+    | exception exn ->
+      raise
+        (Err.E (Err.create [ Pp.text "Error while running xargs process."; Err.exn exn ]))
   in
   List.concat_map files_to_grep ~f:(fun path_in_repo ->
     let file_contents =

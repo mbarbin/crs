@@ -1,3 +1,20 @@
+## 0.0.202506XX (unreleased)
+
+### Added
+
+### Changed
+
+- Reduce dependencies and replace `shexp` by `spawn` (@mbarbin).
+- Make `crs grep` output in a pager when able (@mbarbin).
+
+### Deprecated
+
+### Fixed
+
+### Removed
+
+- No longer depend on `shexp` (@mbarbin).
+
 ## 0.0.20250605 (2025-06-05)
 
 ### Added

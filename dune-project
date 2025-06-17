@@ -38,6 +38,8 @@
    (>= 0.3.1))
   (loc
    (>= 0.2.2))
+  (pageantty
+   (>= 0.0.2))
   (pp
    (>= 2.0.0))
   (pplumbing
@@ -60,7 +62,7 @@
    (>= 0.33))
   (re2
    (>= v0.17))
-  (shexp
+  (spawn
    (>= v0.17))
   (stdio
    (>= v0.17))
@@ -89,6 +91,8 @@
    (>= v0.17))
   (cmdlang
    (>= 0.0.9))
+  conf-git
+  conf-hg
   (crs
    (= :version))
   (expect_test_helpers_core
@@ -101,6 +105,8 @@
    (>= 0.3.1))
   (loc
    (>= 0.2.2))
+  (pageantty
+   (>= 0.0.2))
   (patdiff
    (>= v0.17))
   (pp
@@ -131,7 +137,7 @@
    (>= 0.33))
   (re2
    (>= v0.17))
-  (shexp
+  (spawn
    (>= v0.17))
   (stdio
    (>= v0.17))
@@ -172,6 +178,8 @@
     (>= 2.8.3)))
   (cmdlang
    (>= 0.0.9))
+  conf-git
+  conf-hg
   (crs
    (= :version))
   (crs-tests
@@ -188,6 +196,8 @@
    (>= 0.2.2))
   (mdx
    (>= 2.4))
+  (pageantty
+   (>= 0.0.2))
   (patdiff
    (>= v0.17))
   (pp
@@ -218,7 +228,7 @@
    (>= 0.33))
   (re2
    (>= v0.17))
-  (shexp
+  (spawn
    (>= v0.17))
   (stdio
    (>= v0.17))

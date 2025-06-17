@@ -185,6 +185,6 @@ matching. This involves running [xargs]. Let's cover for some failures there.
   $ chmod +x ./xargs
 
   $ PATH=".:$PATH" crs grep
-  Error: xargs process failed
-  (exit_code 42)
+  Error: Process xargs exited abnormally.
+  (exit_status (Exited 42))
   [123]

@@ -24,8 +24,9 @@
   pp
   pplumbing.err
   re2
-  shexp.process
+  spawn
   stdio
+  unix
   volgo)
  (instrumentation
   (backend bisect_ppx))
