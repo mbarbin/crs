@@ -14,6 +14,9 @@
 
 ### Fixed
 
+- Disable failing build with 5.4 alpha release (#19, @mbarbin).
+- Use xargs null-separated input for portability to MacOS (#19, @mbarbin).
+
 ### Removed
 
 - No longer depend on `re2` (#17, @mbarbin).
