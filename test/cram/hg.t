@@ -1,7 +1,7 @@
 First we need to setup a repo in a way that satisfies the test environment. This
 includes specifics required by the GitHub Actions environment.
 
-  $ hg init
+  $ hg init 2> /dev/null
 
 To make sure the CRs are not mistaken for actual cr comments in this
 file, we make use of some trick.
