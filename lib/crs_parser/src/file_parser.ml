@@ -106,7 +106,10 @@ let find_ml_end =
          | "(*" -> nest_comments ~depth:(depth + 1) next_pos
          | "*)" ->
            if depth = 0 then Some next_pos else nest_comments ~depth:(depth - 1) next_pos
-         | _ -> failwith "ML regex matched something other than an ML comment start/end!")
+         | _ ->
+           failwith
+             "ML regex matched something other than an ML comment start/end!"
+           [@coverage off])
     in
     nest_comments ~depth:0 start_pos
 ;;
