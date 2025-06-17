@@ -9,6 +9,10 @@ file, we make use of some trick.
   $ export CR="CR"
   $ export XCR="XCR"
 
+We disable the pager in this test.
+
+  $ export GIT_PAGER=cat
+
 Let's add some files to the tree.
 
   $ cat > hello << EOF
