@@ -25,7 +25,9 @@
   "A tool for managing code review comments embedded in source code")
  (depends
   (ocaml
-   (>= 5.2))
+   (and
+    (>= 5.2)
+    (< 5.4~)))
   (base
    (>= v0.17))
   (cmdlang
