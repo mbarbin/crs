@@ -53,63 +53,77 @@
    * - Rename [Processed] to [Header].
    * - Remove support for 'v' separator in CR comment
    * - Include the leading '-' char in due's [Loc.t].
+   * - Migrate from [Re2] to [ocaml-re].
 *)
 
-module Regex = Re2
-
-(* various utilities -- mostly attempting to make the code more readable *)
-let named_group name patt = String.concat [ "(?P<"; name; ">"; patt; ")" ]
-
-(* (?:re)? makes an optional group that can't be matched via the ~sub arguments to
-   various re2 functions.  I don't know if this is any better than just (re)?, but it's
-   certainly not worse. *)
-let with_flags flags patt = String.concat [ "(?"; flags; ":"; patt; ")" ]
-let protect patt = with_flags "" patt (* to avoid the usual stringy macro problems *)
-let optional patt = protect patt ^ "?"
-let any patt = protect patt ^ "*"
-let some patt = protect patt ^ "+"
-let seq patts = String.concat patts
-let alt patts = protect (String.concat ~sep:"|" patts)
-
 (* : and @ have other meanings in CR comments *)
-let word = "[^ \\t\\n:@]+"
-let whitespace = "\\s"
-let exactly patt = Regex.create_exn ("^" ^ patt ^ "$")
+let word_t =
+  Re.compl [ Re.char ' '; Re.char '\t'; Re.char '\n'; Re.char ':'; Re.char '@' ]
+;;
+
+let whitespace = Re.alt [ Re.char ' '; Re.char '\n'; Re.char '\t' ]
 
 let comment_regex =
-  exactly
-    (seq
-       [ any whitespace
-       ; named_group "cr_kind" "X?CR"
-       ; optional (seq [ "-"; named_group "due" (alt [ "\\d{6}"; "soon"; "someday" ]) ])
-       ; some whitespace
-       ; named_group "reported_by" word
-       ; optional
-           (seq [ some whitespace; "for"; some whitespace; named_group "for" word ])
-       ; any whitespace
-       ; ":"
-       ; with_flags "s" ".*" (* the "s" flag makes "." match newlines *)
-       ])
+  lazy
+    (Re.(
+       whole_string
+         (seq
+            [ rep whitespace
+            ; group ~name:"cr_kind" (seq [ opt (char 'X'); str "CR" ])
+            ; opt
+                (seq
+                   [ char '-'
+                   ; group
+                       ~name:"due"
+                       (alt [ repn digit 6 (Some 6); str "soon"; str "someday" ])
+                   ])
+            ; rep1 whitespace
+            ; group ~name:"reported_by" (rep1 word_t)
+            ; opt
+                (seq
+                   [ rep1 whitespace
+                   ; str "for"
+                   ; rep1 whitespace
+                   ; group ~name:"for" (rep1 word_t)
+                   ])
+            ; rep whitespace
+            ; char ':'
+            ; rep any
+            ]))
+     |> Re.compile)
 ;;
 
 let parse ~file_cache ~content_start_offset ~content =
-  let get_match_loc_exn ~sub m =
-    let pos, len = Re2.Match.get_pos_exn ~sub m in
-    let start = content_start_offset + pos in
-    Loc.of_file_range ~file_cache ~range:{ start; stop = start + len }
-  in
   try
+    let comment_regex = Lazy.force comment_regex in
+    let group_names = Re.group_names comment_regex in
     let open Or_error.Let_syntax in
     let%bind m =
-      match Regex.get_matches_exn ~max:1 comment_regex content with
-      | [] -> Or_error.error "Invalid CR comment" content String.sexp_of_t
-      | m :: _ -> return m
+      match Re.exec_opt comment_regex content with
+      | None -> Or_error.error "Invalid CR comment" content String.sexp_of_t
+      | Some m -> return m
     in
     let get field_name =
-      let sub = `Name field_name in
-      match Regex.Match.get ~sub m with
+      let index =
+        match
+          List.find group_names ~f:(fun (name, _) -> String.equal field_name name)
+        with
+        | Some (_, index) -> index
+        | None ->
+          failwith
+            (Printf.sprintf "Invalid regexp group name %S" field_name) [@coverage off]
+      in
+      match Re.Group.get_opt m index with
       | None -> None
-      | Some v -> Some (v, get_match_loc_exn ~sub m)
+      | Some v ->
+        let start, stop = Re.Group.offset m index in
+        let loc =
+          Loc.of_file_range
+            ~file_cache
+            ~range:
+              { start = content_start_offset + start; stop = content_start_offset + stop }
+        in
+        Some (v, loc)
     in
     let reported_by =
       match get "reported_by" with

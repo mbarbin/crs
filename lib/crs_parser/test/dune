@@ -21,6 +21,7 @@
   fpath
   loc
   patdiff.expect_test_patdiff
+  re
   volgo)
  (inline_tests)
  (instrumentation

@@ -51,9 +51,8 @@
    * - Remove assignee computation (left as external work).
    * - Compute positions and offsets with [Loc].
    * - Strip the ending of CR content.
+   * - Migrate from [Re2] to [ocaml-re].
 *)
-
-module Regex = Re2
 
 (* supported comment syntaxes:
 
@@ -80,93 +79,78 @@ module Regex = Re2
    XML    <!-- X?CR ... --> may not nest recursively
 *)
 
-let slice_after contents last_excluded_index =
-  (* the longest suffix not containing [last_excluded_index] *)
-  String.sub
-    contents
-    ~pos:(last_excluded_index + 1)
-    ~len:(String.length contents - last_excluded_index - 1)
-;;
-
-(* several functions in Regex take a [sub] argument, but this is going to be [`Index 0]
-   everywhere in this module, indicating that we're interested in the entire match *)
-let sub = `Index 0
-
 let find_ml_end =
-  let regex = Regex.create_exn "\\(\\*|\\*\\)" in
+  let regex = Re.compile Re.(alt [ str "(*"; str "*)" ]) in
   fun file_contents start_pos ->
     let rec nest_comments ~depth current_pos =
-      let rest_of_file = slice_after file_contents current_pos in
-      match Regex.get_matches_exn ~max:1 regex rest_of_file with
-      | [] -> None
-      | m :: _ ->
-        let match_start, match_len = Regex.Match.get_pos_exn ~sub m in
-        let next_pos = current_pos + match_start + match_len in
-        (match Regex.Match.get_exn ~sub m with
+      match Re.exec_opt regex file_contents ~pos:current_pos with
+      | None -> None
+      | Some m ->
+        let next_pos = Re.Group.stop m 0 in
+        (match Re.Group.get m 0 with
          | "(*" -> nest_comments ~depth:(depth + 1) next_pos
          | "*)" ->
-           if depth = 0 then Some next_pos else nest_comments ~depth:(depth - 1) next_pos
-         | _ -> failwith "ML regex matched something other than an ML comment start/end!")
+           if depth = 0
+           then Some (next_pos - 2, next_pos)
+           else nest_comments ~depth:(depth - 1) next_pos
+         | _ ->
+           failwith
+             "ML regex matched something other than an ML comment start/end!"
+           [@coverage off])
     in
     nest_comments ~depth:0 start_pos
 ;;
 
 let find_non_nesting_end end_regex file_contents start_pos =
-  let partial_contents = slice_after file_contents start_pos in
-  match Regex.get_matches_exn ~max:1 end_regex partial_contents with
-  | [] -> None
-  | m :: _ ->
-    let pos, len = Regex.Match.get_pos_exn ~sub m in
-    Some (start_pos + pos + len)
+  match Re.exec_opt end_regex file_contents ~pos:(start_pos + 1) with
+  | None -> None
+  | Some m ->
+    let start, stop = Re.Group.offset m 0 in
+    Some (start, stop)
 ;;
 
 let find_line_comment_end regex file_contents start_pos =
-  match Regex.get_matches_exn ~max:1 regex (slice_after file_contents start_pos) with
-  | [] ->
+  match Re.exec_opt regex file_contents ~pos:(start_pos + 1) with
+  | None ->
     (* reached EOF without finding a match, so block ends at EOF *)
     String.length file_contents - 1
-  | m :: _ ->
-    let newline_pos, _ = Regex.Match.get_pos_exn ~sub m in
-    start_pos + newline_pos
+  | Some m -> Re.Group.start m 0 - 1
 ;;
 
 let find_comment_bounds =
   (* These end regexes are for matching the ends of block comments. *)
-  let ml_end_regex = Regex.create_exn "\\*+\\)$" in
-  let c_end_regex = Regex.create_exn "\\*+/" in
-  let xml_end_regex = Regex.create_exn "-->" in
+  let c_end_regex = Re.compile Re.(seq [ rep1 (char '*'); char '/' ]) in
+  let xml_end_regex = Re.compile Re.(str "-->") in
   (* The line regexes match lines that DON'T start with a line comment marker. *)
   (* matches any character except [c], space, and tab *)
-  let not_char c = "[^" ^ Char.to_string c ^ " \\t]" in
+  let not_char c = Re.(compl [ char ' '; char '\t'; char c ]) in
   (* newline, followed by any amount of space *)
-  let line_start = "\\n[ \\t]*" in
-  let sh_regex = Regex.create_exn (line_start ^ not_char '#') in
-  let lisp_regex = Regex.create_exn (line_start ^ not_char ';') in
+  let line_start = Re.(seq [ char '\n'; rep (alt [ char ' '; char '\t' ]) ]) in
+  let sh_regex = Re.compile Re.(seq [ line_start; not_char '#' ]) in
+  let lisp_regex = Re.compile Re.(seq [ line_start; not_char ';' ]) in
   (* The C line complicates things since it's two characters long.  The idea is that the
      line can optionally start with '/', but that can't be followed by another '/'. *)
-  let c_line_regex = Regex.create_exn (line_start ^ "/?" ^ not_char '/') in
-  let sql_regex = Regex.create_exn (line_start ^ "-?" ^ not_char '-') in
+  let c_line_regex = Re.compile Re.(seq [ line_start; opt (char '/'); not_char '/' ]) in
+  let sql_regex = Re.compile Re.(seq [ line_start; opt (char '-'); not_char '-' ]) in
   fun file_contents content_start_pos ->
     let end_block kind comment_start_pos =
-      let find_end, end_regex =
+      let find_end =
         match kind with
-        | `ml -> find_ml_end, ml_end_regex
-        | `c -> find_non_nesting_end c_end_regex, c_end_regex
-        | `xml -> find_non_nesting_end xml_end_regex, xml_end_regex
+        | `ml -> find_ml_end
+        | `c -> find_non_nesting_end c_end_regex
+        | `xml -> find_non_nesting_end xml_end_regex
       in
       match find_end file_contents content_start_pos with
       | None -> None
-      | Some end_pos ->
-        (* string from "X?CR" to end of comment (including comment ender) *)
-        let raw_contents =
+      | Some (end_contents, end_cr) ->
+        let contents =
+          (* string from "X?CR" to end of comment, excluding comment ender. *)
           String.sub
             file_contents
             ~pos:content_start_pos
-            ~len:(end_pos + 1 - content_start_pos)
+            ~len:(end_contents - content_start_pos)
         in
-        (* remove the comment ender *)
-        let contents = Regex.rewrite_exn end_regex raw_contents ~template:"" in
-        Some (comment_start_pos, end_pos, contents)
+        Some (comment_start_pos, end_cr - 1, contents)
     in
     let end_lines regex comment_start_pos =
       let end_pos = find_line_comment_end regex file_contents content_start_pos in
@@ -220,13 +204,22 @@ let find_comment_bounds =
     check_backwards ~last:`not_special (content_start_pos - 1)
 ;;
 
-let cr_pattern_re2 = "\\bX?CR[-v: \\t]"
-let cr_pattern_egrep = cr_pattern_re2
-let cr_regex = Regex.create_exn cr_pattern_re2
+let cr_pattern_egrep = "\\bX?CR[-v: \\t]"
+
+let cr_regex =
+  Re.compile
+    Re.(
+      seq
+        [ bow
+        ; opt (char 'X')
+        ; str "CR"
+        ; alt [ char '-'; char 'v'; char ':'; char ' '; char '\t' ]
+        ])
+;;
 
 let condense_whitespace =
-  let regex = Regex.create_exn "\\s+" in
-  fun s -> Regex.rewrite_exn regex ~template:" " s
+  let regex = Re.compile Re.(rep1 (set " \t\n")) in
+  fun s -> Re.replace_string regex ~by:" " s
 ;;
 
 let parse_file ~path ~(file_contents : Vcs.File_contents.t) =
@@ -234,10 +227,10 @@ let parse_file ~path ~(file_contents : Vcs.File_contents.t) =
   let file_cache =
     lazy (Loc.File_cache.create ~path:(Vcs.Path_in_repo.to_fpath path) ~file_contents)
   in
-  let ms = Regex.get_matches_exn cr_regex file_contents in
+  let ms = Re.all cr_regex file_contents in
   List.filter_map ms ~f:(fun m ->
     let open Option.Let_syntax in
-    let cr_start, _ = Regex.Match.get_pos_exn ~sub m in
+    let cr_start = Re.Group.start m 0 in
     let%map start_index, end_index, content =
       find_comment_bounds file_contents cr_start
     in

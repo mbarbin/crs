@@ -2,10 +2,13 @@
 
 ### Added
 
+- Continue to increase code coverage (#17, @mbarbin).
+
 ### Changed
 
-- Reduce dependencies and replace `shexp` by `spawn` (@mbarbin).
-- Make `crs grep` output in a pager when able (@mbarbin).
+- Reduce dependencies and replace `re2` by `ocaml-re` (#17, @mbarbin).
+- Reduce dependencies and replace `shexp` by `spawn` (#16, @mbarbin).
+- Make `crs grep` output in a pager when able (#16, @mbarbin).
 
 ### Deprecated
 
@@ -13,7 +16,8 @@
 
 ### Removed
 
-- No longer depend on `shexp` (@mbarbin).
+- No longer depend on `re2` (#17, @mbarbin).
+- No longer depend on `shexp` (#16, @mbarbin).
 
 ## 0.0.20250605 (2025-06-05)
 

@@ -759,5 +759,731 @@ this as part of our tests. *)
 
       user2: Hi! Good tests, good times.
     |}];
+  (* There is an issue with multiple lines comments when each line starts with
+     the comment delimiter. Currently the delimiter is captured as being part of
+     the contents, and thus the CR is rendered incorrectly. *)
+  test
+    {|
+// $CR user: This is a multiple lines CR in the c-style
+// We should try and remove the delimiter prefix from subsequent lines.
+
+;; $CR user: Note that this is not limited to c-style comments.
+;; Basically any language where delimiters start the line has this issue.
+
+;; $CR user: This may require further considerations
+; when the syntax allows different number
+;; of delimiters on each line.
+
+-- $CR user: Hello to
+-- multi-line comments in sql-syntax too!
+|};
+  [%expect
+    {|
+    File "my_file.ml", lines 1-2, characters 0-126:
+    CR user: This is a multiple lines CR in the c-style
+    // We should try and remove the delimiter prefix from subsequent lines.
+
+    File "my_file.ml", lines 4-5, characters 0-136:
+    CR user: Note that this is not limited to c-style comments.
+    ;; Basically any language where delimiters start the line has this issue.
+
+    File "my_file.ml", lines 7-9, characters 0-124:
+    CR user: This may require further considerations
+    ; when the syntax allows different number
+    ;; of delimiters on each line.
+
+    File "my_file.ml", lines 11-13, characters 0-62:
+    CR user: Hello to
+    -- multi-line comments in sql-syntax too!
+    |}];
+  ()
+;;
+
+(* Covering for other comment syntaxes supported. *)
+
+let%expect_test "c-style" =
+  test
+    {|
+/* $CR user: This is a comment. */
+
+/* $XCR user: And it can
+span multiple lines too.
+*/
+|};
+  [%expect
+    {|
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:1:0)
+         (stop  my_file.ml:1:33)))
+       (header (
+         Ok (
+           (kind (
+             (txt CR)
+             (loc (
+               (start my_file.ml:1:3)
+               (stop  my_file.ml:1:5)))))
+           (due (
+             (txt Now)
+             (loc (
+               (start my_file.ml:1:3)
+               (stop  my_file.ml:1:5)))))
+           (reported_by (
+             (txt user)
+             (loc (
+               (start my_file.ml:1:6)
+               (stop  my_file.ml:1:10)))))
+           (for_ ()))))
+       (digest_of_condensed_content 163bbcea849da7f4b4bc94be0c158f3b)
+       (content "CR user: This is a comment.")))
+     (getters (
+       (path    my_file.ml)
+       (content "CR user: This is a comment.")
+       (kind    CR)
+       (due     Now)
+       (work_on Now))))
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:3:0)
+         (stop  my_file.ml:6:0)))
+       (header (
+         Ok (
+           (kind (
+             (txt XCR)
+             (loc (
+               (start my_file.ml:3:3)
+               (stop  my_file.ml:3:6)))))
+           (due (
+             (txt Now)
+             (loc (
+               (start my_file.ml:3:3)
+               (stop  my_file.ml:3:6)))))
+           (reported_by (
+             (txt user)
+             (loc (
+               (start my_file.ml:3:7)
+               (stop  my_file.ml:3:11)))))
+           (for_ ()))))
+       (digest_of_condensed_content b0cd03d9b3fa2989b1733e82d73c65cf)
+       (content "XCR user: And it can\nspan multiple lines too.")))
+     (getters (
+       (path my_file.ml)
+       (content "XCR user: And it can\nspan multiple lines too.")
+       (kind    XCR)
+       (due     Now)
+       (work_on Now))))
+    |}];
+  test
+    {|
+// $CR user: This is a single line comment.
+
+// $XCR user: This syntax can be used to write
+// comments that span multiple lines too.
+|};
+  [%expect
+    {|
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:1:0)
+         (stop  my_file.ml:1:42)))
+       (header (
+         Ok (
+           (kind (
+             (txt CR)
+             (loc (
+               (start my_file.ml:1:3)
+               (stop  my_file.ml:1:5)))))
+           (due (
+             (txt Now)
+             (loc (
+               (start my_file.ml:1:3)
+               (stop  my_file.ml:1:5)))))
+           (reported_by (
+             (txt user)
+             (loc (
+               (start my_file.ml:1:6)
+               (stop  my_file.ml:1:10)))))
+           (for_ ()))))
+       (digest_of_condensed_content cb6422de18b3ec708df5f2176d6d0255)
+       (content "CR user: This is a single line comment.")))
+     (getters (
+       (path    my_file.ml)
+       (content "CR user: This is a single line comment.")
+       (kind    CR)
+       (due     Now)
+       (work_on Now))))
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:3:0)
+         (stop  my_file.ml:5:0)))
+       (header (
+         Ok (
+           (kind (
+             (txt XCR)
+             (loc (
+               (start my_file.ml:3:3)
+               (stop  my_file.ml:3:6)))))
+           (due (
+             (txt Now)
+             (loc (
+               (start my_file.ml:3:3)
+               (stop  my_file.ml:3:6)))))
+           (reported_by (
+             (txt user)
+             (loc (
+               (start my_file.ml:3:7)
+               (stop  my_file.ml:3:11)))))
+           (for_ ()))))
+       (digest_of_condensed_content 779812c3126e3a16333ad9264b741f75)
+       (content
+        "XCR user: This syntax can be used to write\n// comments that span multiple lines too.")))
+     (getters (
+       (path my_file.ml)
+       (content
+        "XCR user: This syntax can be used to write\n// comments that span multiple lines too.")
+       (kind    XCR)
+       (due     Now)
+       (work_on Now))))
+    |}];
+  test
+    {|
+/* $CR user: This is a c-style comment but with no comment ending.
+|};
+  [%expect {||}];
+  ()
+;;
+
+let%expect_test "hash-style" =
+  test
+    {|
+# $CR user: This is a comment.
+
+# $XCR user: And it can
+# span multiple lines too.
+|};
+  [%expect
+    {|
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:1:0)
+         (stop  my_file.ml:1:29)))
+       (header (
+         Ok (
+           (kind (
+             (txt CR)
+             (loc (
+               (start my_file.ml:1:2)
+               (stop  my_file.ml:1:4)))))
+           (due (
+             (txt Now)
+             (loc (
+               (start my_file.ml:1:2)
+               (stop  my_file.ml:1:4)))))
+           (reported_by (
+             (txt user)
+             (loc (
+               (start my_file.ml:1:5)
+               (stop  my_file.ml:1:9)))))
+           (for_ ()))))
+       (digest_of_condensed_content 163bbcea849da7f4b4bc94be0c158f3b)
+       (content "CR user: This is a comment.")))
+     (getters (
+       (path    my_file.ml)
+       (content "CR user: This is a comment.")
+       (kind    CR)
+       (due     Now)
+       (work_on Now))))
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:3:0)
+         (stop  my_file.ml:5:0)))
+       (header (
+         Ok (
+           (kind (
+             (txt XCR)
+             (loc (
+               (start my_file.ml:3:2)
+               (stop  my_file.ml:3:5)))))
+           (due (
+             (txt Now)
+             (loc (
+               (start my_file.ml:3:2)
+               (stop  my_file.ml:3:5)))))
+           (reported_by (
+             (txt user)
+             (loc (
+               (start my_file.ml:3:6)
+               (stop  my_file.ml:3:10)))))
+           (for_ ()))))
+       (digest_of_condensed_content a9cae35010ee7de740f2152952982a10)
+       (content "XCR user: And it can\n# span multiple lines too.")))
+     (getters (
+       (path my_file.ml)
+       (content "XCR user: And it can\n# span multiple lines too.")
+       (kind    XCR)
+       (due     Now)
+       (work_on Now))))
+    |}];
+  ()
+;;
+
+let%expect_test "dash-style" =
+  test
+    {|
+-- $CR user: This is a comment.
+
+-- $XCR user: And it can
+-- span multiple lines too.
+|};
+  [%expect
+    {|
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:1:0)
+         (stop  my_file.ml:1:30)))
+       (header (
+         Ok (
+           (kind (
+             (txt CR)
+             (loc (
+               (start my_file.ml:1:3)
+               (stop  my_file.ml:1:5)))))
+           (due (
+             (txt Now)
+             (loc (
+               (start my_file.ml:1:3)
+               (stop  my_file.ml:1:5)))))
+           (reported_by (
+             (txt user)
+             (loc (
+               (start my_file.ml:1:6)
+               (stop  my_file.ml:1:10)))))
+           (for_ ()))))
+       (digest_of_condensed_content 163bbcea849da7f4b4bc94be0c158f3b)
+       (content "CR user: This is a comment.")))
+     (getters (
+       (path    my_file.ml)
+       (content "CR user: This is a comment.")
+       (kind    CR)
+       (due     Now)
+       (work_on Now))))
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:3:0)
+         (stop  my_file.ml:5:0)))
+       (header (
+         Ok (
+           (kind (
+             (txt XCR)
+             (loc (
+               (start my_file.ml:3:3)
+               (stop  my_file.ml:3:6)))))
+           (due (
+             (txt Now)
+             (loc (
+               (start my_file.ml:3:3)
+               (stop  my_file.ml:3:6)))))
+           (reported_by (
+             (txt user)
+             (loc (
+               (start my_file.ml:3:7)
+               (stop  my_file.ml:3:11)))))
+           (for_ ()))))
+       (digest_of_condensed_content 0c475f77a37f48a47f734f053571e2c5)
+       (content "XCR user: And it can\n-- span multiple lines too.")))
+     (getters (
+       (path my_file.ml)
+       (content "XCR user: And it can\n-- span multiple lines too.")
+       (kind    XCR)
+       (due     Now)
+       (work_on Now))))
+    |}];
+  ()
+;;
+
+let%expect_test "semi-style" =
+  test
+    {|
+; $CR user: This is a comment.
+
+; $XCR user: And it can
+; span multiple lines too.
+|};
+  [%expect
+    {|
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:1:0)
+         (stop  my_file.ml:1:29)))
+       (header (
+         Ok (
+           (kind (
+             (txt CR)
+             (loc (
+               (start my_file.ml:1:2)
+               (stop  my_file.ml:1:4)))))
+           (due (
+             (txt Now)
+             (loc (
+               (start my_file.ml:1:2)
+               (stop  my_file.ml:1:4)))))
+           (reported_by (
+             (txt user)
+             (loc (
+               (start my_file.ml:1:5)
+               (stop  my_file.ml:1:9)))))
+           (for_ ()))))
+       (digest_of_condensed_content 163bbcea849da7f4b4bc94be0c158f3b)
+       (content "CR user: This is a comment.")))
+     (getters (
+       (path    my_file.ml)
+       (content "CR user: This is a comment.")
+       (kind    CR)
+       (due     Now)
+       (work_on Now))))
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:3:0)
+         (stop  my_file.ml:5:0)))
+       (header (
+         Ok (
+           (kind (
+             (txt XCR)
+             (loc (
+               (start my_file.ml:3:2)
+               (stop  my_file.ml:3:5)))))
+           (due (
+             (txt Now)
+             (loc (
+               (start my_file.ml:3:2)
+               (stop  my_file.ml:3:5)))))
+           (reported_by (
+             (txt user)
+             (loc (
+               (start my_file.ml:3:6)
+               (stop  my_file.ml:3:10)))))
+           (for_ ()))))
+       (digest_of_condensed_content b1b46945ef550294693fab3aff025b3c)
+       (content "XCR user: And it can\n; span multiple lines too.")))
+     (getters (
+       (path my_file.ml)
+       (content "XCR user: And it can\n; span multiple lines too.")
+       (kind    XCR)
+       (due     Now)
+       (work_on Now))))
+    |}];
+  ()
+;;
+
+let%expect_test "double-semi-style" =
+  test
+    {|
+;; $CR user: This is a comment.
+
+;; $XCR user: And it can
+;; span multiple lines too.
+|};
+  [%expect
+    {|
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:1:0)
+         (stop  my_file.ml:1:30)))
+       (header (
+         Ok (
+           (kind (
+             (txt CR)
+             (loc (
+               (start my_file.ml:1:3)
+               (stop  my_file.ml:1:5)))))
+           (due (
+             (txt Now)
+             (loc (
+               (start my_file.ml:1:3)
+               (stop  my_file.ml:1:5)))))
+           (reported_by (
+             (txt user)
+             (loc (
+               (start my_file.ml:1:6)
+               (stop  my_file.ml:1:10)))))
+           (for_ ()))))
+       (digest_of_condensed_content 163bbcea849da7f4b4bc94be0c158f3b)
+       (content "CR user: This is a comment.")))
+     (getters (
+       (path    my_file.ml)
+       (content "CR user: This is a comment.")
+       (kind    CR)
+       (due     Now)
+       (work_on Now))))
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:3:0)
+         (stop  my_file.ml:5:0)))
+       (header (
+         Ok (
+           (kind (
+             (txt XCR)
+             (loc (
+               (start my_file.ml:3:3)
+               (stop  my_file.ml:3:6)))))
+           (due (
+             (txt Now)
+             (loc (
+               (start my_file.ml:3:3)
+               (stop  my_file.ml:3:6)))))
+           (reported_by (
+             (txt user)
+             (loc (
+               (start my_file.ml:3:7)
+               (stop  my_file.ml:3:11)))))
+           (for_ ()))))
+       (digest_of_condensed_content c59442a767269767df392a109a8e074b)
+       (content "XCR user: And it can\n;; span multiple lines too.")))
+     (getters (
+       (path my_file.ml)
+       (content "XCR user: And it can\n;; span multiple lines too.")
+       (kind    XCR)
+       (due     Now)
+       (work_on Now))))
+    |}];
+  ()
+;;
+
+let%expect_test "xml-style" =
+  test
+    {|
+<!-- $CR user: This is a comment. -->
+
+<!-- $XCR user: And it can
+     span multiple lines too. -->
+
+<!-- Hello comment.
+  <!-- $XCR user: What happens if it is nested? -->
+-->
+|};
+  [%expect
+    {|
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:1:0)
+         (stop  my_file.ml:1:36)))
+       (header (
+         Ok (
+           (kind (
+             (txt CR)
+             (loc (
+               (start my_file.ml:1:5)
+               (stop  my_file.ml:1:7)))))
+           (due (
+             (txt Now)
+             (loc (
+               (start my_file.ml:1:5)
+               (stop  my_file.ml:1:7)))))
+           (reported_by (
+             (txt user)
+             (loc (
+               (start my_file.ml:1:8)
+               (stop  my_file.ml:1:12)))))
+           (for_ ()))))
+       (digest_of_condensed_content 163bbcea849da7f4b4bc94be0c158f3b)
+       (content "CR user: This is a comment.")))
+     (getters (
+       (path    my_file.ml)
+       (content "CR user: This is a comment.")
+       (kind    CR)
+       (due     Now)
+       (work_on Now))))
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:3:0)
+         (stop  my_file.ml:4:33)))
+       (header (
+         Ok (
+           (kind (
+             (txt XCR)
+             (loc (
+               (start my_file.ml:3:5)
+               (stop  my_file.ml:3:8)))))
+           (due (
+             (txt Now)
+             (loc (
+               (start my_file.ml:3:5)
+               (stop  my_file.ml:3:8)))))
+           (reported_by (
+             (txt user)
+             (loc (
+               (start my_file.ml:3:9)
+               (stop  my_file.ml:3:13)))))
+           (for_ ()))))
+       (digest_of_condensed_content b0cd03d9b3fa2989b1733e82d73c65cf)
+       (content "XCR user: And it can\n     span multiple lines too.")))
+     (getters (
+       (path my_file.ml)
+       (content "XCR user: And it can\n     span multiple lines too.")
+       (kind    XCR)
+       (due     Now)
+       (work_on Now))))
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:7:2)
+         (stop  my_file.ml:7:50)))
+       (header (
+         Ok (
+           (kind (
+             (txt XCR)
+             (loc (
+               (start my_file.ml:7:7)
+               (stop  my_file.ml:7:10)))))
+           (due (
+             (txt Now)
+             (loc (
+               (start my_file.ml:7:7)
+               (stop  my_file.ml:7:10)))))
+           (reported_by (
+             (txt user)
+             (loc (
+               (start my_file.ml:7:11)
+               (stop  my_file.ml:7:15)))))
+           (for_ ()))))
+       (digest_of_condensed_content 4e6aab504567aa351025b2db16cc21c9)
+       (content "XCR user: What happens if it is nested?")))
+     (getters (
+       (path    my_file.ml)
+       (content "XCR user: What happens if it is nested?")
+       (kind    XCR)
+       (due     Now)
+       (work_on Now))))
+    |}];
+  (* Note a comment in [file_parser.ml] says:
+
+     {v XML    <!-- X?CR ... --> may not nest recursively v}
+
+     However as this test shows, this is one case where a nested comment seems
+     to be parsed. Leaving as monitoring test. *)
+  ()
+;;
+
+let%expect_test "nested-ml-style" =
+  test
+    {|
+(* Hello comment.
+
+   (* $XCR user: CR comment may be nested inside other comment in OCaml. *)
+
+   Perhaps that may be useful when commenting/uncommenting large section
+   of code in dev mode?
+
+   Note, this is not a part that is documented, and it may end up changing
+   in the future. *)
+|};
+  [%expect
+    {|
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:3:3)
+         (stop  my_file.ml:3:74)))
+       (header (
+         Ok (
+           (kind (
+             (txt XCR)
+             (loc (
+               (start my_file.ml:3:6)
+               (stop  my_file.ml:3:9)))))
+           (due (
+             (txt Now)
+             (loc (
+               (start my_file.ml:3:6)
+               (stop  my_file.ml:3:9)))))
+           (reported_by (
+             (txt user)
+             (loc (
+               (start my_file.ml:3:10)
+               (stop  my_file.ml:3:14)))))
+           (for_ ()))))
+       (digest_of_condensed_content eabf2e14ab93e23c865512b2be28ca23)
+       (content
+        "XCR user: CR comment may be nested inside other comment in OCaml.")))
+     (getters (
+       (path my_file.ml)
+       (content
+        "XCR user: CR comment may be nested inside other comment in OCaml.")
+       (kind    XCR)
+       (due     Now)
+       (work_on Now))))
+    |}];
+  test
+    {|
+(* $CR user: Maybe the original use case is the opposite though.
+
+    That is, a (* comment inside a CR comment. *)
+
+    We'd like to cover this case too. *)
+|};
+  [%expect
+    {|
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:1:0)
+         (stop  my_file.ml:6:0)))
+       (header (
+         Ok (
+           (kind (
+             (txt CR)
+             (loc (
+               (start my_file.ml:1:3)
+               (stop  my_file.ml:1:5)))))
+           (due (
+             (txt Now)
+             (loc (
+               (start my_file.ml:1:3)
+               (stop  my_file.ml:1:5)))))
+           (reported_by (
+             (txt user)
+             (loc (
+               (start my_file.ml:1:6)
+               (stop  my_file.ml:1:10)))))
+           (for_ ()))))
+       (digest_of_condensed_content 5e02200634a76672a440e5a2a1243b5c)
+       (content
+        "CR user: Maybe the original use case is the opposite though.\n\n    That is, a (* comment inside a CR comment. *)\n\n    We'd like to cover this case too.")))
+     (getters (
+       (path my_file.ml)
+       (content
+        "CR user: Maybe the original use case is the opposite though.\n\n    That is, a (* comment inside a CR comment. *)\n\n    We'd like to cover this case too.")
+       (kind    CR)
+       (due     Now)
+       (work_on Now))))
+    |}];
+  test
+    {|
+(* $CR user: What happens when nested comments are not well closed?
+
+    With a (* comment inside a CR comment. *)
+
+    We'd like to cover this case too.
+|};
+  [%expect {||}];
+  test
+    {|
+(* $CR user: And what happens when simple comments are not well closed actually?
+|};
+  [%expect {||}];
   ()
 ;;

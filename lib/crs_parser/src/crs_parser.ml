@@ -141,12 +141,12 @@ let grep ~vcs ~repo_root ~below =
       assert (pid = pid');
       match process_status with
       | Unix.WEXITED (0 | 123) -> `Output stdout
-      | Unix.WEXITED n -> `Exited n
-      | Unix.WSIGNALED n -> `Signaled n [@coverage off]
-      | Unix.WSTOPPED n -> `Stopped n [@coverage off]
+      | Unix.WEXITED n -> `Exit_status (`Exited n)
+      | Unix.WSIGNALED n -> `Exit_status (`Signaled n) [@coverage off]
+      | Unix.WSTOPPED n -> `Exit_status (`Stopped n) [@coverage off]
     with
     | `Output stdout -> stdout |> String.split_lines |> List.map ~f:Vcs.Path_in_repo.v
-    | (`Exited _ | `Signaled _ | `Stopped _) as exit_status ->
+    | `Exit_status exit_status ->
       raise
         (Err.E
            (Err.create
@@ -156,6 +156,7 @@ let grep ~vcs ~repo_root ~below =
     | exception exn ->
       raise
         (Err.E (Err.create [ Pp.text "Error while running xargs process."; Err.exn exn ]))
+      [@coverage off]
   in
   List.concat_map files_to_grep ~f:(fun path_in_repo ->
     let file_contents =
