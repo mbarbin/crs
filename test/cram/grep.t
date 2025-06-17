@@ -186,5 +186,5 @@ matching. This involves running [xargs]. Let's cover for some failures there.
 
   $ PATH=".:$PATH" crs grep
   Error: Process xargs exited abnormally.
-  (exit_status (Exited 42))
+  ((exit_status (Exited 42)) (stdout "Hello Fake xargs\n") (stderr ""))
   [123]

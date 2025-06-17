@@ -96,6 +96,8 @@ let grep ~vcs ~repo_root ~below =
     files_to_grep |> List.map ~f:Vcs.Path_in_repo.to_string |> String.concat ~sep:"\n"
   in
   let files_to_grep =
+    let stdout_ref = ref "<Unknown>" in
+    let stderr_ref = ref "<Unknown>" in
     match
       let prog =
         match Lazy.force find_xargs with
@@ -136,7 +138,9 @@ let grep ~vcs ~repo_root ~below =
         Unix.close stdin_writer
       in
       let stdout = read_all_from_fd stdout_reader in
-      let (_ : string) = read_all_from_fd stderr_reader in
+      stdout_ref := stdout;
+      let stderr = read_all_from_fd stderr_reader in
+      stderr_ref := stderr;
       let pid', process_status = waitpid_non_intr pid in
       assert (pid = pid');
       match process_status with
@@ -147,11 +151,15 @@ let grep ~vcs ~repo_root ~below =
     with
     | `Output stdout -> stdout |> String.split_lines |> List.map ~f:Vcs.Path_in_repo.v
     | `Exit_status exit_status ->
+      let stdout = !stdout_ref in
+      let stderr = !stderr_ref in
       raise
         (Err.E
            (Err.create
               [ Pp.text "Process xargs exited abnormally."
-              ; Err.sexp [%sexp { exit_status : Exit_status.t }]
+              ; Err.sexp
+                  [%sexp
+                    { exit_status : Exit_status.t; stdout : string; stderr : string }]
               ]))
     | exception exn ->
       raise
