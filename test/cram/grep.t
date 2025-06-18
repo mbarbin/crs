@@ -49,22 +49,22 @@ If we grep from there, there is no CR in the tree.
 
 Now let's add some CRs.
 
-  $ echo -e "(* $CR user1 for user2: Hey, this is a code review comment *)" >> hello
+  $ printf "(* $CR user1 for user2: Hey, this is a code review comment *)\n" >> hello
 
-  $ echo -e "(* ${XCR} user1: Fix this. Edit: Done. *)" >> foo/a.txt
+  $ printf "(* ${XCR} user1: Fix this. Edit: Done. *)\n" >> foo/a.txt
 
-  $ echo -e "/* $CR user1 for user3: Hey, this is a code review comment */" >> foo/foo.c
+  $ printf "/* $CR user1 for user3: Hey, this is a code review comment */\n" >> foo/foo.c
 
-  $ echo -e "(* ${CR}-someday user1: Reconsider if/when updating to the new version. *)" >> foo/b.txt
+  $ printf "(* ${CR}-someday user1: Reconsider if/when updating to the new version. *)\n" >> foo/b.txt
 
-  $ echo -e "(* ${CR}-soon user1: Hey, this is a code review comment *)" >> foo/bar/b.txt
+  $ printf "(* ${CR}-soon user1: Hey, this is a code review comment *)\n" >> foo/bar/b.txt
 
 To avoid ignoring CRs that are unintentionally invalid, the tool will
 recognized comments that look like CRs, but flag them as invalid.
 
-  $ echo -e "(* ${CR}-user: Hey, I'm trying to use CR, it's cool! *)" >> foo/bar/c.txt
+  $ printf "(* ${CR}-user: Hey, I'm trying to use CR, it's cool! *)\n" >> foo/bar/c.txt
 
-  $ echo -e "(* ${CR} : Hey, this comment look like a CR but it's not quite one. *)" >> foo/bar/d.txt
+  $ printf "(* ${CR} : Hey, this comment look like a CR but it's not quite one. *)\n" >> foo/bar/d.txt
 
   $ volgo-vcs add hello
   $ volgo-vcs add foo
@@ -113,37 +113,37 @@ A basic [sexp] output is available.
 The default is to print them, visually separated.
 
   $ crs grep
-  File "foo/a.txt", line 2, characters 3-41:
+  File "foo/a.txt", line 2, characters 0-38:
     XCR user1: Fix this. Edit: Done.
   
-  File "foo/b.txt", line 1, characters 3-74:
+  File "foo/b.txt", line 1, characters 0-71:
     CR-someday user1: Reconsider if/when updating to the new version.
   
-  File "foo/bar/b.txt", line 2, characters 3-58:
+  File "foo/bar/b.txt", line 2, characters 0-55:
     CR-soon user1: Hey, this is a code review comment
   
-  File "foo/bar/c.txt", line 1, characters 3-55:
+  File "foo/bar/c.txt", line 1, characters 0-52:
     CR-user: Hey, I'm trying to use CR, it's cool!
   
-  File "foo/bar/d.txt", line 1, characters 3-70:
+  File "foo/bar/d.txt", line 1, characters 0-67:
     CR : Hey, this comment look like a CR but it's not quite one.
   
-  File "foo/foo.c", line 1, characters 3-63:
+  File "foo/foo.c", line 1, characters 0-60:
     CR user1 for user3: Hey, this is a code review comment
   
-  File "hello", line 2, characters 3-63:
+  File "hello", line 2, characters 0-60:
     CR user1 for user2: Hey, this is a code review comment
 
 You may restrict the search to a subdirectory only.
 
   $ crs grep --below ./foo/bar
-  File "foo/bar/b.txt", line 2, characters 3-58:
+  File "foo/bar/b.txt", line 2, characters 0-55:
     CR-soon user1: Hey, this is a code review comment
   
-  File "foo/bar/c.txt", line 1, characters 3-55:
+  File "foo/bar/c.txt", line 1, characters 0-52:
     CR-user: Hey, I'm trying to use CR, it's cool!
   
-  File "foo/bar/d.txt", line 1, characters 3-70:
+  File "foo/bar/d.txt", line 1, characters 0-67:
     CR : Hey, this comment look like a CR but it's not quite one.
 
   $ crs grep --below /tmp

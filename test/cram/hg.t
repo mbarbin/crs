@@ -30,7 +30,7 @@ If we grep from there, there is no CR in the tree.
 
 Now let's add some CRs.
 
-  $ echo -e "(* $CR user1 for user2: Hey, this is a code review comment *)" >> hello
+  $ printf "(* $CR user1 for user2: Hey, this is a code review comment *)\n" >> hello
 
   $ volgo-vcs add hello
   $ rev1=$(volgo-vcs commit -m "CRs")
@@ -38,5 +38,5 @@ Now let's add some CRs.
 Now let's grep for the CRs.
 
   $ crs grep
-  File "hello", line 2, characters 3-63:
+  File "hello", line 2, characters 0-60:
     CR user1 for user2: Hey, this is a code review comment

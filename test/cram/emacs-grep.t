@@ -43,15 +43,15 @@ If we grep from there, there is no CR in the tree.
 
 Now let's add some CRs.
 
-  $ echo -e "(* $CR user1 for user2: Hey, this is a code review comment *)" >> hello
+  $ printf "(* $CR user1 for user2: Hey, this is a code review comment *)\n" >> hello
 
-  $ echo -e "(* ${XCR} user1: Fix this. Edit: Done. *)" >> foo/a.txt
+  $ printf "(* ${XCR} user1: Fix this. Edit: Done. *)\n" >> foo/a.txt
 
-  $ echo -e "/* $CR user1 for user3: Hey, this is a code review comment */" >> foo/foo.c
+  $ printf "/* $CR user1 for user3: Hey, this is a code review comment */\n" >> foo/foo.c
 
-  $ echo -e "(* ${CR}-someday user1: Reconsider if/when updating to the new version. *)" >> foo/b.txt
+  $ printf "(* ${CR}-someday user1: Reconsider if/when updating to the new version. *)\n" >> foo/b.txt
 
-  $ echo -e "(* ${CR}-soon user1: Hey, this is a code review comment *)" >> foo/bar/b.txt
+  $ printf "(* ${CR}-soon user1: Hey, this is a code review comment *)\n" >> foo/bar/b.txt
 
   $ volgo-vcs add hello
   $ volgo-vcs add foo
