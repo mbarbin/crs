@@ -2,6 +2,8 @@
 
 [![CI Status](https://github.com/mbarbin/crs/workflows/ci/badge.svg)](https://github.com/mbarbin/crs/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/mbarbin/crs/badge.svg?branch=main)](https://coveralls.io/github/mbarbin/crs?branch=main)
+[![Deploy Doc Status](https://github.com/mbarbin/crs/workflows/deploy-doc/badge.svg)](https://github.com/mbarbin/crs/actions/workflows/deploy-doc.yml)
+[![OCaml-CI Build Status](https://img.shields.io/endpoint?url=https://ocaml.ci.dev/badge/mbarbin/crs/main&logo=ocaml)](https://ocaml.ci.dev/github/mbarbin/crs)
 
 ## Introduction
 
