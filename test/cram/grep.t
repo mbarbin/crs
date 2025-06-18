@@ -10,6 +10,10 @@ file, we make use of some trick.
   $ export CR="CR"
   $ export XCR="XCR"
 
+We disable the pager in this test.
+
+  $ export GIT_PAGER=cat
+
 Let's add some files to the tree.
 
   $ cat > hello << EOF
@@ -146,6 +150,24 @@ You may restrict the search to a subdirectory only.
   Error: Path "/tmp" is not in repo.
   [123]
 
+  $ crs grep --below not-a-directory
+  Context:
+  (Vcs.ls_files
+   (repo_root
+    $TESTCASE_ROOT)
+   (below not-a-directory))
+  ((prog git) (args (ls-files --full-name)) (exit_status Unknown)
+   (cwd
+    $TESTCASE_ROOT/not-a-directory)
+   (stdout "") (stderr ""))
+  Error:
+  (Unix.Unix_error "No such file or directory" chdir
+   $TESTCASE_ROOT/not-a-directory)
+  [123]
+
+  $ mkdir empty-directory
+  $ crs grep --below empty-directory
+
 There's also an option to display the results as summary tables.
 
   $ crs grep --summary
@@ -179,6 +201,8 @@ matching. This involves running [xargs]. Let's cover for some failures there.
 
   $ cat > xargs <<EOF
   > #!/bin/bash -e
+  > # Read and discard all stdin to avoid broken pipe
+  > cat > /dev/null
   > echo "Hello Fake xargs"
   > exit 42
   > EOF
@@ -186,5 +210,5 @@ matching. This involves running [xargs]. Let's cover for some failures there.
 
   $ PATH=".:$PATH" crs grep
   Error: Process xargs exited abnormally.
-  (exit_status (Exited 42))
+  ((exit_status (Exited 42)) (stdout "Hello Fake xargs\n") (stderr ""))
   [123]

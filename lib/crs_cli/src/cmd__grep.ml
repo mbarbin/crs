@@ -61,6 +61,7 @@ let main =
        | None -> Vcs.Path_in_repo.root
        | Some path -> Common_helpers.relativize ~repo_root ~cwd ~path
      in
+     let () = Stdlib.Sys.set_signal Stdlib.Sys.sigpipe Stdlib.Sys.Signal_ignore in
      let crs = Crs_parser.grep ~vcs ~repo_root ~below in
      Git_pager.run ~f:(fun git_pager ->
        let oc = Git_pager.write_end git_pager in
