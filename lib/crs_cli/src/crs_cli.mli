@@ -21,6 +21,12 @@
 
 val main : unit Command.t
 
+(** {1 Private}
+
+    This module is exported to be used by libraries with strong ties to [crs].
+    Its signature may change in breaking ways at any time without prior notice,
+    and outside of the guidelines set by semver. *)
+
 module Private : sig
   val grep_cmd : unit Command.t
 end

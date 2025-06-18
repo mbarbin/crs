@@ -1,4 +1,4 @@
-# Licence
+# License
 
 crs is released under the terms of the `LGPL-3.0-or-later WITH LGPL-3.0-linking-exception` license.
 

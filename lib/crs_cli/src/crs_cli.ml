@@ -24,7 +24,7 @@ let main =
     ~summary:"A tool for managing code review comments embedded in source code."
     ~readme:(fun () ->
       {|
-The primary goal of $(b,crs) is to make it easy to locate, parse, and manipulate special code review comments called 'CRs' (pronouned "C"-"R"-z), embedded directly in source code.
+The primary goal of $(b,crs) is to make it easy to locate, parse, and manipulate special code review comments called 'CRs' (pronounced "C"-"R"-z), embedded directly in source code.
 
 This CLI aims to offer ergonomic helpers for tasks such as systematically updating comments across multiple files, changing their priority, marking them as resolved, modifying reporter or assignee information, and more.
 
