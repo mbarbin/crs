@@ -46,19 +46,26 @@
   * - Use [Vcs] instead of [Hg].
 *)
 
-(** This pattern is exposed to speed up the extraction of CR comments across a
-    repository. First we do an over estimation of files that may contain comments
-    using this pattern, and then parse them with this module. *)
-val cr_pattern_egrep : string
+(** Utils for parsing and searching for code review comments (CRs) in versioned
+    source files. *)
 
-(** Parse all comments from a file. Comments that look like cr but are somewhat
-    invalid are still returned as errors, so we can alert the user rather than
-    simply ignoring them. *)
+(** {1 Parsing} *)
+
+(** Parse all code review comments (CRs) from a file. Comments that resemble CRs
+    but are malformed or partially invalid are still returned, with error
+    information in their metadata, so users can be alerted rather than having
+    such comments silently ignored. *)
 val parse_file
   :  path:Vcs.Path_in_repo.t
   -> file_contents:Vcs.File_contents.t
   -> Cr_comment.t list
 
+(** {1 Searching} *)
+
+(** Search recursively for all code review comments (CRs) in files versioned
+    under the supplied [repo_root], starting at and [below] the given path in
+    the repository. Only files tracked by the version control system are
+    included; untracked or ignored files are skipped. Returns all found CRs. *)
 val grep
   :  vcs:< Vcs.Trait.ls_files ; .. > Vcs.t
   -> repo_root:Vcs.Repo_root.t

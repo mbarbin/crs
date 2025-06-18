@@ -66,9 +66,8 @@
    * - Make [reported_by] mandatory.
    * - Refactor [Raw], make [t] a record with a processed part that may fail.
    * - Compute [digest_of_condensed_content] for all CR kinds.
-   * - Remove special type for cr soons. Return all CRs parsed.
    * - Rename [Processed] to [Header].
-   * - Remove support for printing crs without their content.
+   * - Remove support for printing CRs without their content.
    * - Compute positions and offsets with [Loc].
    * - Some minor changes to the [reindented] content rendering.
 *)
@@ -194,7 +193,7 @@ let reindented_content t =
         | Some s -> "  " ^ s))
   with
   | exception Stdlib.Exit -> str
-  | deindented_lines -> String.concat deindented_lines ~sep:"\n"
+  | lines -> String.concat lines ~sep:"\n"
 ;;
 
 let sort ts = List.sort ts ~compare:For_sorted_output.compare

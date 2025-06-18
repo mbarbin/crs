@@ -41,7 +41,7 @@
   * Changes: ...
   *
   * - Remove dependency to [Core] and [Async].
-  * - Remove the [Stable] module - unversion the code.
+  * - Remove the [Stable] module - remove the versioning of the code.
   * - Replace [Relpath] by [Vcs.Path_in_repo].
   * - Remove [of_sexp] constructs.
   * - Remove [Cr_comment_format].
@@ -57,13 +57,24 @@
   * - Remove support for attributes.
   * - Remove assignee computation (left as external work).
   * - Do not export [Raw].
-  * - Remove special type for cr soons. Return all CRs parsed.
   * - Rename [Processed] to [Header].
-  * - Remove support for printing crs without their content.
+  * - Remove support for printing CRs without their content.
   * - Compute positions and offsets with [Loc].
 *)
 
+(** Code review comments embedded in source code.
+
+    This module provides the core types and functions for representing and
+    manipulating code review comments (CRs) embedded directly in source code
+    using a special syntax. A CR captures actionable feedback, metadata, and
+    assignment information, supporting workflows for tracking, resolving, and
+    managing code review discussions within the codebase. *)
+
 module Kind : sig
+  (** The [Kind.t] type distinguishes between active and resolved code review
+      comments.
+      - [CR]: An active code review comment.
+      - [XCR]: A resolved code review comment. *)
   type t =
     | CR
     | XCR
@@ -71,6 +82,23 @@ module Kind : sig
 end
 
 module Due : sig
+  (** The [Due.t] type represents an optional urgency or priority class that can
+      be attached to a code review comment (CR) using the CR syntax. This
+      classification is a general convenience provided by the library to help
+      organize and filter CRs, but the exact workflow and expectations
+      associated with each class — such as when a [Soon] or [Someday] comment
+      should be addressed — are intentionally left undefined here.
+
+      It is up to higher-level tools or code review systems built on top of CRs
+      to define and enforce specific policies or behaviors around these classes.
+
+      As a rule of thumb:
+      - [Now]: Should be addressed promptly.
+      - [Soon]: Should be addressed in the near future.
+      - [Someday]: Can be deferred until later.
+
+      These categories are intended to be flexible and adaptable to the needs of
+      various development process. *)
   type t =
     | Now
     | Soon
@@ -91,8 +119,9 @@ module Header : sig
   (** [reported_by] is [user] in [CR user...]. *)
   val reported_by : t -> Vcs.User_handle.t
 
-  (** [for_] is [user2] in [CR user1 for user2: ...]. It is none since the part
-      with the [for user2] is optional. *)
+  (** [for_] is [user2] in [CR user1 for user2: ...]. Assigning CRs to
+      particular users is optional. This returns [None] if that part is left
+      out, such as in [CR user1: Comment]. *)
   val for_ : t -> Vcs.User_handle.t option
 
   val kind : t -> Kind.t
@@ -104,14 +133,14 @@ module Header : sig
   module With_loc : sig
     (** These getters allows you to access the position of each elements of the
         CR header. This is meant for tools processing CRs automatically, such
-        as CR comment rewriters. *)
+        as CRs rewriters. *)
 
     (** The location includes the entire reporter username, without the
         surrounding spaces. *)
     val reported_by : t -> Vcs.User_handle.t Loc.Txt.t
 
     (** The location includes the entire assignee username, if it is present,
-        without the surround spaces. In particular, the location does not
+        without the surrounding spaces. In particular, the location does not
         include the ["for"] keyword itself. *)
     val for_ : t -> Vcs.User_handle.t Loc.Txt.t option
 
@@ -123,13 +152,15 @@ module Header : sig
     (** When the CR is due [Soon] or [Someday], the location returned starts
         right after the dash separator (but does not include it), and contains
         the entire due keyword. For example, the location will include
-        ["soon"] for a [CR-soon]. When the cr is due [Now], there is no
+        ["soon"] for a [CR-soon]. When the CR is due [Now], there is no
         keyword to attach a location to : conventionally, we return instead
-        the location of the cr [kind] in this case. *)
+        the location of the CR [kind] in this case. *)
     val due : t -> Due.t Loc.Txt.t
   end
 end
 
+(** A [Cr_comment.t] is an immutable value holding the information and metadata
+    about a CR that was parsed from a file. *)
 type t [@@deriving equal, sexp_of]
 
 (** {1 Getters} *)
@@ -137,7 +168,7 @@ type t [@@deriving equal, sexp_of]
 val path : t -> Vcs.Path_in_repo.t
 
 (** [content] is the text of the CR with comment markers removed from the
-    beginning and end (if applicable). *)
+    beginning and end (if applicable). See also {!reindented_content}. *)
 val content : t -> string
 
 (** [whole_loc] is suitable for removal of the entire CR comment. It includes
@@ -146,12 +177,19 @@ val whole_loc : t -> Loc.t
 
 val header : t -> Header.t Or_error.t
 val kind : t -> Kind.t
+
+(** [due t] is a convenience wrapper to get the [due] property of the CR
+    header. This returns [Now] when parsing the header resulted in an error. *)
 val due : t -> Due.t
+
+(** [work_on t] represents the expectation as to when work on the CR is meant to
+    happen. Is it similar to [due t] except that XCRs are meant to be worked
+    on [Now]. *)
 val work_on : t -> Due.t
 
 (** This digest is computed such that changes in positions in a file, or changes
     in whitespaces are ignored. It is used by downstream systems to detect
-    that two crs are equivalent, which in turn may affect when a cr is
+    that two CRs are equivalent, which in turn may affect when a CR is
     active. *)
 val digest_ignoring_minor_text_changes : t -> Digest_hex.t
 
@@ -160,13 +198,12 @@ val digest_ignoring_minor_text_changes : t -> Digest_hex.t
 (** Show the CR with a line showing the file position. *)
 val to_string : t -> string
 
-(** [reindented_content t] is similar to {!content}, but reseting the
-    indentation of the actual CR to a normalized amount, to print multiple CRs
-    together in a more unified fashion. This is used by [crs grep] for
-    example. *)
+(** [reindented_content t] returns the content of the CR with leading
+    indentation removed or normalized. This is useful for displaying multiple
+    CRs together in a unified format, such as in [crs grep]. *)
 val reindented_content : t -> string
 
-(** Sorts the supplied list of crs and outputs it to the supplied out channel,
+(** Sorts the supplied list of CRs and outputs it to the supplied out channel,
     separated by newline characters. *)
 val output_list : t list -> oc:Out_channel.t -> unit
 
@@ -185,11 +222,11 @@ val sort : t list -> t list
 
     This module is exported to be used by libraries with strong ties to
     [cr_comment]. Its signature may change in breaking ways at any time without
-    prior notice, and outside of the guidelines set by semver.
+    prior notice, and outside the guidelines set by semver.
 
-    In particular, the intention here is that cr comments may only be created
-    using dedicated helpers libraries that are defined in this project, parsing
-    comments from files in vcs trees. *)
+    In particular, the intention here is that CRs may only be created using
+    dedicated helpers libraries that are defined in this project, parsing them
+    from files in vcs trees. *)
 
 module Private : sig
   type header := Header.t
