@@ -78,7 +78,7 @@ using a special syntax.
   ./hello:2:
     CR user1 for user2: Hey, this is a code review comment
 
-When launched from a subdir, to facilate the integration, we can display the
+When launched from a subdir, to facilitate the integration, we can display the
 path relative to that subdir from where the command is run.
 
   $ (cd foo ; crs tools emacs-grep)
