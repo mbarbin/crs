@@ -52,8 +52,8 @@ let test file_contents =
     |> Vcs.File_contents.create
   in
   let crs = Crs_parser.parse_file ~path ~file_contents |> Cr_comment.sort in
-  List.iter crs ~f:(fun t ->
-    Ref.set_temporarily Loc.include_sexp_of_locs true ~f:(fun () ->
+  Ref.set_temporarily Loc.include_sexp_of_locs true ~f:(fun () ->
+    List.iter crs ~f:(fun t ->
       let getters = Getters.of_cr t in
       print_s [%sexp { raw = (t : Cr_comment.t); getters : Getters.t }]))
 ;;
