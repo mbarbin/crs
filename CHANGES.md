@@ -1,8 +1,8 @@
-## 0.0.202506XX (unreleased)
+## 0.0.20250618 (2025-06-18)
 
 ### Added
 
-- Continue to increase code coverage (#17, @mbarbin).
+- Continue to increase code coverage (#17, #25, @mbarbin).
 
 ### Changed
 
@@ -10,8 +10,6 @@
 - Reduce dependencies and replace `re2` by `ocaml-re` (#17, @mbarbin).
 - Reduce dependencies and replace `shexp` by `spawn` (#16, @mbarbin).
 - Make `crs grep` output in a pager when able (#16, @mbarbin).
-
-### Deprecated
 
 ### Fixed
 
