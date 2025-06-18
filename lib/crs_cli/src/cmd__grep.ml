@@ -67,8 +67,9 @@ let main =
        let oc = Git_pager.write_end git_pager in
        if sexp
        then
-         List.iter crs ~f:(fun cr ->
-           Out_channel.output_line oc (Sexp.to_string_hum [%sexp (cr : Cr_comment.t)]))
+         Ref.set_temporarily Loc.include_sexp_of_locs true ~f:(fun () ->
+           List.iter crs ~f:(fun cr ->
+             Out_channel.output_line oc (Sexp.to_string_hum [%sexp (cr : Cr_comment.t)])))
        else if summary
        then (
          let by_type =
