@@ -6,6 +6,7 @@
 
 ### Changed
 
+- Include locations in the output of `crs grep --sexp` (#24, @mbarbin).
 - Reduce dependencies and replace `re2` by `ocaml-re` (#17, @mbarbin).
 - Reduce dependencies and replace `shexp` by `spawn` (#16, @mbarbin).
 - Make `crs grep` output in a pager when able (#16, @mbarbin).
@@ -14,6 +15,7 @@
 
 ### Fixed
 
+- Fix position mismatch in tests shown by `ocaml-ci` (#23, @mbarbin).
 - Disable failing build with 5.4 alpha release (#19, @mbarbin).
 - Adapt grep implementation for portability to MacOS (#19, @mbarbin).
 
