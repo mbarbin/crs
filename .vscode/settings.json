@@ -1,7 +1,16 @@
 {
     "cSpell.words": [
+        "chdir",
+        "docv",
+        "Fpath",
         "janestreet",
         "odoc",
-        "opam"
+        "opam",
+        "patdiff",
+        "reindentation",
+        "reindented",
+        "shexp",
+        "sigpipe",
+        "volgo"
     ]
 }
