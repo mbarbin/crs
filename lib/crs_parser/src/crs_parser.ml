@@ -148,13 +148,27 @@ let grep ~vcs ~repo_root ~below =
          let pid', process_status = waitpid_non_intr pid in
          assert (pid = pid');
          match process_status with
-         | Unix.WEXITED (0 | 123) -> `Output stdout
-         | Unix.WEXITED n -> `Exit_status (`Exited n)
-         | Unix.WSIGNALED n -> `Exit_status (`Signaled n) [@coverage off]
-         | Unix.WSTOPPED n -> `Exit_status (`Stopped n) [@coverage off]
+         | Unix.WEXITED n ->
+           (* The exit code of [xargs] is not consistent on all of the platforms
+              that we'd like to support. While it always returns [0] in case of
+              a match, when the inner [grep] doesn't find a match and returns
+              [1], the outer call to [xargs] may return [1] or [123] depending
+              on things like the OS. *)
+           if Int.equal n 0
+           then (
+             let files = stdout |> String.split_lines |> List.map ~f:Vcs.Path_in_repo.v in
+             `Files files)
+           else if
+             (Int.equal n 123 || (Int.equal n 1 [@coverage off] (* On MacOS *)))
+             && String.is_empty stdout
+             && String.is_empty stderr
+           then `Files []
+           else `Error (`Exited n)
+         | Unix.WSIGNALED n -> `Error (`Signaled n) [@coverage off]
+         | Unix.WSTOPPED n -> `Error (`Stopped n) [@coverage off]
        with
-       | `Output stdout -> stdout |> String.split_lines |> List.map ~f:Vcs.Path_in_repo.v
-       | `Exit_status exit_status ->
+       | `Files files -> files
+       | `Error exit_status ->
          let stdout = !stdout_ref in
          let stderr = !stderr_ref in
          raise
