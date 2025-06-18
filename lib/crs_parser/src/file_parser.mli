@@ -51,9 +51,15 @@
   * - Remove assignee computation (left as external work).
 *)
 
-val cr_pattern_egrep : string
-
 val parse_file
   :  path:Vcs.Path_in_repo.t
   -> file_contents:Vcs.File_contents.t
   -> Cr_comment.t list
+
+(** This pattern is exposed to speed up the extraction of CR comments across a
+    repository. First we do an over estimation of files that may contain comments
+    using this pattern, and then parse them with this module.
+
+    It is defined in this file so it is next to other related regexps, but it is
+    actually used in [crs_parser.ml]. *)
+val cr_pattern_egrep : string
