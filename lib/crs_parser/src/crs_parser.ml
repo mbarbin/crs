@@ -159,7 +159,7 @@ let grep ~vcs ~repo_root ~below =
              let files = stdout |> String.split_lines |> List.map ~f:Vcs.Path_in_repo.v in
              `Files files)
            else if
-             (Int.equal n 123 || (Int.equal n 1 [@coverage off] (* On MacOS *)))
+             (Int.equal n 123 || Int.equal n 1 (* On MacOS *))
              && String.is_empty stdout
              && String.is_empty stderr
            then `Files []

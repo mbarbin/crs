@@ -212,3 +212,43 @@ matching. This involves running [xargs]. Let's cover for some failures there.
   Error: Process xargs exited abnormally.
   ((exit_status (Exited 42)) (stdout "Hello Fake xargs\n") (stderr ""))
   [123]
+
+When the return code is `1` or `123` we require stdout and stderr to be empty.
+
+  $ cat > xargs <<EOF
+  > #!/bin/bash -e
+  > # Read and discard all stdin to avoid broken pipe
+  > cat > /dev/null
+  > echo "Hello Fake xargs" >&2
+  > exit 1
+  > EOF
+  $ chmod +x ./xargs
+
+  $ PATH=".:$PATH" crs grep
+  Error: Process xargs exited abnormally.
+  ((exit_status (Exited 1)) (stdout "") (stderr "Hello Fake xargs\n"))
+  [123]
+
+  $ cat > xargs <<EOF
+  > #!/bin/bash -e
+  > # Read and discard all stdin to avoid broken pipe
+  > cat > /dev/null
+  > exit 1
+  > EOF
+  $ chmod +x ./xargs
+
+  $ PATH=".:$PATH" crs grep
+
+  $ cat > xargs <<EOF
+  > #!/bin/bash -e
+  > # Read and discard all stdin to avoid broken pipe
+  > cat > /dev/null
+  > echo "path/to/file.ml"
+  > exit 1
+  > EOF
+  $ chmod +x ./xargs
+
+  $ PATH=".:$PATH" crs grep
+  Error: Process xargs exited abnormally.
+  ((exit_status (Exited 1)) (stdout "path/to/file.ml\n") (stderr ""))
+  [123]
