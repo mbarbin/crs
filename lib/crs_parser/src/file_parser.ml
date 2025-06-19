@@ -228,12 +228,10 @@ let parse_file ~path ~(file_contents : Vcs.File_contents.t) =
     lazy (Loc.File_cache.create ~path:(Vcs.Path_in_repo.to_fpath path) ~file_contents)
   in
   let ms = Re.all cr_regex file_contents in
+  let ( let+ ) a f = Option.map a ~f in
   List.filter_map ms ~f:(fun m ->
-    let open Option.Let_syntax in
     let cr_start = Re.Group.start m 0 in
-    let%map start_index, end_index, content =
-      find_comment_bounds file_contents cr_start
-    in
+    let+ start_index, end_index, content = find_comment_bounds file_contents cr_start in
     let content = String.rstrip content in
     let file_cache = Lazy.force file_cache in
     let start_position = Loc.Offset.to_position start_index ~file_cache in
