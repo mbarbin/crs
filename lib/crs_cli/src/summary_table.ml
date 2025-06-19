@@ -113,8 +113,8 @@ module By_type = struct
 
   let columns =
     PrintBox.
-      [ Column.make "type" (fun (row : Row.t) -> line (Type.to_string row.type_))
-      ; Column.make "count" ~align:`Right (fun (row : Row.t) ->
+      [ Column.make "CR Type" (fun (row : Row.t) -> line (Type.to_string row.type_))
+      ; Column.make "Count" ~align:`Right (fun (row : Row.t) ->
           line_with_style
             (match row.type_ with
              | Invalid -> Style.fg_color Red
@@ -219,9 +219,9 @@ let columns =
         if count = 0 then empty else line (Int.to_string_hum count)))
   in
   PrintBox.
-    [ Column.make "reporter" (fun (row : Row.t) ->
+    [ Column.make "Reporter" (fun (row : Row.t) ->
         line (Vcs.User_handle.to_string row.reporter))
-    ; Column.make "for" (fun (row : Row.t) ->
+    ; Column.make "For" (fun (row : Row.t) ->
         match row.for_ with
         | None -> empty
         | Some user -> line (Vcs.User_handle.to_string user))
