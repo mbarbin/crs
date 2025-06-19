@@ -19,6 +19,48 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
+module Column = struct
+  type 'a t =
+    { header : string
+    ; make_box : 'a -> PrintBox.t
+    ; align_h : [ `Left | `Center | `Right ]
+    }
+
+  let make header ?(align = `Left) f = { header; make_box = f; align_h = align }
+end
+
+let make_table columns rows =
+  let pad_cell box = PrintBox.hpad 1 box in
+  PrintBox.(
+    frame
+      (hlist
+         (List.filter_map columns ~f:(fun { Column.header; make_box; align_h } ->
+            let rows = List.map rows ~f:make_box in
+            if
+              List.for_all rows ~f:(fun box ->
+                match PrintBox.view box with
+                | Empty -> true
+                | _ -> false)
+            then None
+            else
+              Some
+                (vlist
+                   [ align ~h:align_h ~v:`Center (pad_cell (line header))
+                   ; grid_l
+                       ~bars:false
+                       (List.map rows ~f:(fun box ->
+                          let box =
+                            (* When encountering an empty cell, [grid_l] shifts
+                               the remaining rows up one level, which creates a
+                               misalignment. Thus we use a workaround here. *)
+                            match PrintBox.view box with
+                            | Empty -> line " "
+                            | _ -> box
+                          in
+                          [ align ~h:align_h ~v:`Center (pad_cell box) ]))
+                   ])))))
+;;
+
 module By_type = struct
   module Type = struct
     type t =
@@ -70,18 +112,21 @@ module By_type = struct
   ;;
 
   let columns =
-    Ascii_table.Column.
-      [ create_attr "type" (fun (row : Row.t) -> [], Type.to_string row.type_)
-      ; create_attr "count" ~align:Right (fun (row : Row.t) ->
-          ( (match row.type_ with
-             | Invalid -> [ `Red ]
-             | CR | XCR | Soon | Someday -> [])
-          , Int.to_string_hum row.count ))
+    PrintBox.
+      [ Column.make "type" (fun (row : Row.t) -> line (Type.to_string row.type_))
+      ; Column.make "count" ~align:`Right (fun (row : Row.t) ->
+          line_with_style
+            (match row.type_ with
+             | Invalid -> Style.fg_color Red
+             | CR | XCR | Soon | Someday -> Style.default)
+            (Int.to_string_hum row.count))
       ]
   ;;
 
   let to_string t =
-    if List.is_empty t.rows then "" else Ascii_table.to_string columns t.rows
+    if List.is_empty t.rows
+    then ""
+    else PrintBox_text.to_string (make_table columns t.rows) ^ "\n"
   ;;
 end
 
@@ -167,28 +212,29 @@ let make (crs : Cr_comment.t list) =
 ;;
 
 let columns =
-  let empty_cell = [], "" in
-  let count_cell count = if count = 0 then empty_cell else [], Int.to_string_hum count in
-  Ascii_table.Column.
-    [ create_attr "reporter" (fun (row : Row.t) ->
-        [], Vcs.User_handle.to_string row.reporter)
-    ; create_attr "for" ~show:`If_not_empty (fun (row : Row.t) ->
+  let count label count =
+    PrintBox.(
+      Column.make label ~align:`Right (fun (row : Row.t) ->
+        let count = count row in
+        if count = 0 then empty else line (Int.to_string_hum count)))
+  in
+  PrintBox.
+    [ Column.make "reporter" (fun (row : Row.t) ->
+        line (Vcs.User_handle.to_string row.reporter))
+    ; Column.make "for" (fun (row : Row.t) ->
         match row.for_ with
-        | None -> empty_cell
-        | Some user -> [], Vcs.User_handle.to_string user)
-    ; create_attr "CRs" ~align:Right ~show:`If_not_empty (fun (row : Row.t) ->
-        count_cell row.cr_count)
-    ; create_attr "XCRs" ~align:Right ~show:`If_not_empty (fun (row : Row.t) ->
-        count_cell row.xcr_count)
-    ; create_attr "Soon" ~align:Right ~show:`If_not_empty (fun (row : Row.t) ->
-        count_cell row.soon_count)
-    ; create_attr "Someday" ~align:Right ~show:`If_not_empty (fun (row : Row.t) ->
-        count_cell row.someday_count)
-    ; create_attr "Total" ~align:Right ~show:`If_not_empty (fun (row : Row.t) ->
-        count_cell row.total_count)
+        | None -> empty
+        | Some user -> line (Vcs.User_handle.to_string user))
+    ; count "CRs" (fun row -> row.cr_count)
+    ; count "XCRs" (fun row -> row.xcr_count)
+    ; count "Soon" (fun row -> row.soon_count)
+    ; count "Someday" (fun row -> row.someday_count)
+    ; count "Total" (fun row -> row.total_count)
     ]
 ;;
 
 let to_string t =
-  if List.is_empty t.rows then "" else Ascii_table.to_string columns t.rows
+  if List.is_empty t.rows
+  then ""
+  else PrintBox_text.to_string (make_table columns t.rows) ^ "\n"
 ;;
