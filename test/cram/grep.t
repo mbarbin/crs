@@ -225,6 +225,20 @@ There's also an option to display the results as summary tables.
   │ user1    │ user3 │   1 │      │      │         │     1 │
   └──────────┴───────┴─────┴──────┴──────┴─────────┴───────┘
 
+  $ crs grep --below ./foo/bar --summary
+  ┌─────────┬───────┐
+  │ type    │ count │
+  ├─────────┼───────┤
+  │ Invalid │     2 │
+  │ Soon    │     1 │
+  └─────────┴───────┘
+  
+  ┌──────────┬──────┬───────┐
+  │ reporter │ Soon │ Total │
+  ├──────────┼──────┼───────┤
+  │ user1    │    1 │     1 │
+  └──────────┴──────┴───────┘
+
 Summary tables may not be displayed as sexps.
 
   $ crs grep --summary --sexp
