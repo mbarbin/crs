@@ -33,7 +33,6 @@
   printbox
   printbox-text
   stdio
-  textutils.ascii_table
   unix
   volgo-base
   volgo-git-unix

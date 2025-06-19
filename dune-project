@@ -70,8 +70,6 @@
    (>= v0.17))
   (stdio
    (>= v0.17))
-  (textutils
-   (>= v0.17))
   (volgo
    (>= 0.0.18))
   (volgo-base
@@ -144,8 +142,6 @@
   (spawn
    (>= v0.17))
   (stdio
-   (>= v0.17))
-  (textutils
    (>= v0.17))
   (volgo
    (>= 0.0.18))
@@ -235,8 +231,6 @@
   (spawn
    (>= v0.17))
   (stdio
-   (>= v0.17))
-  (textutils
    (>= v0.17))
   (volgo
    (>= 0.0.18))
