@@ -30,6 +30,8 @@
   pp
   pplumbing.err
   pplumbing.pp-tty
+  printbox
+  printbox-text
   stdio
   textutils.ascii_table
   unix

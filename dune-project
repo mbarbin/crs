@@ -60,6 +60,10 @@
    (>= v0.17))
   (ppxlib
    (>= 0.33))
+  (printbox
+   (>= 0.12))
+  (printbox-text
+   (>= 0.12))
   (re
    (>= 1.12.0))
   (spawn
