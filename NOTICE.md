@@ -22,7 +22,7 @@ In 2016-2017, Jane Street released on GitHub an internal code review system name
 
 Iron was released under the terms of the [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0) License.
 
-We've included a copy of the `Apache-2.0` License in the repository [here](./3rd-party-license/LICENSE-apache-2.0.txt)
+We've included a copy of Iron's `Apache-2.0` License in the repository [here](./third-party-license/LICENSE-iron-apache-2.0.txt)
 
 We're referring to the Iron source code as of `v0.9.114.44+47`, revision `dfb106cb82abf5d16e548d4ee4f419d0994d3644`.
 
