@@ -92,6 +92,18 @@ end
 
 let null_separator = String.make 1 (Char.of_int_exn 0)
 
+let () =
+  (* Something similar is done when you link with [Core_unix] however it is
+     preferable to make the rendering of errors deterministic based on code
+     present in this module here rather than purely from dependencies, since
+     dependencies may change. *)
+  Sexplib0.Sexp_conv.Exn_converter.add [%extension_constructor Unix.Unix_error] (function
+    | Unix.Unix_error (error, fn, param) ->
+      Sexp.List
+        [ Atom "Unix.Unix_error"; Atom (Unix.error_message error); Atom fn; Atom param ]
+    | _ -> assert false)
+;;
+
 let grep ~vcs ~repo_root ~below =
   let files_to_grep =
     match Vcs.ls_files vcs ~repo_root ~below with
