@@ -91,7 +91,6 @@ module Type = struct
     | XCR
     | Soon
     | Someday
-  [@@deriving equal]
 
   let of_header h =
     match Cr_comment.Header.kind h with
@@ -143,14 +142,25 @@ let make (crs : Cr_comment.t list) =
     |> List.map ~f:(function
       | [] -> assert false
       | ({ Key.reporter; for_ }, _) :: _ as list ->
-        let count_type ty = List.count list ~f:(fun (_, type_) -> Type.equal type_ ty) in
+        let cr_count = ref 0 in
+        let xcr_count = ref 0 in
+        let soon_count = ref 0 in
+        let someday_count = ref 0 in
+        let total_count = ref 0 in
+        List.iter list ~f:(fun (_, type_) ->
+          Int.incr total_count;
+          match (type_ : Type.t) with
+          | CR -> Int.incr cr_count
+          | XCR -> Int.incr xcr_count
+          | Soon -> Int.incr soon_count
+          | Someday -> Int.incr someday_count);
         { Row.reporter
         ; for_
-        ; cr_count = count_type CR
-        ; xcr_count = count_type XCR
-        ; soon_count = count_type Soon
-        ; someday_count = count_type Someday
-        ; total_count = List.length list
+        ; cr_count = !cr_count
+        ; xcr_count = !xcr_count
+        ; soon_count = !soon_count
+        ; someday_count = !someday_count
+        ; total_count = !total_count
         })
   in
   { rows }
