@@ -94,14 +94,14 @@ let comment_regex =
 ;;
 
 let parse ~file_cache ~content_start_offset ~content =
+  let ( let* ) a f = Or_error.bind a ~f in
   try
     let comment_regex = Lazy.force comment_regex in
     let group_names = Re.group_names comment_regex in
-    let open Or_error.Let_syntax in
-    let%bind m =
+    let* m =
       match Re.exec_opt comment_regex content with
       | None -> Or_error.error "Invalid CR comment" content String.sexp_of_t
-      | Some m -> return m
+      | Some m -> Or_error.return m
     in
     let get field_name =
       let index =
@@ -155,7 +155,7 @@ let parse ~file_cache ~content_start_offset ~content =
         (* dated CR -> CR-someday *)
         { Loc.Txt.txt = Cr_comment.Due.Someday; loc }
     in
-    return (Cr_comment.Private.Header.create ~kind ~due ~reported_by ~for_)
+    Or_error.return (Cr_comment.Private.Header.create ~kind ~due ~reported_by ~for_)
   with
   | exn ->
     Or_error.error

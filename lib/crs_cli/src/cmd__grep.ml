@@ -22,14 +22,15 @@
 let main =
   Command.make
     ~summary:"Grep for CRs in the tree."
-    (let%map_open.Command below =
+    (let open Command.Std in
+     let+ below =
        Arg.named_opt
          [ "below" ]
          (Param.validated_string (module Fpath))
          ~docv:"PATH"
          ~doc:"Only grep below the supplied path."
-     and sexp = Arg.flag [ "sexp" ] ~doc:"Print the CRs as sexps on stdout."
-     and summary =
+     and+ sexp = Arg.flag [ "sexp" ] ~doc:"Print the CRs as sexps on stdout."
+     and+ summary =
        Arg.flag
          [ "summary" ]
          ~doc:
