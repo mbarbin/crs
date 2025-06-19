@@ -1,3 +1,17 @@
+## 0.0.2025XXXX (unreleased)
+
+### Added
+
+### Changed
+
+- Migrate from `Textutils.Ascii_table` to `PrintBox` to reduce dependencies (#28, @mbarbin).
+
+### Fixed
+
+### Removed
+
+- No longer depend on `textutils` and transitively `core_unix` (#28, @mbarbin).
+
 ## 0.0.20250618 (2025-06-18)
 
 ### Added
