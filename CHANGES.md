@@ -10,7 +10,7 @@
 
 ### Removed
 
-- No longer depend on `textutils` and transitvely `core_unix` (#28, @mbarbin).
+- No longer depend on `textutils` and transitively `core_unix` (#28, @mbarbin).
 
 ## 0.0.20250618 (2025-06-18)
 
