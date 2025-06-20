@@ -79,14 +79,6 @@ module Digest_hex = struct
   let create str = str |> Stdlib.Digest.string |> Stdlib.Digest.to_hex
 end
 
-module Due = struct
-  type t =
-    | Now
-    | Soon
-    | Someday
-  [@@deriving compare, equal, sexp_of]
-end
-
 module Header = struct
   module T = struct
     [@@@coverage off]

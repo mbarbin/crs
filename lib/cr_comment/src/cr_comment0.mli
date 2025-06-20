@@ -70,31 +70,6 @@
     assignment information, supporting workflows for tracking, resolving, and
     managing code review discussions within the codebase. *)
 
-module Due : sig
-  (** The [Due.t] type represents an optional urgency or priority class that can
-      be attached to a code review comment (CR) using the CR syntax. This
-      classification is a general convenience provided by the library to help
-      organize and filter CRs, but the exact workflow and expectations
-      associated with each class — such as when a [Soon] or [Someday] comment
-      should be addressed — are intentionally left undefined here.
-
-      It is up to higher-level tools or code review systems built on top of CRs
-      to define and enforce specific policies or behaviors around these classes.
-
-      As a rule of thumb:
-      - [Now]: Should be addressed promptly.
-      - [Soon]: Should be addressed in the near future.
-      - [Someday]: Can be deferred until later.
-
-      These categories are intended to be flexible and adaptable to the needs of
-      various development process. *)
-  type t =
-    | Now
-    | Soon
-    | Someday
-  [@@deriving compare, equal, sexp_of]
-end
-
 module Digest_hex : sig
   type t [@@deriving compare, equal, sexp_of]
 

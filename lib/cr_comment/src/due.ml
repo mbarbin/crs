@@ -19,6 +19,8 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-module Due = Due
-module Kind = Kind
-include Cr_comment0
+type t =
+  | Now
+  | Soon
+  | Someday
+[@@deriving compare, equal, sexp_of]
