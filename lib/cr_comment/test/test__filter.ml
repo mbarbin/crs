@@ -29,6 +29,9 @@ let%expect_test "all" =
         }]);
   [%expect
     {|
+    ((filter    All)
+     (to_string all)
+     (shorthand a))
     ((filter    Invalid)
      (to_string invalid)
      (shorthand i))

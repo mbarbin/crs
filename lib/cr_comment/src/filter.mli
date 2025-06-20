@@ -22,6 +22,7 @@
 (** A type to select only a subset of CRs. *)
 
 type t =
+  | All
   | Invalid
   | CRs
   | XCRs

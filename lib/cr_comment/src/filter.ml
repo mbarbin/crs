@@ -20,6 +20,7 @@
 (********************************************************************************)
 
 type t =
+  | All
   | Invalid
   | CRs
   | XCRs
@@ -29,13 +30,14 @@ type t =
 [@@deriving compare, equal, enumerate, sexp_of]
 
 let to_string = function
-  | (Invalid | CRs | XCRs | Now | Soon | Someday) as t ->
+  | (All | Invalid | CRs | XCRs | Now | Soon | Someday) as t ->
     (match sexp_of_t t with
      | Atom str -> String.lowercase str
      | List _ -> assert false)
 ;;
 
 let shorthand = function
+  | All -> 'a'
   | Invalid -> 'i'
   | CRs -> 'c'
   | XCRs -> 'x'
@@ -46,6 +48,7 @@ let shorthand = function
 
 let matches t ~cr =
   match t with
+  | All -> true
   | Invalid ->
     (match Cr_comment0.header cr with
      | Error _ -> true
