@@ -89,7 +89,9 @@ Always a string, e.g. \"now\", \"all\", etc.")
               (progn
                 (crs-grep-mode)
                 (goto-char (point-min))
-                (message "CRs loaded successfully."))
+                (message
+                 (format "CRs loaded successfully (%s)."
+                         crs-grep-current-filter)))
             (message
              "Failed to run `crs grep`. Check the CLI path or repository state.")))))
     (pop-to-buffer output-buffer)))
