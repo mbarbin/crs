@@ -40,7 +40,7 @@ let%expect_test "all" =
      (shorthand x))
     ((filter    Now)
      (to_string now)
-     (shorthand n))
+     (shorthand w))
     ((filter    Soon)
      (to_string soon)
      (shorthand o))

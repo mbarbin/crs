@@ -39,7 +39,7 @@ let shorthand = function
   | Invalid -> 'i'
   | CRs -> 'c'
   | XCRs -> 'x'
-  | Now -> 'n'
+  | Now -> 'w'
   | Soon -> 'o'
   | Someday -> 'd'
 ;;
