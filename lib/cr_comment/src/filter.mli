@@ -19,7 +19,27 @@
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
 
-module Due = Due
-module Kind = Kind
-module Filter = Filter
-include module type of Cr_comment0
+(** A type to select only a subset of CRs. *)
+
+type t =
+  | Invalid
+  | CRs
+  | XCRs
+  | Now
+  | Soon
+  | Someday
+[@@deriving compare, equal, enumerate, sexp_of]
+
+(** {1 Representation} *)
+
+(** A lowercase version of [t] for use e.g. as command line flags. *)
+val to_string : t -> string
+
+(** This defines opinionated shorthands to designate each case, to be used in
+    UIs. May be shared by cli, editor integration, etc. *)
+val shorthand : t -> char
+
+(** {1 Matching} *)
+
+(** Returns [true] iif the filter applies to the supplied CR. *)
+val matches : t -> cr:Cr_comment0.t -> bool

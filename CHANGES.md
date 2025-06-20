@@ -2,6 +2,8 @@
 
 ### Added
 
+- Add filtering flags to `crs grep` (`--soon`, `--xcrs`, etc.) (#30, @mbarbin).
+
 ### Changed
 
 - Migrate from `Textutils.Ascii_table` to `PrintBox` to reduce dependencies (#28, @mbarbin).

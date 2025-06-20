@@ -19,7 +19,7 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-module Due = Due
-module Kind = Kind
-module Filter = Filter
-include Cr_comment0
+type t =
+  | CR
+  | XCR
+[@@deriving compare, equal, enumerate, sexp_of]

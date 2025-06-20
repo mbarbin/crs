@@ -21,22 +21,32 @@
 
 let main =
   Command.make
-    ~summary:"Grep for CRs in the tree."
+    ~summary:"Grep for CRs in the repository tree."
+    ~readme:(fun () ->
+      {|
+This command searches for code review comments ($(b,CRs)) among all files under version control in the enclosing repository, and prints them to $(b,stdout).
+
+Supports both $(b,git) and $(b,hg) repositories.
+
+By default, all CRs from the root of the enclosing repository are selected, even if the command is run from a subdirectory. Use $(b,--below) to restrict the search to a specific path.
+
+All types of CRs are printed by default. You can restrict the selection using filtering flags such as $(b,--xcrs) or $(b,--soon). Supplying multiple filtering flags selects the union of all matching CRs (i.e., flags are combined with OR).
+|})
     (let open Command.Std in
      let+ below =
        Arg.named_opt
          [ "below" ]
          (Param.validated_string (module Fpath))
          ~docv:"PATH"
-         ~doc:"Only grep below the supplied path."
-     and+ sexp = Arg.flag [ "sexp" ] ~doc:"Print the CRs as sexps on stdout."
+         ~doc:"Only search for CRs below the supplied path."
+     and+ sexp = Arg.flag [ "sexp" ] ~doc:"Print CRs as S-expressions on stdout."
      and+ summary =
        Arg.flag
          [ "summary" ]
          ~doc:
-           "This flags causes the command to print CR counts in summary tables rather \
-            than printing each CR individually. This is not compatible with $(b,sexp)."
-     in
+           "Print CR counts in summary tables instead of listing each CR. Not compatible \
+            with $(b,--sexp)."
+     and+ filters = Common_helpers.filters in
      let () =
        if sexp && summary
        then
@@ -63,7 +73,17 @@ let main =
        | Some path -> Common_helpers.relativize ~repo_root ~cwd ~path
      in
      let () = Stdlib.Sys.set_signal Stdlib.Sys.sigpipe Stdlib.Sys.Signal_ignore in
-     let crs = Crs_parser.grep ~vcs ~repo_root ~below in
+     let crs =
+       let all_crs = Crs_parser.grep ~vcs ~repo_root ~below in
+       let selected =
+         match filters with
+         | `Default -> all_crs
+         | `Supplied filters ->
+           List.filter all_crs ~f:(fun cr ->
+             List.exists filters ~f:(fun filter -> Cr_comment.Filter.matches filter ~cr))
+       in
+       Cr_comment.sort selected
+     in
      Git_pager.run ~f:(fun git_pager ->
        let oc = Git_pager.write_end git_pager in
        if sexp
