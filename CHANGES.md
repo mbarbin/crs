@@ -2,6 +2,7 @@
 
 ### Added
 
+- Support for filtering CRs types in emacs cr-grep-mode (#31, @mbarbin).
 - Add filtering flags to `crs grep` (`--soon`, `--xcrs`, etc.) (#30, @mbarbin).
 
 ### Changed

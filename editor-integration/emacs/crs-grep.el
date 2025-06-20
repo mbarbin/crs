@@ -45,18 +45,36 @@ Set this to an absolute path if the executable is not in your `PATH`."
   :type 'string
   :group 'crs-grep)
 
+(defcustom crs-grep-default-filter "now"
+  "Default filter for `crs-grep` when opening the CRs buffer.
+Should be one of: all, crs, xcrs, now, soon, someday, invalid."
+  :type
+  '(choice
+    (const "all")
+    (const "crs")
+    (const "xcrs")
+    (const "now")
+    (const "soon")
+    (const "someday")
+    (const "invalid"))
+  :group 'crs-grep)
+
 (defvar crs-grep-buffer-name "*CRs*"
   "Name of the buffer used to display Code Review Comments (CRs).")
 
 (defvar crs-grep-last-directory nil
   "Stores the last directory where `crs grep` was run.")
 
+(defvar crs-grep-current-filter nil
+  "Current filter flag for `crs-grep` CLI.
+Always a string, e.g. \"now\", \"all\", etc.")
+
 (defun crs-grep--run-in-directory (directory)
   "Run the `crs grep` command in the given DIRECTORY and update the `*CRs*` buffer."
   (let ((output-buffer (get-buffer-create crs-grep-buffer-name)))
     (with-current-buffer output-buffer
       (let ((default-directory directory)
-            (inhibit-read-only t)) ;; Allow modifications temporarily
+            (inhibit-read-only t))
         (erase-buffer)
         (let ((exit-code
                (call-process crs-grep-cli
@@ -65,12 +83,15 @@ Set this to an absolute path if the executable is not in your `PATH`."
                              nil
                              "tools"
                              "emacs-grep"
-                             "--path-display-mode=absolute")))
+                             "--path-display-mode=absolute"
+                             (concat "--" crs-grep-current-filter))))
           (if (eq exit-code 0)
               (progn
-                (crs-grep-mode) ;; Activate mode
+                (crs-grep-mode)
                 (goto-char (point-min))
-                (message "CRs loaded successfully."))
+                (message
+                 (format "CRs loaded successfully (%s)."
+                         crs-grep-current-filter)))
             (message
              "Failed to run `crs grep`. Check the CLI path or repository state.")))))
     (pop-to-buffer output-buffer)))
@@ -79,9 +100,9 @@ Set this to an absolute path if the executable is not in your `PATH`."
 (defun crs-grep-run ()
   "Run the `crs grep` command and display the results in a special buffer."
   (interactive)
-  (let
-      ((current-dir default-directory)) ;; Capture the current working directory
-    (setq crs-grep-last-directory current-dir) ;; Save the directory for refresh
+  (let ((current-dir default-directory))
+    (setq crs-grep-last-directory current-dir)
+    (setq crs-grep-current-filter crs-grep-default-filter)
     (crs-grep--run-in-directory current-dir)))
 
 (defun crs-grep-refresh ()
@@ -91,21 +112,81 @@ Set this to an absolute path if the executable is not in your `PATH`."
       (crs-grep--run-in-directory crs-grep-last-directory)
     (message "No previous directory to refresh from. Run `crs-grep` first.")))
 
+(defun crs-grep-set-filter (filter-name)
+  "Set the filter to FILTER-NAME (string), refresh buffer.
+Prompts if called interactively."
+  (interactive (list
+                (completing-read
+                 "Filter (all, crs, xcrs, now, soon, someday, invalid): "
+                 '("all" "crs" "xcrs" "now" "soon" "someday" "invalid")
+                 nil
+                 t)))
+  (setq crs-grep-current-filter filter-name)
+  (crs-grep-refresh))
+
 ;;; Mode
 
 (defvar crs-grep-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "g") 'crs-grep-refresh) ;; Refresh the buffer
-    (define-key map (kbd "q") 'quit-window) ;; Quit the buffer
+    (define-key map "g" 'crs-grep-refresh)
+    (define-key map "q" 'quit-window)
+    (define-key
+     map "c"
+     (lambda ()
+       (interactive)
+       (crs-grep-set-filter "crs")))
+    (define-key
+     map "x"
+     (lambda ()
+       (interactive)
+       (crs-grep-set-filter "xcrs")))
+    (define-key
+     map "w"
+     (lambda ()
+       (interactive)
+       (crs-grep-set-filter "now")))
+    (define-key
+     map "o"
+     (lambda ()
+       (interactive)
+       (crs-grep-set-filter "soon")))
+    (define-key
+     map "d"
+     (lambda ()
+       (interactive)
+       (crs-grep-set-filter "someday")))
+    (define-key
+     map "i"
+     (lambda ()
+       (interactive)
+       (crs-grep-set-filter "invalid")))
+    (define-key
+     map "a"
+     (lambda ()
+       (interactive)
+       (crs-grep-set-filter "all")))
     map)
-  "Keymap for `crs-grep-mode`.")
+  "Keymap for `crs-grep-mode`.
+
+Keys:
+  g   Refresh buffer (keep current filter)
+  a   Show all CRs (clear filter)
+  c   Filter: CRs
+  x   Filter: XCRs
+  w   Filter: Now
+  o   Filter: Soon
+  d   Filter: Someday
+  i   Filter: Invalid
+  q   Quit")
 
 ;;;###autoload
 (define-derived-mode
- crs-grep-mode
- grep-mode
- "CRs"
- "Major mode for navigating Code Review Comments (CRs)."
+ crs-grep-mode grep-mode "CRs"
+ "Major mode for navigating Code Review Comments (CRs).
+\n\
+Press a filter key (a, c, x, w, o, d, i) to restrict the list.\n\
+Press \"g\" to refresh with the current filter.\n\
+Press \"q\" to quit.\n"
  :keymap crs-grep-mode-map)
 
 (provide 'crs-grep)

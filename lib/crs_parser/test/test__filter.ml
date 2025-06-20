@@ -73,6 +73,40 @@ let%expect_test "categorize" =
 |};
   [%expect
     {|
+    ====== all
+    File "my_file.ml", line 1, characters 0-15:
+      CR : Hey.
+
+    File "my_file.ml", line 3, characters 0-20:
+      CR user1: Hey.
+
+    File "my_file.ml", line 5, characters 0-30:
+      CR user1 for user2: Hey.
+
+    File "my_file.ml", line 7, characters 0-21:
+      XCR user1: Hey.
+
+    File "my_file.ml", line 9, characters 0-31:
+      XCR user1 for user2: Hey.
+
+    File "my_file.ml", line 11, characters 0-25:
+      CR-soon user1: Hey.
+
+    File "my_file.ml", line 13, characters 0-35:
+      CR-soon user1 for user2: Hey.
+
+    File "my_file.ml", line 15, characters 0-26:
+      XCR-soon user1: Hey.
+
+    File "my_file.ml", line 17, characters 0-28:
+      CR-someday user1: Hey.
+
+    File "my_file.ml", line 19, characters 0-38:
+      CR-someday user1 for user2: Hey.
+
+    File "my_file.ml", lines 21-22, characters 0-29:
+      XCR-someday user1: Hey.
+
     ====== invalid
     File "my_file.ml", line 1, characters 0-15:
       CR : Hey.

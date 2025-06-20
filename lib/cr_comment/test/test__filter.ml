@@ -29,6 +29,9 @@ let%expect_test "all" =
         }]);
   [%expect
     {|
+    ((filter    All)
+     (to_string all)
+     (shorthand a))
     ((filter    Invalid)
      (to_string invalid)
      (shorthand i))
@@ -40,7 +43,7 @@ let%expect_test "all" =
      (shorthand x))
     ((filter    Now)
      (to_string now)
-     (shorthand n))
+     (shorthand w))
     ((filter    Soon)
      (to_string soon)
      (shorthand o))

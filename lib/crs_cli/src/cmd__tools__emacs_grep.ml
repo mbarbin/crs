@@ -95,7 +95,7 @@ By default the file paths are displayed relative to the command's $(b,cwd).
          ~docv:"MODE"
          ~doc:"Specify how the paths are displayed."
          ~default:Relative_to_cwd
-     in
+     and+ filters = Common_helpers.filters in
      let cwd = Unix.getcwd () |> Absolute_path.v in
      let { Enclosing_repo.vcs_kind = _; repo_root; vcs } =
        Common_helpers.find_enclosing_repo ~from:cwd
@@ -103,7 +103,14 @@ By default the file paths are displayed relative to the command's $(b,cwd).
      let below =
        Common_helpers.relativize ~repo_root ~cwd ~path:(Relative_path.empty :> Fpath.t)
      in
-     let crs = Crs_parser.grep ~vcs ~repo_root ~below in
+     let crs =
+       let all_crs = Crs_parser.grep ~vcs ~repo_root ~below in
+       match filters with
+       | `Default -> all_crs
+       | `Supplied filters ->
+         List.filter all_crs ~f:(fun cr ->
+           List.exists filters ~f:(fun filter -> Cr_comment.Filter.matches filter ~cr))
+     in
      output_list
        crs
        ~oc:Out_channel.stdout

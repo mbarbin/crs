@@ -78,6 +78,12 @@ using a special syntax.
   ./hello:2:
     CR user1 for user2: Hey, this is a code review comment
 
+The emacs grep command supports filtering flags.
+
+  $ crs tools emacs-grep --xcrs
+  ./foo/a.txt:2:
+    XCR user1: Fix this. Edit: Done.
+
 When launched from a subdir, to facilitate the integration, we can display the
 path relative to that subdir from where the command is run.
 
