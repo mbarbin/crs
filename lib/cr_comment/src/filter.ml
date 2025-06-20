@@ -43,3 +43,58 @@ let shorthand = function
   | Soon -> 'o'
   | Someday -> 'd'
 ;;
+
+let matches t ~cr =
+  match t with
+  | Invalid ->
+    (match Cr_comment0.header cr with
+     | Error _ -> true
+     | Ok _ -> false)
+  | CRs ->
+    (match Cr_comment0.header cr with
+     | Error _ -> false
+     | Ok h ->
+       (match Cr_comment0.Header.kind h with
+        | XCR -> false
+        | CR ->
+          (match Cr_comment0.Header.due h with
+           | Now -> true
+           | Soon | Someday -> false)))
+  | XCRs ->
+    (match Cr_comment0.header cr with
+     | Error _ -> false
+     | Ok h ->
+       (match Cr_comment0.Header.kind h with
+        | CR -> false
+        | XCR -> true))
+  | Now ->
+    (match Cr_comment0.header cr with
+     | Error _ -> false
+     | Ok h ->
+       (match Cr_comment0.Header.kind h with
+        | XCR -> true
+        | CR ->
+          (match Cr_comment0.Header.due h with
+           | Now -> true
+           | Soon | Someday -> false)))
+  | Soon ->
+    (match Cr_comment0.header cr with
+     | Error _ -> false
+     | Ok h ->
+       (match Cr_comment0.Header.kind h with
+        | XCR -> false
+        | CR ->
+          (match Cr_comment0.Header.due h with
+           | Soon -> true
+           | Now | Someday -> false)))
+  | Someday ->
+    (match Cr_comment0.header cr with
+     | Error _ -> false
+     | Ok h ->
+       (match Cr_comment0.Header.kind h with
+        | XCR -> false
+        | CR ->
+          (match Cr_comment0.Header.due h with
+           | Someday -> true
+           | Now | Soon -> false)))
+;;
