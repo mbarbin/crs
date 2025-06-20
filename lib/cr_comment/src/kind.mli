@@ -26,4 +26,4 @@
 type t =
   | CR
   | XCR
-[@@deriving compare, equal, sexp_of]
+[@@deriving compare, equal, enumerate, sexp_of]

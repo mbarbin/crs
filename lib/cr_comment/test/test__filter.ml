@@ -19,7 +19,60 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-type t =
-  | CR
-  | XCR
-[@@deriving compare, equal, enumerate, sexp_of]
+let%expect_test "all" =
+  List.iter Cr_comment.Filter.all ~f:(fun filter ->
+    print_s
+      [%sexp
+        { filter : Cr_comment.Filter.t
+        ; to_string = (Cr_comment.Filter.to_string filter : string)
+        ; shorthand = (Cr_comment.Filter.shorthand filter : char)
+        }]);
+  [%expect
+    {|
+    ((filter    Invalid)
+     (to_string invalid)
+     (shorthand i))
+    ((filter    CRs)
+     (to_string crs)
+     (shorthand c))
+    ((filter    XCRs)
+     (to_string xcrs)
+     (shorthand x))
+    ((filter    Now)
+     (to_string now)
+     (shorthand n))
+    ((filter    Soon)
+     (to_string soon)
+     (shorthand o))
+    ((filter    Someday)
+     (to_string someday)
+     (shorthand d))
+    |}];
+  ()
+;;
+
+let%expect_test "string count" =
+  let count = List.length Cr_comment.Filter.all in
+  let string_count =
+    Set.of_list
+      (module String)
+      (List.map Cr_comment.Filter.all ~f:Cr_comment.Filter.to_string)
+    |> Set.length
+  in
+  require_equal [%here] (module Int) count string_count;
+  [%expect {||}];
+  ()
+;;
+
+let%expect_test "shorthand count" =
+  let count = List.length Cr_comment.Filter.all in
+  let shorthand_count =
+    Set.of_list
+      (module Char)
+      (List.map Cr_comment.Filter.all ~f:Cr_comment.Filter.shorthand)
+    |> Set.length
+  in
+  require_equal [%here] (module Int) count shorthand_count;
+  [%expect {||}];
+  ()
+;;

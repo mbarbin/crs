@@ -21,4 +21,5 @@
 
 module Due = Due
 module Kind = Kind
+module Filter = Filter
 include Cr_comment0

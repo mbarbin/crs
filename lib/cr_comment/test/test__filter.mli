@@ -18,8 +18,3 @@
 (*_  and the LGPL-3.0 Linking Exception along with this library. If not, see     *)
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
-
-module Due = Due
-module Kind = Kind
-module Filter = Filter
-include module type of Cr_comment0

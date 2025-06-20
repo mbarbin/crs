@@ -40,4 +40,4 @@ type t =
   | Now
   | Soon
   | Someday
-[@@deriving compare, equal, sexp_of]
+[@@deriving compare, equal, enumerate, sexp_of]
