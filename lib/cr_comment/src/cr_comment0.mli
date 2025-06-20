@@ -70,17 +70,6 @@
     assignment information, supporting workflows for tracking, resolving, and
     managing code review discussions within the codebase. *)
 
-module Kind : sig
-  (** The [Kind.t] type distinguishes between active and resolved code review
-      comments.
-      - [CR]: An active code review comment.
-      - [XCR]: A resolved code review comment. *)
-  type t =
-    | CR
-    | XCR
-  [@@deriving compare, equal, sexp_of]
-end
-
 module Due : sig
   (** The [Due.t] type represents an optional urgency or priority class that can
       be attached to a code review comment (CR) using the CR syntax. This

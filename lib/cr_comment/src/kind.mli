@@ -19,5 +19,11 @@
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
 
-module Kind = Kind
-include module type of Cr_comment0
+(** The [Kind.t] type distinguishes between active and resolved code review
+    comments.
+    - [CR]: An active code review comment.
+    - [XCR]: A resolved code review comment. *)
+type t =
+  | CR
+  | XCR
+[@@deriving compare, equal, sexp_of]

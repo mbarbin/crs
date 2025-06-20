@@ -19,5 +19,7 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-module Kind = Kind
-include Cr_comment0
+type t =
+  | CR
+  | XCR
+[@@deriving compare, equal, sexp_of]

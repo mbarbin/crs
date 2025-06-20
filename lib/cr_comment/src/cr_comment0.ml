@@ -79,13 +79,6 @@ module Digest_hex = struct
   let create str = str |> Stdlib.Digest.string |> Stdlib.Digest.to_hex
 end
 
-module Kind = struct
-  type t =
-    | CR
-    | XCR
-  [@@deriving compare, equal, sexp_of]
-end
-
 module Due = struct
   type t =
     | Now
