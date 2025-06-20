@@ -1,4 +1,4 @@
-## 0.0.2025XXXX (unreleased)
+## 0.0.20250620 (2025-06-20)
 
 ### Added
 
@@ -8,8 +8,6 @@
 ### Changed
 
 - Migrate from `Textutils.Ascii_table` to `PrintBox` to reduce dependencies (#28, @mbarbin).
-
-### Fixed
 
 ### Removed
 
