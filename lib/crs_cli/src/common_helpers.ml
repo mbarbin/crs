@@ -55,3 +55,30 @@ let relativize ~repo_root ~cwd ~path =
           ++ Pp.text " is not in repo."
         ]
 ;;
+
+let filters =
+  let open Command.Std in
+  let one filter =
+    let+ select =
+      Arg.flag
+        [ Cr_comment.Filter.to_string filter
+        ; Printf.sprintf "%c" (Cr_comment.Filter.shorthand filter)
+        ]
+        ~doc:
+          (Printf.sprintf
+             "Select only CRs of type %S"
+             (Cr_comment.Filter.to_string filter))
+    in
+    if select then [ filter ] else []
+  in
+  let+ invalid = one Invalid
+  and+ crs = one CRs
+  and+ xcrs = one XCRs
+  and+ now = one Now
+  and+ soon = one Soon
+  and+ someday = one Someday in
+  let filters = List.concat [ invalid; crs; xcrs; now; soon; someday ] in
+  match filters with
+  | [] -> `Default
+  | _ :: _ as filters -> `Supplied filters
+;;

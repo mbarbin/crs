@@ -204,6 +204,21 @@ You may restrict the search to a subdirectory only.
   $ mkdir empty-directory
   $ crs grep --below empty-directory
 
+Filtering flags are available to select a subset of the CRs.
+
+  $ crs grep --xcrs
+  File "foo/a.txt", line 2, characters 0-38:
+    XCR user1: Fix this. Edit: Done.
+
+Filtering flags may be combined to select their union.
+
+  $ crs grep --soon --someday
+  File "foo/b.txt", line 1, characters 0-71:
+    CR-someday user1: Reconsider if/when updating to the new version.
+  
+  File "foo/bar/b.txt", line 2, characters 0-55:
+    CR-soon user1: Hey, this is a code review comment
+
 There's also an option to display the results as summary tables.
 
   $ crs grep --summary
