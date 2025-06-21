@@ -66,8 +66,23 @@ recognized comments that look like CRs, but flag them as invalid.
 
   $ printf "(* ${CR} : Hey, this comment look like a CR but it's not quite one. *)\n" >> foo/bar/d.txt
 
+We do not match CRs when they are located in ignored or untracked files.
+
+  $ printf "(* $CR user1: A CR in an untracked file. *)\n" > untracked-file
+  $ printf "(* $CR user1: A CR in an ignored file. *)\n" > ignored-file
+  $ echo "ignored-file" >> .gitignore
+  $ volgo-vcs add .gitignore
+
+We also specifically ignore binary files.
+
+  $ printf "\000 \n(* $CR user1: This is CR in a binary file - it is ignored. *)" > binary-file
+
+  $ grep 'CR' binary-file --binary-file=without-match
+  [1]
+
   $ volgo-vcs add hello
   $ volgo-vcs add foo
+  $ volgo-vcs add binary-file
   $ rev1=$(volgo-vcs commit -m "CRs")
 
 Now let's grep for the CRs.
@@ -278,7 +293,7 @@ matching. This involves running [xargs]. Let's cover for some failures there.
   ((exit_status (Exited 42)) (stdout "Hello Fake xargs\n") (stderr ""))
   [123]
 
-When the return code is `1` or `123` we require stdout and stderr to be empty.
+When the return code is `1` or `123` we require stderr to be empty.
 
   $ cat > xargs <<EOF
   > #!/bin/bash -e
@@ -298,6 +313,20 @@ When the return code is `1` or `123` we require stdout and stderr to be empty.
   > #!/bin/bash -e
   > # Read and discard all stdin to avoid broken pipe
   > cat > /dev/null
+  > echo "Hello Fake xargs" >&2
+  > exit 123
+  > EOF
+  $ chmod +x ./xargs
+
+  $ PATH=".:$PATH" crs grep
+  Error: Process xargs exited abnormally.
+  ((exit_status (Exited 123)) (stdout "") (stderr "Hello Fake xargs\n"))
+  [123]
+
+  $ cat > xargs <<EOF
+  > #!/bin/bash -e
+  > # Read and discard all stdin to avoid broken pipe
+  > cat > /dev/null
   > exit 1
   > EOF
   $ chmod +x ./xargs
@@ -308,12 +337,39 @@ When the return code is `1` or `123` we require stdout and stderr to be empty.
   > #!/bin/bash -e
   > # Read and discard all stdin to avoid broken pipe
   > cat > /dev/null
-  > echo "path/to/file.ml"
+  > exit 123
+  > EOF
+  $ chmod +x ./xargs
+
+  $ PATH=".:$PATH" crs grep
+
+When [xargs] runs the grep command several times, if one of the command yields
+no match, the exit code of the overall call to [xargs] will be [123]. However,
+in this case its output will contain matches from the other run, and thus this
+needs to be treated as a successful execution. We cover this below.
+
+  $ cat > xargs <<EOF
+  > #!/bin/bash -e
+  > # Read and discard all stdin to avoid broken pipe
+  > cat > /dev/null
+  > echo "foo/a.txt"
   > exit 1
   > EOF
   $ chmod +x ./xargs
 
   $ PATH=".:$PATH" crs grep
-  Error: Process xargs exited abnormally.
-  ((exit_status (Exited 1)) (stdout "path/to/file.ml\n") (stderr ""))
-  [123]
+  File "foo/a.txt", line 2, characters 0-38:
+    XCR user1: Fix this. Edit: Done.
+
+  $ cat > xargs <<EOF
+  > #!/bin/bash -e
+  > # Read and discard all stdin to avoid broken pipe
+  > cat > /dev/null
+  > echo "foo/a.txt"
+  > exit 123
+  > EOF
+  $ chmod +x ./xargs
+
+  $ PATH=".:$PATH" crs grep
+  File "foo/a.txt", line 2, characters 0-38:
+    XCR user1: Fix this. Edit: Done.
