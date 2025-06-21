@@ -24,6 +24,11 @@ module Vcs_kind = struct
     [ `Git
     | `Hg
     ]
+
+  let sexp_of_t = function
+    | `Git -> Sexp.Atom "git"
+    | `Hg -> Sexp.Atom "hg"
+  ;;
 end
 
 type vcs = < Vcs.Trait.file_system ; Vcs.Trait.ls_files > Vcs.t

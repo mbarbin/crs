@@ -59,15 +59,18 @@ let relativize ~repo_root ~cwd ~path =
 let filters =
   let open Command.Std in
   let one filter =
+    let filter_str = Cr_comment.Filter.to_string filter in
     let+ select =
       Arg.flag
-        [ Cr_comment.Filter.to_string filter
-        ; Printf.sprintf "%c" (Cr_comment.Filter.shorthand filter)
-        ]
+        [ filter_str; Printf.sprintf "%c" (Cr_comment.Filter.shorthand filter) ]
         ~doc:
-          (Printf.sprintf
-             "Select only CRs of type %S"
-             (Cr_comment.Filter.to_string filter))
+          (match filter with
+           | All -> "Select all CRs types (this is the default)."
+           | Invalid -> "Select only invalid CRs."
+           | CRs -> "Select only CRs of type CR."
+           | XCRs -> "Select only CRs of type XCR."
+           | Now | Soon | Someday ->
+             Printf.sprintf "Select only CRs to be worked on %s." filter_str)
     in
     if select then [ filter ] else []
   in
@@ -80,6 +83,6 @@ let filters =
   and+ someday = one Someday in
   let filters = List.concat [ all; invalid; crs; xcrs; now; soon; someday ] in
   match filters with
-  | [] -> `Default
-  | _ :: _ as filters -> `Supplied filters
+  | [] -> `All
+  | _ :: _ as filters -> `Only filters
 ;;

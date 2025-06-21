@@ -1,8 +1,23 @@
+## 0.0.2025XXXX (unreleased)
+
+### Added
+
+- Add key binding 'r' in emacs crs-grep-mode to refresh from repo-root (#34, @mbarbin).
+- Show running directory and filters in emacs CRs messages (#34, @mbarbin).
+
+### Changed
+
+### Fixed
+
+- Fix handling of xargs exit code 123 (#33, @mbarbin).
+
+### Removed
+
 ## 0.0.20250620 (2025-06-20)
 
 ### Added
 
-- Support for filtering CRs types in emacs cr-grep-mode (#31, @mbarbin).
+- Support for filtering CRs types in emacs crs-grep-mode (#31, @mbarbin).
 - Add filtering flags to `crs grep` (`--soon`, `--xcrs`, etc.) (#30, @mbarbin).
 
 ### Changed

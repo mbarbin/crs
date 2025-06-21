@@ -20,32 +20,34 @@
 (********************************************************************************)
 
 let main =
-  Command.group
-    ~summary:"A tool for managing code review comments embedded in source code."
+  Command.make
+    ~summary:"A util to get info about the enclosing repo."
     ~readme:(fun () ->
       {|
-The primary goal of $(b,crs) is to make it easy to locate, parse, and manipulate special code review comments called 'CRs' (pronounced "C"-"R"-z), embedded directly in source code.
+This command locates the root of the repository containing the current working directory.
 
-This CLI aims to offer ergonomic helpers for tasks such as systematically updating comments across multiple files, changing their priority, marking them as resolved, modifying reporter or assignee information, and more.
+It then displays a S-expression containing several fields related to that repository and the current path.
 
-Main commands include:
+- $(b,repo_root) : The root of the enclosing repo (absolute path).
 
-- $(b,grep): grep-search and print CRs found in the current repository.
+- $(b,path_in_repo) : The path of the current directory related to the repo root (relative path).
 
-- $(b,tools): a collection of more specific commands, for example to facilitate the integration with other tools (editors, etc).
-
-For more information, use the $(b,--help) flag on a subcommand.
+- $(b,vcs_kind) : The kind of version control for the enclosing repository (git|hg).
 |})
-    [ "grep", Cmd__grep.main
-    ; ( "tools"
-      , Command.group
-          ~summary:"Useful utils to integrate with other tools."
-          [ "emacs-grep", Cmd__tools__emacs_grep.main
-          ; "enclosing-repo-info", Cmd__tools__enclosing_repo_info.main
-          ] )
-    ]
+    (let open Command.Std in
+     let+ () = Arg.return () in
+     let cwd = Unix.getcwd () |> Absolute_path.v in
+     let { Enclosing_repo.vcs_kind; repo_root; vcs = _ } =
+       Common_helpers.find_enclosing_repo ~from:cwd
+     in
+     let path_in_repo =
+       Common_helpers.relativize ~repo_root ~cwd ~path:(Relative_path.empty :> Fpath.t)
+     in
+     print_s
+       [%sexp
+         { repo_root : Vcs.Repo_root.t
+         ; path_in_repo : Vcs.Path_in_repo.t
+         ; vcs_kind : Enclosing_repo.Vcs_kind.t
+         }];
+     ())
 ;;
-
-module Private = struct
-  let grep_cmd = Cmd__grep.main
-end

@@ -36,7 +36,5 @@ val relativize
   -> Vcs.Path_in_repo.t
 
 (** Allows to use flags to supply CR filters. For example: [--xcrs] or [--now].
-    If no filter flags are supplied, this returns [`Default], which may be
-    interpreted differently depending on the context. Each command is
-    responsible for documenting the meaning of its filter flags. *)
-val filters : [ `Default | `Supplied of Cr_comment.Filter.t list ] Command.Arg.t
+    If no filter flags are supplied, this returns [`All]. *)
+val filters : [ `All | `Only of Cr_comment.Filter.t list ] Command.Arg.t
