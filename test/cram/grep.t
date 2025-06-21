@@ -66,6 +66,13 @@ recognized comments that look like CRs, but flag them as invalid.
 
   $ printf "(* ${CR} : Hey, this comment look like a CR but it's not quite one. *)\n" >> foo/bar/d.txt
 
+We do not match CRs when they are located in ignored or untracked files.
+
+  $ printf "(* $CR user1: A CR in an untracked file. *)\n" > untracked-file
+  $ printf "(* $CR user1: A CR in an ignored file. *)\n" > ignored-file
+  $ echo "ignored-file" >> .gitignore
+  $ volgo-vcs add .gitignore
+
 We also specifically ignore binary files.
 
   $ printf "\000 \n(* $CR user1: This is CR in a binary file - it is ignored. *)" > binary-file
