@@ -6,7 +6,7 @@
 ;; Maintainer: Mathieu Barbin <mathieu.barbin@gmail.com>
 ;; URL: https://github.com/mbarbin/crs
 ;; Keywords: tools
-;; Version: 0.0.1
+;; Version: 0.0.2
 ;; Package-Requires: ((emacs "29.1"))
 ;; SPDX-License-Identifier: GPL-3.0-or-later
 ;;
