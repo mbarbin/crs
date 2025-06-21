@@ -66,8 +66,16 @@ recognized comments that look like CRs, but flag them as invalid.
 
   $ printf "(* ${CR} : Hey, this comment look like a CR but it's not quite one. *)\n" >> foo/bar/d.txt
 
+We also specifically ignore binary files.
+
+  $ printf "\000 \n(* $CR user1: This is CR in a binary file - it is ignored. *)" > binary-file
+
+  $ grep 'CR' binary-file --binary-file=without-match
+  [1]
+
   $ volgo-vcs add hello
   $ volgo-vcs add foo
+  $ volgo-vcs add binary-file
   $ rev1=$(volgo-vcs commit -m "CRs")
 
 Now let's grep for the CRs.
