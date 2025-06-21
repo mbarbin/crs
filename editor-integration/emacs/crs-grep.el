@@ -113,7 +113,7 @@ Always a string, e.g. \"now\", \"all\", etc.")
     (message "No previous directory to refresh from. Run `crs-grep` first.")))
 
 (defun crs-grep-set-filter (filter-name)
-  "Set the filter to FILTER-NAME (string), refresh buffer.
+  "Set the CRs type filter to FILTER-NAME (string) and refresh the CRs buffer.
 Prompts if called interactively."
   (interactive (list
                 (completing-read
@@ -124,59 +124,80 @@ Prompts if called interactively."
   (setq crs-grep-current-filter filter-name)
   (crs-grep-refresh))
 
+(defun crs-grep-set-filter-all ()
+  "Set the CRs type filter to \"all\" and refresh the CRs buffer.
+This will show all CRs types.
+Further refreshing the buffer will continue to show all CRs."
+  (interactive)
+  (crs-grep-set-filter "all"))
+
+(defun crs-grep-set-filter-crs ()
+  "Set the CRs type filter to \"crs\" and refresh the CRs buffer.
+This will show only CRs of type \"CR\".
+Further refreshing the buffer will continue to show \"CR\"s only."
+  (interactive)
+  (crs-grep-set-filter "crs"))
+
+(defun crs-grep-set-filter-xcrs ()
+  "Set the CRs type filter to \"xcrs\" and refresh the CRs buffer.
+This will show only CRs of type \"XCR\".
+Further refreshing the buffer will continue to show \"XCR\"s only."
+  (interactive)
+  (crs-grep-set-filter "xcrs"))
+
+(defun crs-grep-set-filter-now ()
+  "Set the CRs type filter to \"now\" and refresh the CRs buffer.
+This will show only CRs to be worked on \"now\".
+Further refreshing the buffer will continue to show CRs \"now\" only."
+  (interactive)
+  (crs-grep-set-filter "now"))
+
+(defun crs-grep-set-filter-soon ()
+  "Set the CRs type filter to \"soon\" and refresh the CRs buffer.
+This will show only CRs to be worked on \"soon\".
+Further refreshing the buffer will continue to show CRs \"soon\" only."
+  (interactive)
+  (crs-grep-set-filter "soon"))
+
+(defun crs-grep-set-filter-someday ()
+  "Set the CRs type filter to \"someday\" and refresh the CRs buffer.
+This will show only CRs to be worked on \"someday\".
+Further refreshing the buffer will continue to show CRs \"someday\" only."
+  (interactive)
+  (crs-grep-set-filter "someday"))
+
+(defun crs-grep-set-filter-invalid ()
+  "Set the CRs type filter to \"invalid\" and refresh the CRs buffer.
+This will show only invalid CRs.
+Further refreshing the buffer will continue to show invalid CRs only."
+  (interactive)
+  (crs-grep-set-filter "invalid"))
+
 ;;; Mode
 
 (defvar crs-grep-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "g" 'crs-grep-refresh)
     (define-key map "q" 'quit-window)
-    (define-key
-     map "c"
-     (lambda ()
-       (interactive)
-       (crs-grep-set-filter "crs")))
-    (define-key
-     map "x"
-     (lambda ()
-       (interactive)
-       (crs-grep-set-filter "xcrs")))
-    (define-key
-     map "w"
-     (lambda ()
-       (interactive)
-       (crs-grep-set-filter "now")))
-    (define-key
-     map "o"
-     (lambda ()
-       (interactive)
-       (crs-grep-set-filter "soon")))
-    (define-key
-     map "d"
-     (lambda ()
-       (interactive)
-       (crs-grep-set-filter "someday")))
-    (define-key
-     map "i"
-     (lambda ()
-       (interactive)
-       (crs-grep-set-filter "invalid")))
-    (define-key
-     map "a"
-     (lambda ()
-       (interactive)
-       (crs-grep-set-filter "all")))
+    (define-key map "c" 'crs-grep-set-filter-crs)
+    (define-key map "x" 'crs-grep-set-filter-xcrs)
+    (define-key map "w" 'crs-grep-set-filter-now)
+    (define-key map "o" 'crs-grep-set-filter-soon)
+    (define-key map "d" 'crs-grep-set-filter-someday)
+    (define-key map "i" 'crs-grep-set-filter-invalid)
+    (define-key map "a" 'crs-grep-set-filter-all)
     map)
   "Keymap for `crs-grep-mode`.
 
 Keys:
-  g   Refresh buffer (keep current filter)
-  a   Show all CRs (clear filter)
-  c   Filter: CRs
-  x   Filter: XCRs
-  w   Filter: Now
-  o   Filter: Soon
-  d   Filter: Someday
-  i   Filter: Invalid
+  g   Refresh CRs buffer (keep current filter)
+  a   Show all CRs types (clear filter)
+  c   Show only CRs of type \"CR\" (set filter)
+  x   Show only CRs of type \"XCR\" (set filter)
+  w   Show only CRs to be worked on \"now\" (set filter)
+  o   Show only CRs to be worked on \"soon\" (set filter)
+  d   Show only CRs to be worked on \"someday\" (set filter)
+  i   Show only invalid CRs (set filter)
   q   Quit")
 
 ;;;###autoload
