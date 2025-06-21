@@ -722,8 +722,8 @@ this as part of our tests. *)
       comments that are correctly indented.
 
     File "my_file.ml", lines 10-12, characters 0-48:
-    CR user: As well
-    as comments that are not.
+      CR user: As well
+      as comments that are not.
 
     File "my_file.ml", lines 14-22, characters 0-180:
       CR user: At some point we changed the parser to strips the end
@@ -733,8 +733,8 @@ this as part of our tests. *)
       end of the comment.
 
     File "my_file.ml", lines 24-26, characters 0-104:
-    CR user: What happens when the subsequent lines
-       are not lined up with the leading CR keyword?
+      CR user: What happens when the subsequent lines
+      are not lined up with the leading CR keyword?
 
     File "my_file.ml", lines 28-30, characters 0-165:
       CR and let us look at invalid comments as well. The exact behavior for
@@ -742,8 +742,8 @@ this as part of our tests. *)
       first place.
 
     File "my_file.ml", lines 32-33, characters 0-61:
-    CR-user but still we include
-    this as part of our tests.
+      CR-user but still we include
+      this as part of our tests.
 
     File "my_file.ml", lines 35-47, characters 0-302:
       CR user: Let's add a couple with trailing spaces
@@ -780,21 +780,21 @@ this as part of our tests. *)
   [%expect
     {|
     File "my_file.ml", lines 1-2, characters 0-126:
-    CR user: This is a multiple lines CR in the c-style
-    // We should try and remove the delimiter prefix from subsequent lines.
+      CR user: This is a multiple lines CR in the c-style
+      // We should try and remove the delimiter prefix from subsequent lines.
 
     File "my_file.ml", lines 4-5, characters 0-136:
-    CR user: Note that this is not limited to c-style comments.
-    ;; Basically any language where delimiters start the line has this issue.
+      CR user: Note that this is not limited to c-style comments.
+      ;; Basically any language where delimiters start the line has this issue.
 
     File "my_file.ml", lines 7-9, characters 0-124:
-    CR user: This may require further considerations
-    ; when the syntax allows different number
-    ;; of delimiters on each line.
+      CR user: This may require further considerations
+      ; when the syntax allows different number
+      ;; of delimiters on each line.
 
     File "my_file.ml", lines 11-13, characters 0-62:
-    CR user: Hello to
-    -- multi-line comments in sql-syntax too!
+      CR user: Hello to
+      -- multi-line comments in sql-syntax too!
     |}];
   ()
 ;;

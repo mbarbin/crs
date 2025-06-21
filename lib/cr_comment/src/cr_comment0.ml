@@ -167,18 +167,25 @@ let reindented_content t =
   in
   let str = t.content in
   let lines = String.split str ~on:'\n' in
-  match
-    List.mapi lines ~f:(fun i s ->
-      let s = String.rstrip s in
-      if String.is_empty s
+  let lines =
+    List.map lines ~f:(fun line ->
+      let line = String.rstrip line in
+      if String.is_empty line
       then ""
       else (
-        match String.chop_prefix s ~prefix:indent with
-        | None -> if i = 0 then "  " ^ s else raise Stdlib.Exit
-        | Some s -> "  " ^ s))
-  with
-  | exception Stdlib.Exit -> str
-  | lines -> String.concat lines ~sep:"\n"
+        let de_indented_line =
+          match String.chop_prefix line ~prefix:indent with
+          | Some s -> s
+          | None ->
+            (* When the line have less indentation than expected, stripping it
+               this way may end up breaking some vertical alignment present in
+               the text. However the formatting of such CR would be flagged as
+               invalid per some linting rule, so this is not a major problem. *)
+            String.lstrip line
+        in
+        "  " ^ de_indented_line))
+  in
+  String.concat lines ~sep:"\n"
 ;;
 
 let sort ts = List.sort ts ~compare:For_sorted_output.compare
