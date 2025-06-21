@@ -286,7 +286,7 @@ matching. This involves running [xargs]. Let's cover for some failures there.
   ((exit_status (Exited 42)) (stdout "Hello Fake xargs\n") (stderr ""))
   [123]
 
-When the return code is `1` or `123` we require stdout and stderr to be empty.
+When the return code is `1` or `123` we require stderr to be empty.
 
   $ cat > xargs <<EOF
   > #!/bin/bash -e
@@ -351,9 +351,8 @@ needs to be treated as a successful execution. We cover this below.
   $ chmod +x ./xargs
 
   $ PATH=".:$PATH" crs grep
-  Error: Process xargs exited abnormally.
-  ((exit_status (Exited 1)) (stdout "foo/a.txt\n") (stderr ""))
-  [123]
+  File "foo/a.txt", line 2, characters 0-38:
+    XCR user1: Fix this. Edit: Done.
 
   $ cat > xargs <<EOF
   > #!/bin/bash -e
@@ -365,6 +364,5 @@ needs to be treated as a successful execution. We cover this below.
   $ chmod +x ./xargs
 
   $ PATH=".:$PATH" crs grep
-  Error: Process xargs exited abnormally.
-  ((exit_status (Exited 123)) (stdout "foo/a.txt\n") (stderr ""))
-  [123]
+  File "foo/a.txt", line 2, characters 0-38:
+    XCR user1: Fix this. Edit: Done.

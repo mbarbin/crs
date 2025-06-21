@@ -166,15 +166,13 @@ let grep ~vcs ~repo_root ~below =
               a match, when the inner [grep] doesn't find a match and returns
               [1], the outer call to [xargs] may return [1] or [123] depending
               on things like the OS. *)
-           if Int.equal n 0
+           if
+             Int.equal n 0
+             || ((Int.equal n 123 || Int.equal n 1 (* On MacOS *))
+                 && String.is_empty stderr)
            then (
              let files = stdout |> String.split_lines |> List.map ~f:Vcs.Path_in_repo.v in
              `Files files)
-           else if
-             (Int.equal n 123 || Int.equal n 1 (* On MacOS *))
-             && String.is_empty stdout
-             && String.is_empty stderr
-           then `Files []
            else `Error (`Exited n)
          | Unix.WSIGNALED n -> `Error (`Signaled n) [@coverage off]
          | Unix.WSTOPPED n -> `Error (`Stopped n) [@coverage off]
