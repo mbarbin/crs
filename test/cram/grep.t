@@ -306,6 +306,20 @@ When the return code is `1` or `123` we require stdout and stderr to be empty.
   > #!/bin/bash -e
   > # Read and discard all stdin to avoid broken pipe
   > cat > /dev/null
+  > echo "Hello Fake xargs" >&2
+  > exit 123
+  > EOF
+  $ chmod +x ./xargs
+
+  $ PATH=".:$PATH" crs grep
+  Error: Process xargs exited abnormally.
+  ((exit_status (Exited 123)) (stdout "") (stderr "Hello Fake xargs\n"))
+  [123]
+
+  $ cat > xargs <<EOF
+  > #!/bin/bash -e
+  > # Read and discard all stdin to avoid broken pipe
+  > cat > /dev/null
   > exit 1
   > EOF
   $ chmod +x ./xargs
@@ -316,12 +330,41 @@ When the return code is `1` or `123` we require stdout and stderr to be empty.
   > #!/bin/bash -e
   > # Read and discard all stdin to avoid broken pipe
   > cat > /dev/null
-  > echo "path/to/file.ml"
+  > exit 123
+  > EOF
+  $ chmod +x ./xargs
+
+  $ PATH=".:$PATH" crs grep
+
+When [xargs] runs the grep command several times, if one of the command yields
+no match, the exit code of the overall call to [xargs] will be [123]. However,
+in this case its output will contain matches from the other run, and thus this
+needs to be treated as a successful execution. We cover this below.
+
+  $ cat > xargs <<EOF
+  > #!/bin/bash -e
+  > # Read and discard all stdin to avoid broken pipe
+  > cat > /dev/null
+  > echo "foo/a.txt"
   > exit 1
   > EOF
   $ chmod +x ./xargs
 
   $ PATH=".:$PATH" crs grep
   Error: Process xargs exited abnormally.
-  ((exit_status (Exited 1)) (stdout "path/to/file.ml\n") (stderr ""))
+  ((exit_status (Exited 1)) (stdout "foo/a.txt\n") (stderr ""))
+  [123]
+
+  $ cat > xargs <<EOF
+  > #!/bin/bash -e
+  > # Read and discard all stdin to avoid broken pipe
+  > cat > /dev/null
+  > echo "foo/a.txt"
+  > exit 123
+  > EOF
+  $ chmod +x ./xargs
+
+  $ PATH=".:$PATH" crs grep
+  Error: Process xargs exited abnormally.
+  ((exit_status (Exited 123)) (stdout "foo/a.txt\n") (stderr ""))
   [123]
