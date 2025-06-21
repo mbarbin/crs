@@ -69,8 +69,50 @@ Should be one of: all, crs, xcrs, now, soon, someday, invalid."
   "Current filter flag for `crs-grep` CLI.
 Always a string, e.g. \"now\", \"all\", etc.")
 
+;; Variables to store repo-root and path-in-repo
+(defvar crs-grep-repo-root nil
+  "The root directory of the enclosing repository for the current CRs session.")
+
+(defvar crs-grep-path-in-repo nil
+  "The path within the repository for the current CRs session.")
+
+(defun crs-grep--parse-sexp-repo-info (sexp-string)
+  "Parse SEXP-STRING output from `crs tools enclosing-repo-info`."
+  (car (read-from-string sexp-string)))
+
+(defun crs-grep--update-repo-info (directory)
+  "Update `crs-grep-repo-root` and `crs-grep-path-in-repo` for DIRECTORY."
+  (let* ((default-directory directory)
+         (output
+          (with-temp-buffer
+            (let ((exit-code
+                   (call-process crs-grep-cli
+                                 nil
+                                 t
+                                 nil
+                                 "tools"
+                                 "enclosing-repo-info")))
+              (if (eq exit-code 0)
+                  (buffer-string)
+                nil)))))
+    (when output
+      (let* ((alist (crs-grep--parse-sexp-repo-info output))
+             (repo-root
+              (let ((val (cadr (assoc 'repo_root alist))))
+                (if (stringp val)
+                    val
+                  (symbol-name val))))
+             (path-in-repo
+              (let ((val (cadr (assoc 'path_in_repo alist))))
+                (if (stringp val)
+                    val
+                  (symbol-name val)))))
+        (setq crs-grep-repo-root repo-root)
+        (setq crs-grep-path-in-repo path-in-repo)))))
+
 (defun crs-grep--run-in-directory (directory)
   "Run the `crs grep` command in the given DIRECTORY and update the `*CRs*` buffer."
+  (crs-grep--update-repo-info directory)
   (let ((output-buffer (get-buffer-create crs-grep-buffer-name)))
     (with-current-buffer output-buffer
       (let ((default-directory directory)
@@ -90,8 +132,9 @@ Always a string, e.g. \"now\", \"all\", etc.")
                 (crs-grep-mode)
                 (goto-char (point-min))
                 (message
-                 (format "CRs loaded successfully (%s)."
-                         crs-grep-current-filter)))
+                 (format
+                  "CRs loaded successfully (type: \"%s\", below: \"%s\")."
+                  crs-grep-current-filter crs-grep-path-in-repo)))
             (message
              "Failed to run `crs grep`. Check the CLI path or repository state.")))))
     (pop-to-buffer output-buffer)))
@@ -111,6 +154,16 @@ Always a string, e.g. \"now\", \"all\", etc.")
   (if crs-grep-last-directory
       (crs-grep--run-in-directory crs-grep-last-directory)
     (message "No previous directory to refresh from. Run `crs-grep` first.")))
+
+(defun crs-grep-refresh-from-root ()
+  "Set the running directory to the repository root and refresh the CRs buffer.
+If `crs-grep-repo-root` is nil, shows an error message."
+  (interactive)
+  (if crs-grep-repo-root
+      (progn
+        (setq crs-grep-last-directory crs-grep-repo-root)
+        (crs-grep--run-in-directory crs-grep-repo-root))
+    (message "No repository root available. Try running `crs-grep` first.")))
 
 (defun crs-grep-set-filter (filter-name)
   "Set the CRs type filter to FILTER-NAME (string) and refresh the CRs buffer.
@@ -178,6 +231,7 @@ Further refreshing the buffer will continue to show invalid CRs only."
 (defvar crs-grep-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "g" 'crs-grep-refresh)
+    (define-key map "r" 'crs-grep-refresh-from-root)
     (define-key map "q" 'quit-window)
     (define-key map "c" 'crs-grep-set-filter-crs)
     (define-key map "x" 'crs-grep-set-filter-xcrs)
@@ -191,6 +245,7 @@ Further refreshing the buffer will continue to show invalid CRs only."
 
 Keys:
   g   Refresh CRs buffer (keep current filter)
+  r   Set running directory to repository root and refresh (keep current filter)
   a   Show all CRs types (clear filter)
   c   Show only CRs of type \"CR\" (set filter)
   x   Show only CRs of type \"XCR\" (set filter)
@@ -207,6 +262,7 @@ Keys:
 
 Keys:
   g   Refresh CRs buffer (keep current filter)
+  r   Set running directory to repository root and refresh (keep current filter)
   a   Show all CRs types (clear filter)
   c   Show only CRs of type \"CR\" (set filter)
   x   Show only CRs of type \"XCR\" (set filter)
