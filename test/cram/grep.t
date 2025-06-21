@@ -98,6 +98,7 @@ A basic [sexp] output is available.
       (reported_by
        ((txt user1) (loc ((start foo/a.txt:2:7) (stop foo/a.txt:2:12)))))
       (for_ ()))))
+   (comment_prefix "(*")
    (digest_of_condensed_content 9dce8eceb787a95abf3fccb037d164ea)
    (content "XCR user1: Fix this. Edit: Done."))
   ((path foo/b.txt) (whole_loc ((start foo/b.txt:1:0) (stop foo/b.txt:1:71)))
@@ -108,6 +109,7 @@ A basic [sexp] output is available.
       (reported_by
        ((txt user1) (loc ((start foo/b.txt:1:14) (stop foo/b.txt:1:19)))))
       (for_ ()))))
+   (comment_prefix "(*")
    (digest_of_condensed_content 22722b7a3948f75ec004a651d97d02bb)
    (content
     "CR-someday user1: Reconsider if/when updating to the new version."))
@@ -123,6 +125,7 @@ A basic [sexp] output is available.
        ((txt user1)
         (loc ((start foo/bar/b.txt:2:11) (stop foo/bar/b.txt:2:16)))))
       (for_ ()))))
+   (comment_prefix "(*")
    (digest_of_condensed_content 8b683d9bff5df08ee3642df3cf2426ce)
    (content "CR-soon user1: Hey, this is a code review comment"))
   ((path foo/bar/c.txt)
@@ -130,6 +133,7 @@ A basic [sexp] output is available.
    (header
     (Error
      ("Invalid CR comment" "CR-user: Hey, I'm trying to use CR, it's cool!")))
+   (comment_prefix "(*")
    (digest_of_condensed_content 49a84095611ebd8cb3f83e4546e67533)
    (content "CR-user: Hey, I'm trying to use CR, it's cool!"))
   ((path foo/bar/d.txt)
@@ -138,6 +142,7 @@ A basic [sexp] output is available.
     (Error
      ("Invalid CR comment"
       "CR : Hey, this comment look like a CR but it's not quite one.")))
+   (comment_prefix "(*")
    (digest_of_condensed_content d8a25b0acac6d3a23ff4f4c1e4c990a3)
    (content "CR : Hey, this comment look like a CR but it's not quite one."))
   ((path foo/foo.c) (whole_loc ((start foo/foo.c:1:0) (stop foo/foo.c:1:60)))
@@ -149,6 +154,7 @@ A basic [sexp] output is available.
        ((txt user1) (loc ((start foo/foo.c:1:6) (stop foo/foo.c:1:11)))))
       (for_
        (((txt user3) (loc ((start foo/foo.c:1:16) (stop foo/foo.c:1:21)))))))))
+   (comment_prefix /*)
    (digest_of_condensed_content 4721a5c5f8a37bdcb9e065268bbd0153)
    (content "CR user1 for user3: Hey, this is a code review comment"))
   ((path hello) (whole_loc ((start hello:2:0) (stop hello:2:60)))
@@ -158,6 +164,7 @@ A basic [sexp] output is available.
       (due ((txt Now) (loc ((start hello:2:3) (stop hello:2:5)))))
       (reported_by ((txt user1) (loc ((start hello:2:6) (stop hello:2:11)))))
       (for_ (((txt user2) (loc ((start hello:2:16) (stop hello:2:21)))))))))
+   (comment_prefix "(*")
    (digest_of_condensed_content 970aabfe0c3d4ec5707918edd3f01a8a)
    (content "CR user1 for user2: Hey, this is a code review comment"))
 

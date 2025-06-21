@@ -232,6 +232,10 @@ let parse_file ~path ~(file_contents : Vcs.File_contents.t) =
   List.filter_map ms ~f:(fun m ->
     let cr_start = Re.Group.start m 0 in
     let+ start_index, end_index, content = find_comment_bounds file_contents cr_start in
+    let comment_prefix =
+      String.sub file_contents ~pos:start_index ~len:(cr_start - start_index)
+      |> String.strip
+    in
     let content = String.rstrip content in
     let file_cache = Lazy.force file_cache in
     let start_position = Loc.Offset.to_position start_index ~file_cache in
@@ -247,6 +251,7 @@ let parse_file ~path ~(file_contents : Vcs.File_contents.t) =
       ~path
       ~whole_loc
       ~header
+      ~comment_prefix
       ~digest_of_condensed_content
       ~content)
 ;;

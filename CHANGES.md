@@ -9,6 +9,7 @@
 
 ### Fixed
 
+- Remove comment prefix from lines of reindented content (#35, @mbarbin).
 - Fix handling of xargs exit code 123 (#33, @mbarbin).
 
 ### Removed

@@ -60,6 +60,7 @@
   * - Rename [Processed] to [Header].
   * - Remove support for printing CRs without their content.
   * - Compute positions and offsets with [Loc].
+  * - Add [comment_prefix].
 *)
 
 (** Code review comments embedded in source code.
@@ -208,6 +209,7 @@ module Private : sig
     :  path:Vcs.Path_in_repo.t
     -> whole_loc:Loc.t
     -> header:header Or_error.t
+    -> comment_prefix:string
     -> digest_of_condensed_content:Digest_hex.t
     -> content:string
     -> t
