@@ -106,8 +106,8 @@ By default the file paths are displayed relative to the command's $(b,cwd).
      let crs =
        let all_crs = Crs_parser.grep ~vcs ~repo_root ~below in
        match filters with
-       | `Default -> all_crs
-       | `Supplied filters ->
+       | `All -> all_crs
+       | `Only filters ->
          List.filter all_crs ~f:(fun cr ->
            List.exists filters ~f:(fun filter -> Cr_comment.Filter.matches filter ~cr))
      in
