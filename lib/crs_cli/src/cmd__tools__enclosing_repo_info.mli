@@ -19,29 +19,4 @@
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
 
-(** This application works from within a Git or Mercurial repository.
-
-    This module specifies which functionality the rest of the application relies
-    on, by defining the specific set of traits that are required. We make use of
-    the [volgo] library for this. *)
-
-module Vcs_kind : sig
-  (** The kind of vcs supported by the cli. *)
-  type t =
-    [ `Git
-    | `Hg
-    ]
-  [@@deriving sexp_of]
-end
-
-(** The specific list of traits that must be implemented by a vcs backend in
-    order for it to be used by the cli. *)
-type vcs = < Vcs.Trait.file_system ; Vcs.Trait.ls_files > Vcs.t
-
-(** A type to represent the vcs found when walking up from within a directory
-    located inside a repo. *)
-type t =
-  { vcs_kind : Vcs_kind.t
-  ; repo_root : Vcs.Repo_root.t
-  ; vcs : vcs
-  }
+val main : unit Command.t

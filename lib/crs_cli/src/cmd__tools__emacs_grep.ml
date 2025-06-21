@@ -76,7 +76,7 @@ let output_list crs ~oc ~repo_root ~below ~path_display_mode =
 
 let main =
   Command.make
-    ~summary:"A util used by the emacs crs-grep-mode."
+    ~summary:"A util for emacs crs-grep-mode to search CRs."
     ~readme:(fun () ->
       {|
 This command is a building block to the emacs $(b,crs-grep-mode).
