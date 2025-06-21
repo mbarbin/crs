@@ -70,6 +70,7 @@
    * - Remove support for printing CRs without their content.
    * - Compute positions and offsets with [Loc].
    * - Some minor changes to the [reindented] content rendering.
+   * - Add [comment_prefix].
 *)
 
 module Digest_hex = struct
@@ -115,6 +116,7 @@ module T = struct
     { path : Vcs.Path_in_repo.t
     ; whole_loc : Loc.t
     ; header : Header.t Or_error.t
+    ; comment_prefix : string
     ; digest_of_condensed_content : Digest_hex.t
     ; content : string
     }
@@ -128,8 +130,8 @@ let content t = t.content
 let whole_loc t = t.whole_loc
 let header t = t.header
 
-let create ~path ~whole_loc ~header ~digest_of_condensed_content ~content =
-  { path; whole_loc; header; digest_of_condensed_content; content }
+let create ~path ~whole_loc ~header ~comment_prefix ~digest_of_condensed_content ~content =
+  { path; whole_loc; header; comment_prefix; digest_of_condensed_content; content }
 ;;
 
 let digest_ignoring_minor_text_changes t = t.digest_of_condensed_content
@@ -152,16 +154,26 @@ end = struct
 end
 
 let reindented_content t =
+  let expect_comment_prefixed_lines =
+    match t.comment_prefix with
+    | "--" | ";" | ";;" | "//" | "#" | "##" -> true
+    | _ -> false
+  in
   let indent =
     let len =
-      match t.header with
-      | Error _ ->
+      if expect_comment_prefixed_lines
+      then (
         let start = Loc.start t.whole_loc in
-        (* The len of the indentation is a heuristic in this case. *)
-        start.pos_cnum - start.pos_bol + 3
-      | Ok h ->
-        let start = Loc.start h.kind.loc in
-        start.pos_cnum - start.pos_bol
+        start.pos_cnum - start.pos_bol)
+      else (
+        match t.header with
+        | Error _ ->
+          let start = Loc.start t.whole_loc in
+          (* The len of the indentation is a heuristic in this case. *)
+          start.pos_cnum - start.pos_bol + String.length t.comment_prefix + 1
+        | Ok h ->
+          let start = Loc.start h.kind.loc in
+          start.pos_cnum - start.pos_bol)
     in
     String.make len ' '
   in
@@ -173,7 +185,7 @@ let reindented_content t =
       if String.is_empty line
       then ""
       else (
-        let de_indented_line =
+        let line =
           match String.chop_prefix line ~prefix:indent with
           | Some s -> s
           | None ->
@@ -183,7 +195,15 @@ let reindented_content t =
                invalid per some linting rule, so this is not a major problem. *)
             String.lstrip line
         in
-        "  " ^ de_indented_line))
+        let line =
+          match expect_comment_prefixed_lines with
+          | false -> line
+          | true ->
+            (match String.chop_prefix line ~prefix:(t.comment_prefix ^ " ") with
+             | None -> line
+             | Some s -> s)
+        in
+        "  " ^ line))
   in
   String.concat lines ~sep:"\n"
 ;;
