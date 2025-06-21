@@ -204,10 +204,17 @@ Keys:
 (define-derived-mode
  crs-grep-mode grep-mode "CRs"
  "Major mode for navigating Code Review Comments (CRs).
-\n\
-Press a filter key (a, c, x, w, o, d, i) to restrict the list.\n\
-Press \"g\" to refresh with the current filter.\n\
-Press \"q\" to quit.\n"
+
+Keys:
+  g   Refresh CRs buffer (keep current filter)
+  a   Show all CRs types (clear filter)
+  c   Show only CRs of type \"CR\" (set filter)
+  x   Show only CRs of type \"XCR\" (set filter)
+  w   Show only CRs to be worked on \"now\" (set filter)
+  o   Show only CRs to be worked on \"soon\" (set filter)
+  d   Show only CRs to be worked on \"someday\" (set filter)
+  i   Show only invalid CRs (set filter)
+  q   Quit"
  :keymap crs-grep-mode-map)
 
 (provide 'crs-grep)
