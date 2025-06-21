@@ -54,8 +54,11 @@ let test file_contents =
   let crs = Crs_parser.parse_file ~path ~file_contents |> Cr_comment.sort in
   Ref.set_temporarily Loc.include_sexp_of_locs true ~f:(fun () ->
     List.iter crs ~f:(fun t ->
+      print_endline "========================";
+      print_endline (Cr_comment.reindented_content t);
       let getters = Getters.of_cr t in
-      print_s [%sexp { raw = (t : Cr_comment.t); getters : Getters.t }]))
+      print_s [%sexp { raw = (t : Cr_comment.t); getters : Getters.t }];
+      ()))
 ;;
 
 let%expect_test "non commented CR" =
@@ -74,6 +77,8 @@ let%expect_test "invalid syntax CR" =
 |};
   [%expect
     {|
+    ========================
+      CR
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -102,6 +107,8 @@ let%expect_test "multiple spaces CR" =
 |};
   [%expect
     {|
+    ========================
+      CR user: Blah.
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -145,6 +152,8 @@ let%expect_test "empty CR" =
 |};
   [%expect
     {|
+    ========================
+      CR user:
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -199,6 +208,8 @@ let () = ()
 |};
   [%expect
     {|
+    ========================
+      CR-soon user: Some text
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -231,6 +242,8 @@ let () = ()
        (kind    CR)
        (due     Soon)
        (work_on Soon))))
+    ========================
+      CR-someday user: Some text
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -263,6 +276,8 @@ let () = ()
        (kind    CR)
        (due     Someday)
        (work_on Someday))))
+    ========================
+      CR-soon user1 for user2: Some text
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -299,6 +314,8 @@ let () = ()
        (kind    CR)
        (due     Soon)
        (work_on Soon))))
+    ========================
+      CR-someday user1 for user2: Some text
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -335,6 +352,8 @@ let () = ()
        (kind    CR)
        (due     Someday)
        (work_on Someday))))
+    ========================
+      XCR-soon user: Some text
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -367,6 +386,8 @@ let () = ()
        (kind    XCR)
        (due     Soon)
        (work_on Now))))
+    ========================
+      XCR-someday user: Some text
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -421,6 +442,8 @@ let () = ()
 |};
   [%expect
     {|
+    ========================
+      CR-2026-01-31 user: This CR has a due date, by not correctly specified.
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -441,6 +464,8 @@ let () = ()
        (kind    CR)
        (due     Now)
        (work_on Now))))
+    ========================
+      CR-20260131 user: This is not it either..
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -457,6 +482,8 @@ let () = ()
        (kind    CR)
        (due     Now)
        (work_on Now))))
+    ========================
+      CR-202601 user: You would presumably only include the year and month.
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -504,6 +531,8 @@ let () = ()
 |};
   [%expect
     {|
+    ========================
+      CR user: A first CR
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -536,6 +565,8 @@ let () = ()
        (kind    CR)
        (due     Now)
        (work_on Now))))
+    ========================
+      CR user: Followed by another.
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -846,6 +877,8 @@ span multiple lines too.
 |};
   [%expect
     {|
+    ========================
+      CR user: This is a comment.
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -878,6 +911,9 @@ span multiple lines too.
        (kind    CR)
        (due     Now)
        (work_on Now))))
+    ========================
+      XCR user: And it can
+      span multiple lines too.
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -920,6 +956,8 @@ span multiple lines too.
 |};
   [%expect
     {|
+    ========================
+      CR user: This is a single line comment.
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -952,6 +990,9 @@ span multiple lines too.
        (kind    CR)
        (due     Now)
        (work_on Now))))
+    ========================
+      XCR user: This syntax can be used to write
+      comments that span multiple lines too.
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -995,7 +1036,7 @@ span multiple lines too.
   ()
 ;;
 
-let%expect_test "hash-style" =
+let%expect_test "single-hash-style" =
   test
     {|
 # $CR user: This is a comment.
@@ -1005,6 +1046,8 @@ let%expect_test "hash-style" =
 |};
   [%expect
     {|
+    ========================
+      CR user: This is a comment.
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -1037,6 +1080,9 @@ let%expect_test "hash-style" =
        (kind    CR)
        (due     Now)
        (work_on Now))))
+    ========================
+      XCR user: And it can
+      span multiple lines too.
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -1070,6 +1116,89 @@ let%expect_test "hash-style" =
        (due     Now)
        (work_on Now))))
     |}];
+  ()
+;;
+
+let%expect_test "double-hash-style" =
+  test
+    {|
+## $CR user: This is a comment.
+
+## $XCR user: And it can
+## span multiple lines too.
+|};
+  [%expect
+    {|
+    ========================
+      CR user: This is a comment.
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:1:0)
+         (stop  my_file.ml:1:30)))
+       (header (
+         Ok (
+           (kind (
+             (txt CR)
+             (loc (
+               (start my_file.ml:1:3)
+               (stop  my_file.ml:1:5)))))
+           (due (
+             (txt Now)
+             (loc (
+               (start my_file.ml:1:3)
+               (stop  my_file.ml:1:5)))))
+           (reported_by (
+             (txt user)
+             (loc (
+               (start my_file.ml:1:6)
+               (stop  my_file.ml:1:10)))))
+           (for_ ()))))
+       (comment_prefix ##)
+       (digest_of_condensed_content 163bbcea849da7f4b4bc94be0c158f3b)
+       (content "CR user: This is a comment.")))
+     (getters (
+       (path    my_file.ml)
+       (content "CR user: This is a comment.")
+       (kind    CR)
+       (due     Now)
+       (work_on Now))))
+    ========================
+      XCR user: And it can
+      span multiple lines too.
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:3:0)
+         (stop  my_file.ml:5:0)))
+       (header (
+         Ok (
+           (kind (
+             (txt XCR)
+             (loc (
+               (start my_file.ml:3:3)
+               (stop  my_file.ml:3:6)))))
+           (due (
+             (txt Now)
+             (loc (
+               (start my_file.ml:3:3)
+               (stop  my_file.ml:3:6)))))
+           (reported_by (
+             (txt user)
+             (loc (
+               (start my_file.ml:3:7)
+               (stop  my_file.ml:3:11)))))
+           (for_ ()))))
+       (comment_prefix ##)
+       (digest_of_condensed_content 8ca974bb302fc0e99f44c0a33c33c787)
+       (content "XCR user: And it can\n## span multiple lines too.")))
+     (getters (
+       (path my_file.ml)
+       (content "XCR user: And it can\n## span multiple lines too.")
+       (kind    XCR)
+       (due     Now)
+       (work_on Now))))
+    |}];
   test
     {|
 Hello ## $CR user: By the way, multiple hash is supported. The location for the entire
@@ -1077,6 +1206,9 @@ Hello ## $CR user: By the way, multiple hash is supported. The location for the 
 |};
   [%expect
     {|
+    ========================
+      CR user: By the way, multiple hash is supported. The location for the entire
+      comment starts at the left-most hash character.
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -1115,7 +1247,22 @@ Hello ## $CR user: By the way, multiple hash is supported. The location for the 
   ()
 ;;
 
-let%expect_test "dash-style" =
+let%expect_test "single-dash-style" =
+  (* This is currently not part of a supported syntax for comments. *)
+  test
+    {|
+- $CR user: This is a comment.
+
+- $XCR user: And it can
+- span multiple lines too.
+
+Hello text - $CR user: Comment may be left next to a non-empty line.
+|};
+  [%expect {||}];
+  ()
+;;
+
+let%expect_test "double-dash-style" =
   test
     {|
 -- $CR user: This is a comment.
@@ -1127,6 +1274,8 @@ Hello text -- $CR user: Comment may be left next to a non-empty line.
 |};
   [%expect
     {|
+    ========================
+      CR user: This is a comment.
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -1159,6 +1308,9 @@ Hello text -- $CR user: Comment may be left next to a non-empty line.
        (kind    CR)
        (due     Now)
        (work_on Now))))
+    ========================
+      XCR user: And it can
+      span multiple lines too.
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -1191,6 +1343,8 @@ Hello text -- $CR user: Comment may be left next to a non-empty line.
        (kind    XCR)
        (due     Now)
        (work_on Now))))
+    ========================
+      CR user: Comment may be left next to a non-empty line.
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -1227,7 +1381,7 @@ Hello text -- $CR user: Comment may be left next to a non-empty line.
   ()
 ;;
 
-let%expect_test "semi-style" =
+let%expect_test "single-semi-style" =
   test
     {|
 ; $CR user: This is a comment.
@@ -1242,6 +1396,8 @@ let%expect_test "semi-style" =
 |};
   [%expect
     {|
+    ========================
+      CR user: This is a comment.
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -1274,6 +1430,9 @@ let%expect_test "semi-style" =
        (kind    CR)
        (due     Now)
        (work_on Now))))
+    ========================
+      XCR user: And it can
+      span multiple lines too.
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -1306,6 +1465,8 @@ let%expect_test "semi-style" =
        (kind    XCR)
        (due     Now)
        (work_on Now))))
+    ========================
+      CR user: Comment may be placed after a non-empty line.
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -1338,6 +1499,9 @@ let%expect_test "semi-style" =
        (kind    CR)
        (due     Now)
        (work_on Now))))
+    ========================
+      CR user: Comment may span multiple
+      lines too.
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -1384,6 +1548,8 @@ let%expect_test "double-semi-style" =
 |};
   [%expect
     {|
+    ========================
+      CR user: This is a comment.
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -1416,6 +1582,9 @@ let%expect_test "double-semi-style" =
        (kind    CR)
        (due     Now)
        (work_on Now))))
+    ========================
+      XCR user: And it can
+      span multiple lines too.
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -1466,6 +1635,8 @@ let%expect_test "xml-style" =
 |};
   [%expect
     {|
+    ========================
+      CR user: This is a comment.
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -1498,6 +1669,9 @@ let%expect_test "xml-style" =
        (kind    CR)
        (due     Now)
        (work_on Now))))
+    ========================
+      XCR user: And it can
+      span multiple lines too.
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -1530,6 +1704,8 @@ let%expect_test "xml-style" =
        (kind    XCR)
        (due     Now)
        (work_on Now))))
+    ========================
+      XCR user: What happens if it is nested?
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -1587,6 +1763,8 @@ let%expect_test "nested-ml-style" =
 |};
   [%expect
     {|
+    ========================
+      XCR user: CR comment may be nested inside other comment in OCaml.
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -1632,6 +1810,12 @@ let%expect_test "nested-ml-style" =
 |};
   [%expect
     {|
+    ========================
+      CR user: Maybe the original use case is the opposite though.
+
+       That is, a (* comment inside a CR comment. *)
+
+       We'd like to cover this case too.
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -1739,6 +1923,8 @@ let%expect_test "not standard" =
 |};
   [%expect
     {|
+    ========================
+      CR user: This is recognized as a bash comment even though it is in what
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -1780,6 +1966,8 @@ let%expect_test "not standard" =
 |};
   [%expect
     {|
+    ========================
+      CR user1: A CR in a odoc comment.
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -1816,6 +2004,8 @@ let%expect_test "not standard" =
   test "(*\tCR user1: A CR with a tab separator. *)";
   [%expect
     {|
+    ========================
+      CR user1: A CR with a tab separator.
     ((raw (
        (path my_file.ml)
        (whole_loc (
@@ -1856,6 +2046,8 @@ let%expect_test "not standard" =
 |};
   [%expect
     {|
+    ========================
+      CR user1: A CR with spaces and newline separators.
     ((raw (
        (path my_file.ml)
        (whole_loc (
