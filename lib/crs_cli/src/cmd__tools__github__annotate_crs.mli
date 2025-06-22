@@ -19,4 +19,6 @@
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
 
+(* CR mbarbin: Rename [github annotate-crs]. *)
+
 val main : unit Command.t

@@ -32,6 +32,7 @@
   pplumbing.pp-tty
   printbox
   printbox-text
+  reviewdog_rdf
   stdio
   unix
   volgo-base

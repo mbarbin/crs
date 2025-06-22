@@ -42,9 +42,19 @@ For more information, use the $(b,--help) flag on a subcommand.
           ~summary:"Useful utils to integrate with other tools."
           [ "emacs-grep", Cmd__tools__emacs_grep.main
           ; "enclosing-repo-info", Cmd__tools__enclosing_repo_info.main
-            (* CR mbarbin: Consider creating a "github" subcommand with some
-               hierarchy. *)
-          ; "github-workflow-annotations", Cmd__tools__github_workflow_annotations.main
+          ; ( "github"
+            , (* XCR mbarbin: Consider creating a "github" subcommand with some
+                 hierarchy.
+
+                 mbarbin: Done. Keeping the XCR for for to test notifications in
+                 the CR. *)
+              Command.group
+                ~summary:"Utils related to GitHub"
+                [ "annotate-crs", Cmd__tools__github__annotate_crs.main ] )
+          ; ( "reviewdog"
+            , Command.group
+                ~summary:"Utils related to Reviewdog"
+                [ "annotate-crs", Cmd__tools__reviewdog__annotate_crs.main ] )
           ] )
     ]
 ;;
