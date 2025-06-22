@@ -41,8 +41,18 @@ jobs:
       - name: Build
         run: opam exec -- dune build @all @lint
 
-      - name: Annotate CRs
-        run: opam exec -- dune exec crs tools github-workflow-annotations
+      #      - name: Annotate CRs
+      #        run: opam exec -- dune exec crs tools github-workflow-annotations
+
+      - name: Install reviewdog
+        uses: reviewdog/action-install@v1
+
+      - name: Annotate CRs with reviewdog
+        run: |
+          opam exec -- dune exec crs tools reviewdog annotate-crs \
+            | reviewdog -f=rdjson -name="crs" -reporter=github-pr-review -fail-on-error=true
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run tests
         run: |
