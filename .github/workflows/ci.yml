@@ -45,7 +45,7 @@ jobs:
       #        run: opam exec -- dune exec crs tools github-workflow-annotations
 
       - name: Install reviewdog
-        uses: reviewdog/action-install@v1
+        uses: reviewdog/action-setup@v1
 
       - name: Annotate CRs with reviewdog
         run: |
