@@ -19,24 +19,49 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-let main =
-  Command.make
-    ~summary:"Output Reviewdog Annotations for CRs in the repo."
-    ~readme:(fun () ->
-      {|
-This command searches for CRs in the tree and prints Reviewdog Annotations for them to $(b,stdout) in $(rdfjson) format for use in CIs.
-|})
-    (let open Command.Std in
-     let+ () = Arg.return () in
-     let cwd = Unix.getcwd () |> Absolute_path.v in
-     let { Enclosing_repo.vcs_kind = _; repo_root; vcs } =
-       Common_helpers.find_enclosing_repo ~from:cwd
-     in
-     let crs =
-       Crs_parser.grep ~vcs ~repo_root ~below:Vcs.Path_in_repo.root |> Cr_comment.sort
-     in
-     let diagnostic_result = Reviewdog_utils.diagnostic_result crs in
-     let json = Reviewdog_rdf.Reviewdog.encode_json_diagnostic_result diagnostic_result in
-     print_endline (Yojson.Basic.pretty_to_string ~std:true json);
-     ())
+module Rdf = Reviewdog_rdf.Reviewdog
+
+let source : Rdf.source = { name = "crs"; url = "https://github.com/mbarbin/crs" }
+
+let location (loc : Loc.t) =
+  let path = Fpath.to_string (Loc.path loc) in
+  let start_pos = Loc.start loc in
+  let stop_pos = Loc.stop loc in
+  let start_line = Int32.of_int start_pos.pos_lnum in
+  let start_col = Int32.of_int (start_pos.pos_cnum - start_pos.pos_bol + 1) in
+  let stop_line = Int32.of_int stop_pos.pos_lnum in
+  let stop_col = Int32.of_int (stop_pos.pos_cnum - stop_pos.pos_bol + 1) in
+  let start_pb = Rdf.default_position ?line:start_line ?column:start_col () in
+  let end_pb = Rdf.default_position ?line:stop_line ?column:stop_col () in
+  let range = Rdf.default_range ~start:(Some start_pb) ~end_:(Some end_pb) () in
+  Rdf.default_location ~path ~range:(Some range) ()
+;;
+
+let diagnostic (cr : Cr_comment.t) =
+  match Cr_comment.work_on cr with
+  | Soon | Someday -> None
+  | Now ->
+    let kind =
+      match Cr_comment.header cr with
+      | Error _ -> `Invalid
+      | Ok _ -> `Now
+    in
+    let severity =
+      match kind with
+      | `Invalid -> Rdf.Warning
+      | `Now -> Rdf.Info
+    in
+    let message =
+      match kind with
+      | `Invalid -> "This CR is not well formatted. Please attend."
+      | `Now -> "This CR is pending. Please attend."
+    in
+    let loc = Cr_comment.whole_loc cr in
+    let location = location loc in
+    Some (Rdf.default_diagnostic ~message ~location:(Some location) ~severity ())
+;;
+
+let diagnostic_result crs =
+  let diagnostics = List.filter_map crs ~f:diagnostic in
+  Rdf.default_diagnostic_result ~diagnostics ~source:(Some source) ~severity:Info ()
 ;;

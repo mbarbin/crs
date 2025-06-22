@@ -19,4 +19,7 @@
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
 
-val main : unit Command.t
+val source : Reviewdog_rdf.Reviewdog.source
+val location : Loc.t -> Reviewdog_rdf.Reviewdog.location
+val diagnostic : Cr_comment.t -> Reviewdog_rdf.Reviewdog.diagnostic option
+val diagnostic_result : Cr_comment.t list -> Reviewdog_rdf.Reviewdog.diagnostic_result

@@ -37,7 +37,8 @@
   unix
   volgo-base
   volgo-git-unix
-  volgo-hg-unix)
+  volgo-hg-unix
+  yojson)
  (instrumentation
   (backend bisect_ppx))
  (lint
