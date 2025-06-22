@@ -41,6 +41,9 @@ jobs:
       - name: Build
         run: opam exec -- dune build @all @lint
 
+      - name: Annotate CRs
+        run: opam exec -- dune exec crs tools github-workflow-annotations
+
       - name: Run tests
         run: |
           mkdir $BISECT_DIR
