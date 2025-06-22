@@ -40,8 +40,16 @@
    (>= 0.3.1))
   (loc
    (>= 0.2.2))
+  (ocaml-protoc
+   (>= 3.1))
   (pageantty
    (>= 0.0.2))
+  (pbrt
+   (>= 3.1))
+  (pbrt_services
+   (>= 3.1))
+  (pbrt_yojson
+   (>= 3.1))
   (pp
    (>= 2.0.0))
   (pplumbing
@@ -77,7 +85,9 @@
   (volgo-git-unix
    (>= 0.0.18))
   (volgo-hg-unix
-   (>= 0.0.18))))
+   (>= 0.0.18))
+  (yojson
+   (>= 2.1.1))))
 
 (package
  (name crs-tests)
