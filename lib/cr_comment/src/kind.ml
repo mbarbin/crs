@@ -23,3 +23,8 @@ type t =
   | CR
   | XCR
 [@@deriving compare, equal, enumerate, sexp_of]
+
+let to_string = function
+  | CR -> "CR"
+  | XCR -> "XCR"
+;;

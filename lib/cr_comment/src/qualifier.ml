@@ -19,8 +19,14 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-module Kind = Kind
-module Filter = Filter
-module Priority = Priority
-module Qualifier = Qualifier
-include Cr_comment0
+type t =
+  | None
+  | Soon
+  | Someday
+[@@deriving compare, equal, enumerate, sexp_of]
+
+let priority : t -> Priority.t = function
+  | None -> Now
+  | Soon -> Soon
+  | Someday -> Someday
+;;

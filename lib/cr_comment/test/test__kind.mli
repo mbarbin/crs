@@ -18,15 +18,3 @@
 (*_  and the LGPL-3.0 Linking Exception along with this library. If not, see     *)
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
-
-(** The [Kind.t] type distinguishes between resolved and unresolved code review
-    comments.
-
-    - [CR]: An unresolved code review comment.
-    - [XCR]: A resolved code review comment. *)
-type t =
-  | CR
-  | XCR
-[@@deriving compare, equal, enumerate, sexp_of]
-
-val to_string : t -> string

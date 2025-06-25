@@ -81,19 +81,20 @@ end
 module Header : sig
   type t [@@deriving equal, sexp_of]
 
-  (** [reported_by] is [user] in [CR user...]. *)
-  val reported_by : t -> Vcs.User_handle.t
+  (** [reporter] is [user] in [CR user...]. *)
+  val reporter : t -> Vcs.User_handle.t
 
-  (** [for_] is [user2] in [CR user1 for user2: ...]. Assigning CRs to
+  (** [recipient] is [user2] in [CR user1 for user2: ...]. Assigning CRs to
       particular users is optional. This returns [None] if that part is left
       out, such as in [CR user1: Comment]. *)
-  val for_ : t -> Vcs.User_handle.t option
+  val recipient : t -> Vcs.User_handle.t option
 
   val kind : t -> Kind.t
 
-  (** This returns the syntactic due class if present [CR-soon] or [CR-someday].
-      If there is no due specifier, this returns [Now]. *)
-  val due : t -> Due.t
+  (** This returns the qualifier if present ([Soon] for [CR-soon] or [Someday]
+      for [CR-someday]). If there is no qualifier specified, this returns
+      [None]. *)
+  val qualifier : t -> Qualifier.t
 
   module With_loc : sig
     (** These getters allows you to access the position of each elements of the
@@ -102,26 +103,56 @@ module Header : sig
 
     (** The location includes the entire reporter username, without the
         surrounding spaces. *)
-    val reported_by : t -> Vcs.User_handle.t Loc.Txt.t
+    val reporter : t -> Vcs.User_handle.t Loc.Txt.t
 
-    (** The location includes the entire assignee username, if it is present,
+    (** The location includes the entire recipient username, if it is present,
         without the surrounding spaces. In particular, the location does not
         include the ["for"] keyword itself. *)
-    val for_ : t -> Vcs.User_handle.t Loc.Txt.t option
+    val recipient : t -> Vcs.User_handle.t Loc.Txt.t option
 
     (** The location includes the entire keyword ["CR"] or ["XCR"] depending on
         the case. It stops right before the following char, that being a space
         or a ['-'] (and thus does not include it). *)
     val kind : t -> Kind.t Loc.Txt.t
 
-    (** When the CR is due [Soon] or [Someday], the location returned starts
-        right after the dash separator (but does not include it), and contains
-        the entire due keyword. For example, the location will include
-        ["soon"] for a [CR-soon]. When the CR is due [Now], there is no
-        keyword to attach a location to : conventionally, we return instead
-        the location of the CR [kind] in this case. *)
-    val due : t -> Due.t Loc.Txt.t
+    (** When the CR is qualified as [Soon] or [Someday], the location returned
+        starts right after the dash separator (but does not include it), and
+        contains the entire qualifier keyword. For example, the location will
+        include ["soon"] for a [CR-soon]. When the CR has no qualifier, there
+        is no keyword to attach a location to : conventionally, we return
+        instead the location of the CR [kind] in this case. *)
+    val qualifier : t -> Qualifier.t Loc.Txt.t
+
+    (** {1 Deprecated}
+
+        The following is deprecated and will be soon annotated as such with ocaml
+        alerts. Please migrate, and do not use in new code. *)
+
+    (** This was renamed [reporter]. Hint: Run [ocamlmig migrate]. *)
+    val reported_by : t -> Vcs.User_handle.t Loc.Txt.t
+    [@@migrate { repl = Rel.reporter }]
+
+    (** This was renamed [recipient]. Hint: Run [ocamlmig migrate]. *)
+    val for_ : t -> Vcs.User_handle.t Loc.Txt.t option
+    [@@migrate { repl = Rel.recipient }]
+
+    (** This was renamed [qualifier]. Hint: Run [ocamlmig migrate]. *)
+    val due : t -> Qualifier.t Loc.Txt.t
+    [@@migrate { repl = Rel.recipient }]
   end
+
+  (** {1 Deprecated}
+
+      The following is deprecated and will be soon annotated as such with ocaml
+      alerts. Please migrate, and do not use in new code. *)
+
+  (** This was renamed [reporter]. Hint: Run [ocamlmig migrate]. *)
+  val reported_by : t -> Vcs.User_handle.t
+  [@@migrate { repl = Rel.reporter }]
+
+  (** This was renamed [recipient]. Hint: Run [ocamlmig migrate]. *)
+  val for_ : t -> Vcs.User_handle.t option
+  [@@migrate { repl = Rel.recipient }]
 end
 
 (** A [Cr_comment.t] is an immutable value holding the information and metadata
@@ -143,14 +174,10 @@ val whole_loc : t -> Loc.t
 val header : t -> Header.t Or_error.t
 val kind : t -> Kind.t
 
-(** [due t] is a convenience wrapper to get the [due] property of the CR
-    header. This returns [Now] when parsing the header resulted in an error. *)
-val due : t -> Due.t
-
-(** [work_on t] represents the expectation as to when work on the CR is meant to
-    happen. Is it similar to [due t] except that XCRs are meant to be worked
-    on [Now]. *)
-val work_on : t -> Due.t
+(** [priority t] represents the expectation as to when work on the CR is meant
+    to happen. It is based on the header's qualifier except that XCRs and
+    invalid CRs are meant to be worked on [Now]. *)
+val priority : t -> Priority.t
 
 (** This digest is computed such that changes in positions in a file, or changes
     in whitespaces are ignored. It is used by downstream systems to detect
@@ -199,9 +226,9 @@ module Private : sig
   module Header : sig
     val create
       :  kind:Kind.t Loc.Txt.t
-      -> due:Due.t Loc.Txt.t
-      -> reported_by:Vcs.User_handle.t Loc.Txt.t
-      -> for_:Vcs.User_handle.t Loc.Txt.t option
+      -> qualifier:Qualifier.t Loc.Txt.t
+      -> reporter:Vcs.User_handle.t Loc.Txt.t
+      -> recipient:Vcs.User_handle.t Loc.Txt.t option
       -> header
   end
 
@@ -214,3 +241,12 @@ module Private : sig
     -> content:string
     -> t
 end
+
+(** {1 Deprecated}
+
+    The following is deprecated and will be soon annotated as such with ocaml
+    alerts. Please migrate, and do not use in new code. *)
+
+(** This was renamed [priority]. Hint: Run [ocamlmig migrate]. *)
+val work_on : t -> Priority.t
+[@@migrate { repl = Rel.priority }]

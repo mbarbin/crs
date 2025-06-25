@@ -137,13 +137,13 @@ let () = ()
   test file_contents ~f:(fun ~crs ~file_rewriter ->
     List.iter crs ~f:(fun cr ->
       Or_error.iter (Cr_comment.header cr) ~f:(fun p ->
-        match Cr_comment.Header.With_loc.for_ p with
+        match Cr_comment.Header.With_loc.recipient p with
         | None -> ()
         | Some { loc; _ } ->
           File_rewriter.remove
             file_rewriter
             ~range:
-              { start = Loc.stop_offset (Cr_comment.Header.With_loc.reported_by p).loc
+              { start = Loc.stop_offset (Cr_comment.Header.With_loc.reporter p).loc
               ; stop = Loc.stop_offset loc
               })));
   [%expect
@@ -188,12 +188,12 @@ let () = ()
   test file_contents ~f:(fun ~crs ~file_rewriter ->
     List.iter crs ~f:(fun cr ->
       Or_error.iter (Cr_comment.header cr) ~f:(fun p ->
-        match Cr_comment.Header.for_ p with
+        match Cr_comment.Header.recipient p with
         | Some _ -> ()
         | None ->
           File_rewriter.insert
             file_rewriter
-            ~offset:(Loc.stop_offset (Cr_comment.Header.With_loc.reported_by p).loc)
+            ~offset:(Loc.stop_offset (Cr_comment.Header.With_loc.reporter p).loc)
             ~text:" for assignee")));
   [%expect
     {|
@@ -241,14 +241,14 @@ let () = ()
     let other = Vcs.User_handle.v "other" in
     List.iter crs ~f:(fun cr ->
       Or_error.iter (Cr_comment.header cr) ~f:(fun p ->
-        let reported_by = Cr_comment.Header.With_loc.reported_by p in
-        if Vcs.User_handle.equal reported_by.txt user1
+        let reporter = Cr_comment.Header.With_loc.reporter p in
+        if Vcs.User_handle.equal reporter.txt user1
         then
           File_rewriter.replace
             file_rewriter
-            ~range:(Loc.range reported_by.loc)
+            ~range:(Loc.range reporter.loc)
             ~text:(Vcs.User_handle.to_string other);
-        Option.iter (Cr_comment.Header.With_loc.for_ p) ~f:(fun { txt; loc } ->
+        Option.iter (Cr_comment.Header.With_loc.recipient p) ~f:(fun { txt; loc } ->
           if Vcs.User_handle.equal txt user1
           then
             File_rewriter.replace
@@ -275,7 +275,7 @@ let () = ()
   ()
 ;;
 
-let%expect_test "change due now to soon" =
+let%expect_test "change priority now to soon" =
   let file_contents =
     {|
 let () =
@@ -306,9 +306,9 @@ let () =
         match Cr_comment.Header.kind p with
         | XCR -> ()
         | CR ->
-          (match Cr_comment.Header.With_loc.due p with
+          (match Cr_comment.Header.With_loc.qualifier p with
            | { txt = Soon | Someday; loc = _ } -> ()
-           | { txt = Now; loc } ->
+           | { txt = None; loc } ->
              File_rewriter.insert
                file_rewriter
                ~offset:(Loc.stop_offset loc)
@@ -343,7 +343,7 @@ let () =
   ()
 ;;
 
-let%expect_test "change due soon to someday" =
+let%expect_test "change priority soon to someday" =
   let file_contents =
     {|
 let () =
@@ -372,8 +372,8 @@ let () = ()
         match Cr_comment.Header.kind p with
         | XCR -> ()
         | CR ->
-          (match Cr_comment.Header.With_loc.due p with
-           | { txt = Now | Someday; loc = _ } -> ()
+          (match Cr_comment.Header.With_loc.qualifier p with
+           | { txt = None | Someday; loc = _ } -> ()
            | { txt = Soon; loc } ->
              File_rewriter.replace file_rewriter ~range:(Loc.range loc) ~text:"someday"))));
   [%expect
@@ -429,8 +429,8 @@ let () = ()
   test file_contents ~f:(fun ~crs ~file_rewriter ->
     List.iter crs ~f:(fun cr ->
       Or_error.iter (Cr_comment.header cr) ~f:(fun p ->
-        match Cr_comment.Header.With_loc.due p with
-        | { txt = Now; loc = _ } -> ()
+        match Cr_comment.Header.With_loc.qualifier p with
+        | { txt = None; loc = _ } -> ()
         | { txt = Soon | Someday; loc } ->
           File_rewriter.remove
             file_rewriter

@@ -94,10 +94,11 @@ A basic [sexp] output is available.
    (header
     (Ok
      ((kind ((txt XCR) (loc ((start foo/a.txt:2:3) (stop foo/a.txt:2:6)))))
-      (due ((txt Now) (loc ((start foo/a.txt:2:3) (stop foo/a.txt:2:6)))))
-      (reported_by
+      (qualifier
+       ((txt None) (loc ((start foo/a.txt:2:3) (stop foo/a.txt:2:6)))))
+      (reporter
        ((txt user1) (loc ((start foo/a.txt:2:7) (stop foo/a.txt:2:12)))))
-      (for_ ()))))
+      (recipient ()))))
    (comment_prefix "(*")
    (digest_of_condensed_content 9dce8eceb787a95abf3fccb037d164ea)
    (content "XCR user1: Fix this. Edit: Done."))
@@ -105,10 +106,11 @@ A basic [sexp] output is available.
    (header
     (Ok
      ((kind ((txt CR) (loc ((start foo/b.txt:1:3) (stop foo/b.txt:1:5)))))
-      (due ((txt Someday) (loc ((start foo/b.txt:1:6) (stop foo/b.txt:1:13)))))
-      (reported_by
+      (qualifier
+       ((txt Someday) (loc ((start foo/b.txt:1:6) (stop foo/b.txt:1:13)))))
+      (reporter
        ((txt user1) (loc ((start foo/b.txt:1:14) (stop foo/b.txt:1:19)))))
-      (for_ ()))))
+      (recipient ()))))
    (comment_prefix "(*")
    (digest_of_condensed_content 22722b7a3948f75ec004a651d97d02bb)
    (content
@@ -119,12 +121,12 @@ A basic [sexp] output is available.
     (Ok
      ((kind
        ((txt CR) (loc ((start foo/bar/b.txt:2:3) (stop foo/bar/b.txt:2:5)))))
-      (due
+      (qualifier
        ((txt Soon) (loc ((start foo/bar/b.txt:2:6) (stop foo/bar/b.txt:2:10)))))
-      (reported_by
+      (reporter
        ((txt user1)
         (loc ((start foo/bar/b.txt:2:11) (stop foo/bar/b.txt:2:16)))))
-      (for_ ()))))
+      (recipient ()))))
    (comment_prefix "(*")
    (digest_of_condensed_content 8b683d9bff5df08ee3642df3cf2426ce)
    (content "CR-soon user1: Hey, this is a code review comment"))
@@ -149,10 +151,11 @@ A basic [sexp] output is available.
    (header
     (Ok
      ((kind ((txt CR) (loc ((start foo/foo.c:1:3) (stop foo/foo.c:1:5)))))
-      (due ((txt Now) (loc ((start foo/foo.c:1:3) (stop foo/foo.c:1:5)))))
-      (reported_by
+      (qualifier
+       ((txt None) (loc ((start foo/foo.c:1:3) (stop foo/foo.c:1:5)))))
+      (reporter
        ((txt user1) (loc ((start foo/foo.c:1:6) (stop foo/foo.c:1:11)))))
-      (for_
+      (recipient
        (((txt user3) (loc ((start foo/foo.c:1:16) (stop foo/foo.c:1:21)))))))))
    (comment_prefix /*)
    (digest_of_condensed_content 4721a5c5f8a37bdcb9e065268bbd0153)
@@ -161,9 +164,9 @@ A basic [sexp] output is available.
    (header
     (Ok
      ((kind ((txt CR) (loc ((start hello:2:3) (stop hello:2:5)))))
-      (due ((txt Now) (loc ((start hello:2:3) (stop hello:2:5)))))
-      (reported_by ((txt user1) (loc ((start hello:2:6) (stop hello:2:11)))))
-      (for_ (((txt user2) (loc ((start hello:2:16) (stop hello:2:21)))))))))
+      (qualifier ((txt None) (loc ((start hello:2:3) (stop hello:2:5)))))
+      (reporter ((txt user1) (loc ((start hello:2:6) (stop hello:2:11)))))
+      (recipient (((txt user2) (loc ((start hello:2:16) (stop hello:2:21)))))))))
    (comment_prefix "(*")
    (digest_of_condensed_content 970aabfe0c3d4ec5707918edd3f01a8a)
    (content "CR user1 for user2: Hey, this is a code review comment"))
