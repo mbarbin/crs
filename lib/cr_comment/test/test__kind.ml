@@ -19,12 +19,19 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-type t =
-  | CR
-  | XCR
-[@@deriving compare, equal, enumerate, sexp_of]
-
-let to_string = function
-  | CR -> "CR"
-  | XCR -> "XCR"
+let%expect_test "to_string" =
+  List.iter Cr_comment.Kind.all ~f:(fun kind ->
+    print_s
+      [%sexp
+        { kind : Cr_comment.Kind.t
+        ; to_string = (Cr_comment.Kind.to_string kind : string)
+        }]);
+  [%expect
+    {|
+    ((kind      CR)
+     (to_string CR))
+    ((kind      XCR)
+     (to_string XCR))
+    |}];
+  ()
 ;;
