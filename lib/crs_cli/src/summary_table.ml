@@ -151,19 +151,19 @@ end
 module Key = struct
   type t =
     { reporter : Vcs.User_handle.t
-    ; for_ : Vcs.User_handle.t option
+    ; recipient : Vcs.User_handle.t option
     }
   [@@deriving compare]
 
   let of_header (h : Cr_comment.Header.t) =
-    { reporter = Cr_comment.Header.reporter h; for_ = Cr_comment.Header.for_ h }
+    { reporter = Cr_comment.Header.reporter h; recipient = Cr_comment.Header.recipient h }
   ;;
 end
 
 module Row = struct
   type t =
     { reporter : Vcs.User_handle.t
-    ; for_ : Vcs.User_handle.t option
+    ; recipient : Vcs.User_handle.t option
     ; cr_count : int
     ; xcr_count : int
     ; soon_count : int
@@ -186,7 +186,7 @@ let make (crs : Cr_comment.t list) =
     |> List.sort_and_group ~compare:(fun (k1, _) (k2, _) -> Key.compare k1 k2)
     |> List.map ~f:(function
       | [] -> assert false
-      | ({ Key.reporter; for_ }, _) :: _ as list ->
+      | ({ Key.reporter; recipient }, _) :: _ as list ->
         let cr_count = ref 0 in
         let xcr_count = ref 0 in
         let soon_count = ref 0 in
@@ -200,7 +200,7 @@ let make (crs : Cr_comment.t list) =
           | Soon -> Int.incr soon_count
           | Someday -> Int.incr someday_count);
         { Row.reporter
-        ; for_
+        ; recipient
         ; cr_count = !cr_count
         ; xcr_count = !xcr_count
         ; soon_count = !soon_count
@@ -222,7 +222,7 @@ let columns =
     [ Column.make "Reporter" (fun (row : Row.t) ->
         line (Vcs.User_handle.to_string row.reporter))
     ; Column.make "For" (fun (row : Row.t) ->
-        match row.for_ with
+        match row.recipient with
         | None -> empty
         | Some user -> line (Vcs.User_handle.to_string user))
     ; count "CRs" (fun row -> row.cr_count)

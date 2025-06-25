@@ -137,7 +137,7 @@ let () = ()
   test file_contents ~f:(fun ~crs ~file_rewriter ->
     List.iter crs ~f:(fun cr ->
       Or_error.iter (Cr_comment.header cr) ~f:(fun p ->
-        match Cr_comment.Header.With_loc.for_ p with
+        match Cr_comment.Header.With_loc.recipient p with
         | None -> ()
         | Some { loc; _ } ->
           File_rewriter.remove
@@ -188,7 +188,7 @@ let () = ()
   test file_contents ~f:(fun ~crs ~file_rewriter ->
     List.iter crs ~f:(fun cr ->
       Or_error.iter (Cr_comment.header cr) ~f:(fun p ->
-        match Cr_comment.Header.for_ p with
+        match Cr_comment.Header.recipient p with
         | Some _ -> ()
         | None ->
           File_rewriter.insert
@@ -248,7 +248,7 @@ let () = ()
             file_rewriter
             ~range:(Loc.range reporter.loc)
             ~text:(Vcs.User_handle.to_string other);
-        Option.iter (Cr_comment.Header.With_loc.for_ p) ~f:(fun { txt; loc } ->
+        Option.iter (Cr_comment.Header.With_loc.recipient p) ~f:(fun { txt; loc } ->
           if Vcs.User_handle.equal txt user1
           then
             File_rewriter.replace

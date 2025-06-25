@@ -88,7 +88,7 @@ module Header = struct
       { kind : Kind.t Loc.Txt.t
       ; due : Due.t Loc.Txt.t
       ; reporter : Vcs.User_handle.t Loc.Txt.t
-      ; for_ : Vcs.User_handle.t Loc.Txt.t option
+      ; recipient : Vcs.User_handle.t Loc.Txt.t option
       }
     [@@deriving equal, sexp_of]
   end
@@ -97,22 +97,24 @@ module Header = struct
 
   module With_loc = struct
     let reporter t = t.reporter
-    let for_ t = t.for_
+    let recipient t = t.recipient
     let kind t = t.kind
     let due t = t.due
 
     (* Deprecated. *)
     let reported_by = reporter
+    let for_ = recipient
   end
 
-  let create ~kind ~due ~reporter ~for_ = { kind; due; reporter; for_ }
+  let create ~kind ~due ~reporter ~recipient = { kind; due; reporter; recipient }
   let reporter t = t.reporter.txt
-  let for_ t = Option.map t.for_ ~f:Loc.Txt.txt
+  let recipient t = Option.map t.recipient ~f:Loc.Txt.txt
   let kind t = t.kind.txt
   let due t = t.due.txt
 
   (* Deprecated. *)
   let reported_by = reporter
+  let for_ = recipient
 end
 
 module T = struct

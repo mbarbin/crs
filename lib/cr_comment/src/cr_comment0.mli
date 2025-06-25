@@ -84,10 +84,10 @@ module Header : sig
   (** [reporter] is [user] in [CR user...]. *)
   val reporter : t -> Vcs.User_handle.t
 
-  (** [for_] is [user2] in [CR user1 for user2: ...]. Assigning CRs to
+  (** [recipient] is [user2] in [CR user1 for user2: ...]. Assigning CRs to
       particular users is optional. This returns [None] if that part is left
       out, such as in [CR user1: Comment]. *)
-  val for_ : t -> Vcs.User_handle.t option
+  val recipient : t -> Vcs.User_handle.t option
 
   val kind : t -> Kind.t
 
@@ -104,10 +104,10 @@ module Header : sig
         surrounding spaces. *)
     val reporter : t -> Vcs.User_handle.t Loc.Txt.t
 
-    (** The location includes the entire assignee username, if it is present,
+    (** The location includes the entire recipient username, if it is present,
         without the surrounding spaces. In particular, the location does not
         include the ["for"] keyword itself. *)
-    val for_ : t -> Vcs.User_handle.t Loc.Txt.t option
+    val recipient : t -> Vcs.User_handle.t Loc.Txt.t option
 
     (** The location includes the entire keyword ["CR"] or ["XCR"] depending on
         the case. It stops right before the following char, that being a space
@@ -130,6 +130,10 @@ module Header : sig
     (** This was renamed [reporter]. Hint: Run [ocamlmig migrate]. *)
     val reported_by : t -> Vcs.User_handle.t Loc.Txt.t
     [@@migrate { repl = Rel.reporter }]
+
+    (** This was renamed [recipient]. Hint: Run [ocamlmig migrate]. *)
+    val for_ : t -> Vcs.User_handle.t Loc.Txt.t option
+    [@@migrate { repl = Rel.recipient }]
   end
 
   (** {1 Deprecated}
@@ -140,6 +144,10 @@ module Header : sig
   (** This was renamed [reporter]. Hint: Run [ocamlmig migrate]. *)
   val reported_by : t -> Vcs.User_handle.t
   [@@migrate { repl = Rel.reporter }]
+
+  (** This was renamed [recipient]. Hint: Run [ocamlmig migrate]. *)
+  val for_ : t -> Vcs.User_handle.t option
+  [@@migrate { repl = Rel.recipient }]
 end
 
 (** A [Cr_comment.t] is an immutable value holding the information and metadata
@@ -219,7 +227,7 @@ module Private : sig
       :  kind:Kind.t Loc.Txt.t
       -> due:Due.t Loc.Txt.t
       -> reporter:Vcs.User_handle.t Loc.Txt.t
-      -> for_:Vcs.User_handle.t Loc.Txt.t option
+      -> recipient:Vcs.User_handle.t Loc.Txt.t option
       -> header
   end
 

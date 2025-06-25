@@ -84,7 +84,7 @@ let comment_regex =
                    [ rep1 whitespace
                    ; str "for"
                    ; rep1 whitespace
-                   ; group ~name:"for" (rep1 word_t)
+                   ; group ~name:"recipient" (rep1 word_t)
                    ])
             ; rep whitespace
             ; char ':'
@@ -142,8 +142,8 @@ let parse ~file_cache ~content_start_offset ~content =
         in
         { Loc.Txt.txt; loc }
     in
-    let for_ =
-      Option.map (get "for") ~f:(fun (user, loc) ->
+    let recipient =
+      Option.map (get "recipient") ~f:(fun (user, loc) ->
         { Loc.Txt.txt = Vcs.User_handle.v user; loc })
     in
     let due =
@@ -155,7 +155,7 @@ let parse ~file_cache ~content_start_offset ~content =
         (* dated CR -> CR-someday *)
         { Loc.Txt.txt = Cr_comment.Due.Someday; loc }
     in
-    Or_error.return (Cr_comment.Private.Header.create ~kind ~due ~reporter ~for_)
+    Or_error.return (Cr_comment.Private.Header.create ~kind ~due ~reporter ~recipient)
   with
   | exn ->
     Or_error.error
