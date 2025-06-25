@@ -306,9 +306,9 @@ let () =
         match Cr_comment.Header.kind p with
         | XCR -> ()
         | CR ->
-          (match Cr_comment.Header.With_loc.due p with
+          (match Cr_comment.Header.With_loc.qualifier p with
            | { txt = Soon | Someday; loc = _ } -> ()
-           | { txt = Now; loc } ->
+           | { txt = None; loc } ->
              File_rewriter.insert
                file_rewriter
                ~offset:(Loc.stop_offset loc)
@@ -372,8 +372,8 @@ let () = ()
         match Cr_comment.Header.kind p with
         | XCR -> ()
         | CR ->
-          (match Cr_comment.Header.With_loc.due p with
-           | { txt = Now | Someday; loc = _ } -> ()
+          (match Cr_comment.Header.With_loc.qualifier p with
+           | { txt = None | Someday; loc = _ } -> ()
            | { txt = Soon; loc } ->
              File_rewriter.replace file_rewriter ~range:(Loc.range loc) ~text:"someday"))));
   [%expect
@@ -429,8 +429,8 @@ let () = ()
   test file_contents ~f:(fun ~crs ~file_rewriter ->
     List.iter crs ~f:(fun cr ->
       Or_error.iter (Cr_comment.header cr) ~f:(fun p ->
-        match Cr_comment.Header.With_loc.due p with
-        | { txt = Now; loc = _ } -> ()
+        match Cr_comment.Header.With_loc.qualifier p with
+        | { txt = None; loc = _ } -> ()
         | { txt = Soon | Someday; loc } ->
           File_rewriter.remove
             file_rewriter

@@ -19,8 +19,28 @@
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
 
-module Due = Due
-module Kind = Kind
-module Filter = Filter
-module Qualifier = Qualifier
-include module type of Cr_comment0
+(** The [Qualifier.t] type represents an optional keyword that can be attached
+    to a code review comment (CR) using the CR syntax. This classification is a
+    general convenience provided by the library to help organize and filter CRs,
+    but the exact workflow and expectations associated with each qualifier —
+    such as when a [Soon] or [Someday] comment should be addressed — are
+    intentionally left undefined here.
+
+    It is up to higher-level tools or code review systems built on top of CRs to
+    define and enforce specific policies or behaviors around these qualifiers.
+
+    As a rule of thumb:
+    - [None]: Should be addressed promptly.
+    - [Soon]: Should be addressed in the near future.
+    - [Someday]: Can be deferred until later.
+
+    These categories are intended to be flexible and adaptable to the needs of
+    various development process. *)
+type t =
+  | None
+  | Soon
+  | Someday
+[@@deriving compare, equal, enumerate, sexp_of]
+
+(** This returns the planned time to work on the CR according to the qualifier. *)
+val due : t -> Due.t

@@ -84,8 +84,8 @@ module By_type = struct
         (match Cr_comment.Header.kind h with
          | XCR -> XCR
          | CR ->
-           (match Cr_comment.Header.due h with
-            | Now -> CR
+           (match Cr_comment.Header.qualifier h with
+            | None -> CR
             | Soon -> Soon
             | Someday -> Someday))
     ;;
@@ -141,8 +141,8 @@ module Type = struct
     match Cr_comment.Header.kind h with
     | XCR -> XCR
     | CR ->
-      (match Cr_comment.Header.due h with
-       | Now -> CR
+      (match Cr_comment.Header.qualifier h with
+       | None -> CR
        | Soon -> Soon
        | Someday -> Someday)
   ;;

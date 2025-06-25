@@ -86,7 +86,7 @@ module Header = struct
 
     type t =
       { kind : Kind.t Loc.Txt.t
-      ; due : Due.t Loc.Txt.t
+      ; qualifier : Qualifier.t Loc.Txt.t
       ; reporter : Vcs.User_handle.t Loc.Txt.t
       ; recipient : Vcs.User_handle.t Loc.Txt.t option
       }
@@ -99,18 +99,22 @@ module Header = struct
     let reporter t = t.reporter
     let recipient t = t.recipient
     let kind t = t.kind
-    let due t = t.due
+    let qualifier t = t.qualifier
 
     (* Deprecated. *)
     let reported_by = reporter
     let for_ = recipient
+    let due = qualifier
   end
 
-  let create ~kind ~due ~reporter ~recipient = { kind; due; reporter; recipient }
+  let create ~kind ~qualifier ~reporter ~recipient =
+    { kind; qualifier; reporter; recipient }
+  ;;
+
   let reporter t = t.reporter.txt
   let recipient t = Option.map t.recipient ~f:Loc.Txt.txt
   let kind t = t.kind.txt
-  let due t = t.due.txt
+  let qualifier t = t.qualifier.txt
 
   (* Deprecated. *)
   let reported_by = reporter
@@ -218,12 +222,6 @@ let reindented_content t =
 
 let sort ts = List.sort ts ~compare:For_sorted_output.compare
 
-let due t =
-  match t.header with
-  | Error _ -> Due.Now
-  | Ok p -> Header.due p
-;;
-
 let kind t =
   match t.header with
   | Error _ -> Kind.CR
@@ -236,7 +234,7 @@ let work_on t : Due.t =
   | Ok p ->
     (match Header.kind p with
      | XCR -> Now
-     | CR -> Header.due p)
+     | CR -> Header.qualifier p |> Qualifier.due)
 ;;
 
 let to_string t =

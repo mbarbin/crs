@@ -94,7 +94,8 @@ A basic [sexp] output is available.
    (header
     (Ok
      ((kind ((txt XCR) (loc ((start foo/a.txt:2:3) (stop foo/a.txt:2:6)))))
-      (due ((txt Now) (loc ((start foo/a.txt:2:3) (stop foo/a.txt:2:6)))))
+      (qualifier
+       ((txt None) (loc ((start foo/a.txt:2:3) (stop foo/a.txt:2:6)))))
       (reporter
        ((txt user1) (loc ((start foo/a.txt:2:7) (stop foo/a.txt:2:12)))))
       (recipient ()))))
@@ -105,7 +106,8 @@ A basic [sexp] output is available.
    (header
     (Ok
      ((kind ((txt CR) (loc ((start foo/b.txt:1:3) (stop foo/b.txt:1:5)))))
-      (due ((txt Someday) (loc ((start foo/b.txt:1:6) (stop foo/b.txt:1:13)))))
+      (qualifier
+       ((txt Someday) (loc ((start foo/b.txt:1:6) (stop foo/b.txt:1:13)))))
       (reporter
        ((txt user1) (loc ((start foo/b.txt:1:14) (stop foo/b.txt:1:19)))))
       (recipient ()))))
@@ -119,7 +121,7 @@ A basic [sexp] output is available.
     (Ok
      ((kind
        ((txt CR) (loc ((start foo/bar/b.txt:2:3) (stop foo/bar/b.txt:2:5)))))
-      (due
+      (qualifier
        ((txt Soon) (loc ((start foo/bar/b.txt:2:6) (stop foo/bar/b.txt:2:10)))))
       (reporter
        ((txt user1)
@@ -149,7 +151,8 @@ A basic [sexp] output is available.
    (header
     (Ok
      ((kind ((txt CR) (loc ((start foo/foo.c:1:3) (stop foo/foo.c:1:5)))))
-      (due ((txt Now) (loc ((start foo/foo.c:1:3) (stop foo/foo.c:1:5)))))
+      (qualifier
+       ((txt None) (loc ((start foo/foo.c:1:3) (stop foo/foo.c:1:5)))))
       (reporter
        ((txt user1) (loc ((start foo/foo.c:1:6) (stop foo/foo.c:1:11)))))
       (recipient
@@ -161,7 +164,7 @@ A basic [sexp] output is available.
    (header
     (Ok
      ((kind ((txt CR) (loc ((start hello:2:3) (stop hello:2:5)))))
-      (due ((txt Now) (loc ((start hello:2:3) (stop hello:2:5)))))
+      (qualifier ((txt None) (loc ((start hello:2:3) (stop hello:2:5)))))
       (reporter ((txt user1) (loc ((start hello:2:6) (stop hello:2:11)))))
       (recipient (((txt user2) (loc ((start hello:2:16) (stop hello:2:21)))))))))
    (comment_prefix "(*")

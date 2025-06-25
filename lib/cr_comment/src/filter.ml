@@ -60,8 +60,8 @@ let matches t ~cr =
        (match Cr_comment0.Header.kind h with
         | XCR -> false
         | CR ->
-          (match Cr_comment0.Header.due h with
-           | Now -> true
+          (match Cr_comment0.Header.qualifier h with
+           | None -> true
            | Soon | Someday -> false)))
   | XCRs ->
     (match Cr_comment0.header cr with
@@ -77,8 +77,8 @@ let matches t ~cr =
        (match Cr_comment0.Header.kind h with
         | XCR -> true
         | CR ->
-          (match Cr_comment0.Header.due h with
-           | Now -> true
+          (match Cr_comment0.Header.qualifier h with
+           | None -> true
            | Soon | Someday -> false)))
   | Soon ->
     (match Cr_comment0.header cr with
@@ -87,9 +87,9 @@ let matches t ~cr =
        (match Cr_comment0.Header.kind h with
         | XCR -> false
         | CR ->
-          (match Cr_comment0.Header.due h with
+          (match Cr_comment0.Header.qualifier h with
            | Soon -> true
-           | Now | Someday -> false)))
+           | None | Someday -> false)))
   | Someday ->
     (match Cr_comment0.header cr with
      | Error _ -> false
@@ -97,7 +97,7 @@ let matches t ~cr =
        (match Cr_comment0.Header.kind h with
         | XCR -> false
         | CR ->
-          (match Cr_comment0.Header.due h with
+          (match Cr_comment0.Header.qualifier h with
            | Someday -> true
-           | Now | Soon -> false)))
+           | None | Soon -> false)))
 ;;

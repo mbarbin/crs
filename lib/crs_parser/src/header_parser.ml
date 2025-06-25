@@ -74,7 +74,7 @@ let comment_regex =
                 (seq
                    [ char '-'
                    ; group
-                       ~name:"due"
+                       ~name:"qualifier"
                        (alt [ repn digit 6 (Some 6); str "soon"; str "someday" ])
                    ])
             ; rep1 whitespace
@@ -146,16 +146,17 @@ let parse ~file_cache ~content_start_offset ~content =
       Option.map (get "recipient") ~f:(fun (user, loc) ->
         { Loc.Txt.txt = Vcs.User_handle.v user; loc })
     in
-    let due =
-      match get "due" with
-      | None -> { Loc.Txt.txt = Cr_comment.Due.Now; loc = kind.loc }
-      | Some ("soon", loc) -> { Loc.Txt.txt = Cr_comment.Due.Soon; loc }
-      | Some ("someday", loc) -> { Loc.Txt.txt = Cr_comment.Due.Someday; loc }
+    let qualifier =
+      match get "qualifier" with
+      | None -> { Loc.Txt.txt = Cr_comment.Qualifier.None; loc = kind.loc }
+      | Some ("soon", loc) -> { Loc.Txt.txt = Cr_comment.Qualifier.Soon; loc }
+      | Some ("someday", loc) -> { Loc.Txt.txt = Cr_comment.Qualifier.Someday; loc }
       | Some (_, loc) ->
         (* dated CR -> CR-someday *)
-        { Loc.Txt.txt = Cr_comment.Due.Someday; loc }
+        { Loc.Txt.txt = Cr_comment.Qualifier.Someday; loc }
     in
-    Or_error.return (Cr_comment.Private.Header.create ~kind ~due ~reporter ~recipient)
+    Or_error.return
+      (Cr_comment.Private.Header.create ~kind ~qualifier ~reporter ~recipient)
   with
   | exn ->
     Or_error.error

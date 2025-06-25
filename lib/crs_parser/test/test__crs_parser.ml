@@ -26,7 +26,7 @@ module Getters = struct
     { path : Vcs.Path_in_repo.t
     ; content : string
     ; kind : Cr_comment.Kind.t
-    ; due : Cr_comment.Due.t
+    ; qualifier : Cr_comment.Qualifier.t option
     ; work_on : Cr_comment.Due.t
     }
   [@@deriving sexp_of]
@@ -35,7 +35,10 @@ module Getters = struct
     { path = Cr_comment.path cr
     ; content = Cr_comment.content cr
     ; kind = Cr_comment.kind cr
-    ; due = Cr_comment.due cr
+    ; qualifier =
+        (match Cr_comment.header cr with
+         | Error _ -> None
+         | Ok h -> Some (Cr_comment.Header.qualifier h))
     ; work_on = Cr_comment.work_on cr
     }
   ;;
@@ -92,7 +95,7 @@ let%expect_test "invalid syntax CR" =
        (path    my_file.ml)
        (content CR)
        (kind    CR)
-       (due     Now)
+       (qualifier ())
        (work_on Now))))
     |}];
   ()
@@ -121,8 +124,8 @@ let%expect_test "multiple spaces CR" =
              (loc (
                (start my_file.ml:1:4)
                (stop  my_file.ml:1:6)))))
-           (due (
-             (txt Now)
+           (qualifier (
+             (txt None)
              (loc (
                (start my_file.ml:1:4)
                (stop  my_file.ml:1:6)))))
@@ -139,7 +142,7 @@ let%expect_test "multiple spaces CR" =
        (path    my_file.ml)
        (content "CR user: Blah.")
        (kind    CR)
-       (due     Now)
+       (qualifier (None))
        (work_on Now))))
     |}];
   ()
@@ -166,8 +169,8 @@ let%expect_test "empty CR" =
              (loc (
                (start my_file.ml:1:3)
                (stop  my_file.ml:1:5)))))
-           (due (
-             (txt Now)
+           (qualifier (
+             (txt None)
              (loc (
                (start my_file.ml:1:3)
                (stop  my_file.ml:1:5)))))
@@ -184,7 +187,7 @@ let%expect_test "empty CR" =
        (path    my_file.ml)
        (content "CR user:")
        (kind    CR)
-       (due     Now)
+       (qualifier (None))
        (work_on Now))))
     |}];
   ()
@@ -222,7 +225,7 @@ let () = ()
              (loc (
                (start my_file.ml:1:3)
                (stop  my_file.ml:1:5)))))
-           (due (
+           (qualifier (
              (txt Soon)
              (loc (
                (start my_file.ml:1:6)
@@ -240,7 +243,7 @@ let () = ()
        (path    my_file.ml)
        (content "CR-soon user: Some text")
        (kind    CR)
-       (due     Soon)
+       (qualifier (Soon))
        (work_on Soon))))
     ========================
       CR-someday user: Some text
@@ -256,7 +259,7 @@ let () = ()
              (loc (
                (start my_file.ml:3:3)
                (stop  my_file.ml:3:5)))))
-           (due (
+           (qualifier (
              (txt Someday)
              (loc (
                (start my_file.ml:3:6)
@@ -274,7 +277,7 @@ let () = ()
        (path    my_file.ml)
        (content "CR-someday user: Some text")
        (kind    CR)
-       (due     Someday)
+       (qualifier (Someday))
        (work_on Someday))))
     ========================
       CR-soon user1 for user2: Some text
@@ -290,7 +293,7 @@ let () = ()
              (loc (
                (start my_file.ml:5:3)
                (stop  my_file.ml:5:5)))))
-           (due (
+           (qualifier (
              (txt Soon)
              (loc (
                (start my_file.ml:5:6)
@@ -312,7 +315,7 @@ let () = ()
        (path    my_file.ml)
        (content "CR-soon user1 for user2: Some text")
        (kind    CR)
-       (due     Soon)
+       (qualifier (Soon))
        (work_on Soon))))
     ========================
       CR-someday user1 for user2: Some text
@@ -328,7 +331,7 @@ let () = ()
              (loc (
                (start my_file.ml:7:3)
                (stop  my_file.ml:7:5)))))
-           (due (
+           (qualifier (
              (txt Someday)
              (loc (
                (start my_file.ml:7:6)
@@ -350,7 +353,7 @@ let () = ()
        (path    my_file.ml)
        (content "CR-someday user1 for user2: Some text")
        (kind    CR)
-       (due     Someday)
+       (qualifier (Someday))
        (work_on Someday))))
     ========================
       XCR-soon user: Some text
@@ -366,7 +369,7 @@ let () = ()
              (loc (
                (start my_file.ml:9:3)
                (stop  my_file.ml:9:6)))))
-           (due (
+           (qualifier (
              (txt Soon)
              (loc (
                (start my_file.ml:9:7)
@@ -384,7 +387,7 @@ let () = ()
        (path    my_file.ml)
        (content "XCR-soon user: Some text")
        (kind    XCR)
-       (due     Soon)
+       (qualifier (Soon))
        (work_on Now))))
     ========================
       XCR-someday user: Some text
@@ -400,7 +403,7 @@ let () = ()
              (loc (
                (start my_file.ml:11:3)
                (stop  my_file.ml:11:6)))))
-           (due (
+           (qualifier (
              (txt Someday)
              (loc (
                (start my_file.ml:11:7)
@@ -418,7 +421,7 @@ let () = ()
        (path    my_file.ml)
        (content "XCR-someday user: Some text")
        (kind    XCR)
-       (due     Someday)
+       (qualifier (Someday))
        (work_on Now))))
     |}];
   ()
@@ -461,8 +464,8 @@ let () = ()
        (path my_file.ml)
        (content
         "CR-2026-01-31 user: This CR has a due date, by not correctly specified.")
-       (kind    CR)
-       (due     Now)
+       (kind CR)
+       (qualifier ())
        (work_on Now))))
     ========================
       CR-20260131 user: This is not it either..
@@ -480,7 +483,7 @@ let () = ()
        (path    my_file.ml)
        (content "CR-20260131 user: This is not it either..")
        (kind    CR)
-       (due     Now)
+       (qualifier ())
        (work_on Now))))
     ========================
       CR-202601 user: You would presumably only include the year and month.
@@ -496,7 +499,7 @@ let () = ()
              (loc (
                (start my_file.ml:7:3)
                (stop  my_file.ml:7:5)))))
-           (due (
+           (qualifier (
              (txt Someday)
              (loc (
                (start my_file.ml:7:6)
@@ -515,8 +518,8 @@ let () = ()
        (path my_file.ml)
        (content
         "CR-202601 user: You would presumably only include the year and month.")
-       (kind    CR)
-       (due     Someday)
+       (kind CR)
+       (qualifier (Someday))
        (work_on Someday))))
     |}];
   ()
@@ -545,8 +548,8 @@ let () = ()
              (loc (
                (start my_file.ml:1:3)
                (stop  my_file.ml:1:5)))))
-           (due (
-             (txt Now)
+           (qualifier (
+             (txt None)
              (loc (
                (start my_file.ml:1:3)
                (stop  my_file.ml:1:5)))))
@@ -563,7 +566,7 @@ let () = ()
        (path    my_file.ml)
        (content "CR user: A first CR")
        (kind    CR)
-       (due     Now)
+       (qualifier (None))
        (work_on Now))))
     ========================
       CR user: Followed by another.
@@ -579,8 +582,8 @@ let () = ()
              (loc (
                (start my_file.ml:1:41)
                (stop  my_file.ml:1:43)))))
-           (due (
-             (txt Now)
+           (qualifier (
+             (txt None)
              (loc (
                (start my_file.ml:1:41)
                (stop  my_file.ml:1:43)))))
@@ -597,7 +600,7 @@ let () = ()
        (path    my_file.ml)
        (content "CR user: Followed by another.")
        (kind    CR)
-       (due     Now)
+       (qualifier (None))
        (work_on Now))))
     |}];
   ()
@@ -654,9 +657,9 @@ end
        (whole_loc _)
        (header (
          Ok (
-           (kind     CR)
-           (due      Now)
-           (reporter user1)
+           (kind      CR)
+           (qualifier None)
+           (reporter  user1)
            (recipient ()))))
        (comment_prefix "(*")
        (digest_of_condensed_content 03997213173fb186a59985ae32f89cfd)
@@ -891,8 +894,8 @@ span multiple lines too.
              (loc (
                (start my_file.ml:1:3)
                (stop  my_file.ml:1:5)))))
-           (due (
-             (txt Now)
+           (qualifier (
+             (txt None)
              (loc (
                (start my_file.ml:1:3)
                (stop  my_file.ml:1:5)))))
@@ -909,7 +912,7 @@ span multiple lines too.
        (path    my_file.ml)
        (content "CR user: This is a comment.")
        (kind    CR)
-       (due     Now)
+       (qualifier (None))
        (work_on Now))))
     ========================
       XCR user: And it can
@@ -926,8 +929,8 @@ span multiple lines too.
              (loc (
                (start my_file.ml:3:3)
                (stop  my_file.ml:3:6)))))
-           (due (
-             (txt Now)
+           (qualifier (
+             (txt None)
              (loc (
                (start my_file.ml:3:3)
                (stop  my_file.ml:3:6)))))
@@ -943,8 +946,8 @@ span multiple lines too.
      (getters (
        (path my_file.ml)
        (content "XCR user: And it can\nspan multiple lines too.")
-       (kind    XCR)
-       (due     Now)
+       (kind XCR)
+       (qualifier (None))
        (work_on Now))))
     |}];
   test
@@ -970,8 +973,8 @@ span multiple lines too.
              (loc (
                (start my_file.ml:1:3)
                (stop  my_file.ml:1:5)))))
-           (due (
-             (txt Now)
+           (qualifier (
+             (txt None)
              (loc (
                (start my_file.ml:1:3)
                (stop  my_file.ml:1:5)))))
@@ -988,7 +991,7 @@ span multiple lines too.
        (path    my_file.ml)
        (content "CR user: This is a single line comment.")
        (kind    CR)
-       (due     Now)
+       (qualifier (None))
        (work_on Now))))
     ========================
       XCR user: This syntax can be used to write
@@ -1005,8 +1008,8 @@ span multiple lines too.
              (loc (
                (start my_file.ml:3:3)
                (stop  my_file.ml:3:6)))))
-           (due (
-             (txt Now)
+           (qualifier (
+             (txt None)
              (loc (
                (start my_file.ml:3:3)
                (stop  my_file.ml:3:6)))))
@@ -1024,8 +1027,8 @@ span multiple lines too.
        (path my_file.ml)
        (content
         "XCR user: This syntax can be used to write\n// comments that span multiple lines too.")
-       (kind    XCR)
-       (due     Now)
+       (kind XCR)
+       (qualifier (None))
        (work_on Now))))
     |}];
   test
@@ -1060,8 +1063,8 @@ let%expect_test "single-hash-style" =
              (loc (
                (start my_file.ml:1:2)
                (stop  my_file.ml:1:4)))))
-           (due (
-             (txt Now)
+           (qualifier (
+             (txt None)
              (loc (
                (start my_file.ml:1:2)
                (stop  my_file.ml:1:4)))))
@@ -1078,7 +1081,7 @@ let%expect_test "single-hash-style" =
        (path    my_file.ml)
        (content "CR user: This is a comment.")
        (kind    CR)
-       (due     Now)
+       (qualifier (None))
        (work_on Now))))
     ========================
       XCR user: And it can
@@ -1095,8 +1098,8 @@ let%expect_test "single-hash-style" =
              (loc (
                (start my_file.ml:3:2)
                (stop  my_file.ml:3:5)))))
-           (due (
-             (txt Now)
+           (qualifier (
+             (txt None)
              (loc (
                (start my_file.ml:3:2)
                (stop  my_file.ml:3:5)))))
@@ -1112,8 +1115,8 @@ let%expect_test "single-hash-style" =
      (getters (
        (path my_file.ml)
        (content "XCR user: And it can\n# span multiple lines too.")
-       (kind    XCR)
-       (due     Now)
+       (kind XCR)
+       (qualifier (None))
        (work_on Now))))
     |}];
   ()
@@ -1143,8 +1146,8 @@ let%expect_test "double-hash-style" =
              (loc (
                (start my_file.ml:1:3)
                (stop  my_file.ml:1:5)))))
-           (due (
-             (txt Now)
+           (qualifier (
+             (txt None)
              (loc (
                (start my_file.ml:1:3)
                (stop  my_file.ml:1:5)))))
@@ -1161,7 +1164,7 @@ let%expect_test "double-hash-style" =
        (path    my_file.ml)
        (content "CR user: This is a comment.")
        (kind    CR)
-       (due     Now)
+       (qualifier (None))
        (work_on Now))))
     ========================
       XCR user: And it can
@@ -1178,8 +1181,8 @@ let%expect_test "double-hash-style" =
              (loc (
                (start my_file.ml:3:3)
                (stop  my_file.ml:3:6)))))
-           (due (
-             (txt Now)
+           (qualifier (
+             (txt None)
              (loc (
                (start my_file.ml:3:3)
                (stop  my_file.ml:3:6)))))
@@ -1195,8 +1198,8 @@ let%expect_test "double-hash-style" =
      (getters (
        (path my_file.ml)
        (content "XCR user: And it can\n## span multiple lines too.")
-       (kind    XCR)
-       (due     Now)
+       (kind XCR)
+       (qualifier (None))
        (work_on Now))))
     |}];
   test
@@ -1221,8 +1224,8 @@ Hello ## $CR user: By the way, multiple hash is supported. The location for the 
              (loc (
                (start my_file.ml:1:9)
                (stop  my_file.ml:1:11)))))
-           (due (
-             (txt Now)
+           (qualifier (
+             (txt None)
              (loc (
                (start my_file.ml:1:9)
                (stop  my_file.ml:1:11)))))
@@ -1240,8 +1243,8 @@ Hello ## $CR user: By the way, multiple hash is supported. The location for the 
        (path my_file.ml)
        (content
         "CR user: By the way, multiple hash is supported. The location for the entire\n      ## comment starts at the left-most hash character.")
-       (kind    CR)
-       (due     Now)
+       (kind CR)
+       (qualifier (None))
        (work_on Now))))
     |}];
   ()
@@ -1288,8 +1291,8 @@ Hello text -- $CR user: Comment may be left next to a non-empty line.
              (loc (
                (start my_file.ml:1:3)
                (stop  my_file.ml:1:5)))))
-           (due (
-             (txt Now)
+           (qualifier (
+             (txt None)
              (loc (
                (start my_file.ml:1:3)
                (stop  my_file.ml:1:5)))))
@@ -1306,7 +1309,7 @@ Hello text -- $CR user: Comment may be left next to a non-empty line.
        (path    my_file.ml)
        (content "CR user: This is a comment.")
        (kind    CR)
-       (due     Now)
+       (qualifier (None))
        (work_on Now))))
     ========================
       XCR user: And it can
@@ -1323,8 +1326,8 @@ Hello text -- $CR user: Comment may be left next to a non-empty line.
              (loc (
                (start my_file.ml:3:3)
                (stop  my_file.ml:3:6)))))
-           (due (
-             (txt Now)
+           (qualifier (
+             (txt None)
              (loc (
                (start my_file.ml:3:3)
                (stop  my_file.ml:3:6)))))
@@ -1340,8 +1343,8 @@ Hello text -- $CR user: Comment may be left next to a non-empty line.
      (getters (
        (path my_file.ml)
        (content "XCR user: And it can\n-- span multiple lines too.")
-       (kind    XCR)
-       (due     Now)
+       (kind XCR)
+       (qualifier (None))
        (work_on Now))))
     ========================
       CR user: Comment may be left next to a non-empty line.
@@ -1357,8 +1360,8 @@ Hello text -- $CR user: Comment may be left next to a non-empty line.
              (loc (
                (start my_file.ml:6:14)
                (stop  my_file.ml:6:16)))))
-           (due (
-             (txt Now)
+           (qualifier (
+             (txt None)
              (loc (
                (start my_file.ml:6:14)
                (stop  my_file.ml:6:16)))))
@@ -1374,8 +1377,8 @@ Hello text -- $CR user: Comment may be left next to a non-empty line.
      (getters (
        (path my_file.ml)
        (content "CR user: Comment may be left next to a non-empty line.")
-       (kind    CR)
-       (due     Now)
+       (kind CR)
+       (qualifier (None))
        (work_on Now))))
     |}];
   ()
@@ -1410,8 +1413,8 @@ let%expect_test "single-semi-style" =
              (loc (
                (start my_file.ml:1:2)
                (stop  my_file.ml:1:4)))))
-           (due (
-             (txt Now)
+           (qualifier (
+             (txt None)
              (loc (
                (start my_file.ml:1:2)
                (stop  my_file.ml:1:4)))))
@@ -1428,7 +1431,7 @@ let%expect_test "single-semi-style" =
        (path    my_file.ml)
        (content "CR user: This is a comment.")
        (kind    CR)
-       (due     Now)
+       (qualifier (None))
        (work_on Now))))
     ========================
       XCR user: And it can
@@ -1445,8 +1448,8 @@ let%expect_test "single-semi-style" =
              (loc (
                (start my_file.ml:3:2)
                (stop  my_file.ml:3:5)))))
-           (due (
-             (txt Now)
+           (qualifier (
+             (txt None)
              (loc (
                (start my_file.ml:3:2)
                (stop  my_file.ml:3:5)))))
@@ -1462,8 +1465,8 @@ let%expect_test "single-semi-style" =
      (getters (
        (path my_file.ml)
        (content "XCR user: And it can\n; span multiple lines too.")
-       (kind    XCR)
-       (due     Now)
+       (kind XCR)
+       (qualifier (None))
        (work_on Now))))
     ========================
       CR user: Comment may be placed after a non-empty line.
@@ -1479,8 +1482,8 @@ let%expect_test "single-semi-style" =
              (loc (
                (start my_file.ml:6:22)
                (stop  my_file.ml:6:24)))))
-           (due (
-             (txt Now)
+           (qualifier (
+             (txt None)
              (loc (
                (start my_file.ml:6:22)
                (stop  my_file.ml:6:24)))))
@@ -1496,8 +1499,8 @@ let%expect_test "single-semi-style" =
      (getters (
        (path my_file.ml)
        (content "CR user: Comment may be placed after a non-empty line.")
-       (kind    CR)
-       (due     Now)
+       (kind CR)
+       (qualifier (None))
        (work_on Now))))
     ========================
       CR user: Comment may span multiple
@@ -1514,8 +1517,8 @@ let%expect_test "single-semi-style" =
              (loc (
                (start my_file.ml:8:11)
                (stop  my_file.ml:8:13)))))
-           (due (
-             (txt Now)
+           (qualifier (
+             (txt None)
              (loc (
                (start my_file.ml:8:11)
                (stop  my_file.ml:8:13)))))
@@ -1531,8 +1534,8 @@ let%expect_test "single-semi-style" =
      (getters (
        (path my_file.ml)
        (content "CR user: Comment may span multiple\n         ; lines too.")
-       (kind    CR)
-       (due     Now)
+       (kind CR)
+       (qualifier (None))
        (work_on Now))))
     |}];
   ()
@@ -1562,8 +1565,8 @@ let%expect_test "double-semi-style" =
              (loc (
                (start my_file.ml:1:3)
                (stop  my_file.ml:1:5)))))
-           (due (
-             (txt Now)
+           (qualifier (
+             (txt None)
              (loc (
                (start my_file.ml:1:3)
                (stop  my_file.ml:1:5)))))
@@ -1580,7 +1583,7 @@ let%expect_test "double-semi-style" =
        (path    my_file.ml)
        (content "CR user: This is a comment.")
        (kind    CR)
-       (due     Now)
+       (qualifier (None))
        (work_on Now))))
     ========================
       XCR user: And it can
@@ -1597,8 +1600,8 @@ let%expect_test "double-semi-style" =
              (loc (
                (start my_file.ml:3:3)
                (stop  my_file.ml:3:6)))))
-           (due (
-             (txt Now)
+           (qualifier (
+             (txt None)
              (loc (
                (start my_file.ml:3:3)
                (stop  my_file.ml:3:6)))))
@@ -1614,8 +1617,8 @@ let%expect_test "double-semi-style" =
      (getters (
        (path my_file.ml)
        (content "XCR user: And it can\n;; span multiple lines too.")
-       (kind    XCR)
-       (due     Now)
+       (kind XCR)
+       (qualifier (None))
        (work_on Now))))
     |}];
   ()
@@ -1649,8 +1652,8 @@ let%expect_test "xml-style" =
              (loc (
                (start my_file.ml:1:5)
                (stop  my_file.ml:1:7)))))
-           (due (
-             (txt Now)
+           (qualifier (
+             (txt None)
              (loc (
                (start my_file.ml:1:5)
                (stop  my_file.ml:1:7)))))
@@ -1667,7 +1670,7 @@ let%expect_test "xml-style" =
        (path    my_file.ml)
        (content "CR user: This is a comment.")
        (kind    CR)
-       (due     Now)
+       (qualifier (None))
        (work_on Now))))
     ========================
       XCR user: And it can
@@ -1684,8 +1687,8 @@ let%expect_test "xml-style" =
              (loc (
                (start my_file.ml:3:5)
                (stop  my_file.ml:3:8)))))
-           (due (
-             (txt Now)
+           (qualifier (
+             (txt None)
              (loc (
                (start my_file.ml:3:5)
                (stop  my_file.ml:3:8)))))
@@ -1701,8 +1704,8 @@ let%expect_test "xml-style" =
      (getters (
        (path my_file.ml)
        (content "XCR user: And it can\n     span multiple lines too.")
-       (kind    XCR)
-       (due     Now)
+       (kind XCR)
+       (qualifier (None))
        (work_on Now))))
     ========================
       XCR user: What happens if it is nested?
@@ -1718,8 +1721,8 @@ let%expect_test "xml-style" =
              (loc (
                (start my_file.ml:7:7)
                (stop  my_file.ml:7:10)))))
-           (due (
-             (txt Now)
+           (qualifier (
+             (txt None)
              (loc (
                (start my_file.ml:7:7)
                (stop  my_file.ml:7:10)))))
@@ -1736,7 +1739,7 @@ let%expect_test "xml-style" =
        (path    my_file.ml)
        (content "XCR user: What happens if it is nested?")
        (kind    XCR)
-       (due     Now)
+       (qualifier (None))
        (work_on Now))))
     |}];
   (* Note a comment in [file_parser.ml] says:
@@ -1777,8 +1780,8 @@ let%expect_test "nested-ml-style" =
              (loc (
                (start my_file.ml:3:6)
                (stop  my_file.ml:3:9)))))
-           (due (
-             (txt Now)
+           (qualifier (
+             (txt None)
              (loc (
                (start my_file.ml:3:6)
                (stop  my_file.ml:3:9)))))
@@ -1796,8 +1799,8 @@ let%expect_test "nested-ml-style" =
        (path my_file.ml)
        (content
         "XCR user: CR comment may be nested inside other comment in OCaml.")
-       (kind    XCR)
-       (due     Now)
+       (kind XCR)
+       (qualifier (None))
        (work_on Now))))
     |}];
   test
@@ -1828,8 +1831,8 @@ let%expect_test "nested-ml-style" =
              (loc (
                (start my_file.ml:1:3)
                (stop  my_file.ml:1:5)))))
-           (due (
-             (txt Now)
+           (qualifier (
+             (txt None)
              (loc (
                (start my_file.ml:1:3)
                (stop  my_file.ml:1:5)))))
@@ -1847,8 +1850,8 @@ let%expect_test "nested-ml-style" =
        (path my_file.ml)
        (content
         "CR user: Maybe the original use case is the opposite though.\n\n    That is, a (* comment inside a CR comment. *)\n\n    We'd like to cover this case too.")
-       (kind    CR)
-       (due     Now)
+       (kind CR)
+       (qualifier (None))
        (work_on Now))))
     |}];
   test
@@ -1937,8 +1940,8 @@ let%expect_test "not standard" =
              (loc (
                (start my_file.ml:1:5)
                (stop  my_file.ml:1:7)))))
-           (due (
-             (txt Now)
+           (qualifier (
+             (txt None)
              (loc (
                (start my_file.ml:1:5)
                (stop  my_file.ml:1:7)))))
@@ -1956,8 +1959,8 @@ let%expect_test "not standard" =
        (path my_file.ml)
        (content
         "CR user: This is recognized as a bash comment even though it is in what")
-       (kind    CR)
-       (due     Now)
+       (kind CR)
+       (qualifier (None))
        (work_on Now))))
     |}];
   test
@@ -1980,8 +1983,8 @@ let%expect_test "not standard" =
              (loc (
                (start my_file.ml:1:4)
                (stop  my_file.ml:1:6)))))
-           (due (
-             (txt Now)
+           (qualifier (
+             (txt None)
              (loc (
                (start my_file.ml:1:4)
                (stop  my_file.ml:1:6)))))
@@ -1998,7 +2001,7 @@ let%expect_test "not standard" =
        (path    my_file.ml)
        (content "CR user1: A CR in a odoc comment.")
        (kind    CR)
-       (due     Now)
+       (qualifier (None))
        (work_on Now))))
     |}];
   test "(*\tCR user1: A CR with a tab separator. *)";
@@ -2018,8 +2021,8 @@ let%expect_test "not standard" =
              (loc (
                (start my_file.ml:1:3)
                (stop  my_file.ml:1:5)))))
-           (due (
-             (txt Now)
+           (qualifier (
+             (txt None)
              (loc (
                (start my_file.ml:1:3)
                (stop  my_file.ml:1:5)))))
@@ -2036,7 +2039,7 @@ let%expect_test "not standard" =
        (path    my_file.ml)
        (content "CR user1: A CR with a tab separator.")
        (kind    CR)
-       (due     Now)
+       (qualifier (None))
        (work_on Now))))
     |}];
   test
@@ -2060,8 +2063,8 @@ let%expect_test "not standard" =
              (loc (
                (start my_file.ml:2:5)
                (stop  my_file.ml:2:7)))))
-           (due (
-             (txt Now)
+           (qualifier (
+             (txt None)
              (loc (
                (start my_file.ml:2:5)
                (stop  my_file.ml:2:7)))))
@@ -2077,8 +2080,8 @@ let%expect_test "not standard" =
      (getters (
        (path my_file.ml)
        (content "CR user1: A CR with spaces and newline separators.")
-       (kind    CR)
-       (due     Now)
+       (kind CR)
+       (qualifier (None))
        (work_on Now))))
     |}];
   ()

@@ -91,9 +91,10 @@ module Header : sig
 
   val kind : t -> Kind.t
 
-  (** This returns the syntactic due class if present [CR-soon] or [CR-someday].
-      If there is no due specifier, this returns [Now]. *)
-  val due : t -> Due.t
+  (** This returns the qualifier if present ([Soon] for [CR-soon] or [Someday]
+      for [CR-someday]). If there is no qualifier specified, this returns
+      [None]. *)
+  val qualifier : t -> Qualifier.t
 
   module With_loc : sig
     (** These getters allows you to access the position of each elements of the
@@ -114,13 +115,13 @@ module Header : sig
         or a ['-'] (and thus does not include it). *)
     val kind : t -> Kind.t Loc.Txt.t
 
-    (** When the CR is due [Soon] or [Someday], the location returned starts
-        right after the dash separator (but does not include it), and contains
-        the entire due keyword. For example, the location will include
-        ["soon"] for a [CR-soon]. When the CR is due [Now], there is no
-        keyword to attach a location to : conventionally, we return instead
-        the location of the CR [kind] in this case. *)
-    val due : t -> Due.t Loc.Txt.t
+    (** When the CR is qualified as [Soon] or [Someday], the location returned
+        starts right after the dash separator (but does not include it), and
+        contains the entire due keyword. For example, the location will include
+        ["soon"] for a [CR-soon]. When the CR has no qualifier, there is no
+        keyword to attach a location to : conventionally, we return instead the
+        location of the CR [kind] in this case. *)
+    val qualifier : t -> Qualifier.t Loc.Txt.t
 
     (** {1 Deprecated}
 
@@ -133,6 +134,10 @@ module Header : sig
 
     (** This was renamed [recipient]. Hint: Run [ocamlmig migrate]. *)
     val for_ : t -> Vcs.User_handle.t Loc.Txt.t option
+    [@@migrate { repl = Rel.recipient }]
+
+    (** This was renamed [qualifier]. Hint: Run [ocamlmig migrate]. *)
+    val due : t -> Qualifier.t Loc.Txt.t
     [@@migrate { repl = Rel.recipient }]
   end
 
@@ -169,13 +174,9 @@ val whole_loc : t -> Loc.t
 val header : t -> Header.t Or_error.t
 val kind : t -> Kind.t
 
-(** [due t] is a convenience wrapper to get the [due] property of the CR
-    header. This returns [Now] when parsing the header resulted in an error. *)
-val due : t -> Due.t
-
 (** [work_on t] represents the expectation as to when work on the CR is meant to
-    happen. Is it similar to [due t] except that XCRs are meant to be worked
-    on [Now]. *)
+    happen. It reflects the header's qualifier except that XCRs and invalid CRs
+    are meant to be worked on [Now]. *)
 val work_on : t -> Due.t
 
 (** This digest is computed such that changes in positions in a file, or changes
@@ -225,7 +226,7 @@ module Private : sig
   module Header : sig
     val create
       :  kind:Kind.t Loc.Txt.t
-      -> due:Due.t Loc.Txt.t
+      -> qualifier:Qualifier.t Loc.Txt.t
       -> reporter:Vcs.User_handle.t Loc.Txt.t
       -> recipient:Vcs.User_handle.t Loc.Txt.t option
       -> header
@@ -240,3 +241,8 @@ module Private : sig
     -> content:string
     -> t
 end
+
+(** {1 Deprecated}
+
+    The following is deprecated and will be soon annotated as such with ocaml
+    alerts. Please migrate, and do not use in new code. *)
