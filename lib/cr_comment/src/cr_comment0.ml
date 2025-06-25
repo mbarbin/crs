@@ -63,7 +63,7 @@
    * - Remove support for attributes.
    * - Remove assignee computation (left as external work).
    * - Replace [is_xcr] by a variant type [Kind.t].
-   * - Make [reported_by] mandatory.
+   * - Make [reporter] mandatory.
    * - Refactor [Raw], make [t] a record with a processed part that may fail.
    * - Compute [digest_of_condensed_content] for all CR kinds.
    * - Rename [Processed] to [Header].
@@ -87,7 +87,7 @@ module Header = struct
     type t =
       { kind : Kind.t Loc.Txt.t
       ; due : Due.t Loc.Txt.t
-      ; reported_by : Vcs.User_handle.t Loc.Txt.t
+      ; reporter : Vcs.User_handle.t Loc.Txt.t
       ; for_ : Vcs.User_handle.t Loc.Txt.t option
       }
     [@@deriving equal, sexp_of]
@@ -96,17 +96,23 @@ module Header = struct
   include T
 
   module With_loc = struct
-    let reported_by t = t.reported_by
+    let reporter t = t.reporter
     let for_ t = t.for_
     let kind t = t.kind
     let due t = t.due
+
+    (* Deprecated. *)
+    let reported_by = reporter
   end
 
-  let create ~kind ~due ~reported_by ~for_ = { kind; due; reported_by; for_ }
-  let reported_by t = t.reported_by.txt
+  let create ~kind ~due ~reporter ~for_ = { kind; due; reporter; for_ }
+  let reporter t = t.reporter.txt
   let for_ t = Option.map t.for_ ~f:Loc.Txt.txt
   let kind t = t.kind.txt
   let due t = t.due.txt
+
+  (* Deprecated. *)
+  let reported_by = reporter
 end
 
 module T = struct

@@ -81,8 +81,8 @@ end
 module Header : sig
   type t [@@deriving equal, sexp_of]
 
-  (** [reported_by] is [user] in [CR user...]. *)
-  val reported_by : t -> Vcs.User_handle.t
+  (** [reporter] is [user] in [CR user...]. *)
+  val reporter : t -> Vcs.User_handle.t
 
   (** [for_] is [user2] in [CR user1 for user2: ...]. Assigning CRs to
       particular users is optional. This returns [None] if that part is left
@@ -102,7 +102,7 @@ module Header : sig
 
     (** The location includes the entire reporter username, without the
         surrounding spaces. *)
-    val reported_by : t -> Vcs.User_handle.t Loc.Txt.t
+    val reporter : t -> Vcs.User_handle.t Loc.Txt.t
 
     (** The location includes the entire assignee username, if it is present,
         without the surrounding spaces. In particular, the location does not
@@ -121,7 +121,25 @@ module Header : sig
         keyword to attach a location to : conventionally, we return instead
         the location of the CR [kind] in this case. *)
     val due : t -> Due.t Loc.Txt.t
+
+    (** {1 Deprecated}
+
+        The following is deprecated and will be soon annotated as such with ocaml
+        alerts. Please migrate, and do not use in new code. *)
+
+    (** This was renamed [reporter]. Hint: Run [ocamlmig migrate]. *)
+    val reported_by : t -> Vcs.User_handle.t Loc.Txt.t
+    [@@migrate { repl = Rel.reporter }]
   end
+
+  (** {1 Deprecated}
+
+      The following is deprecated and will be soon annotated as such with ocaml
+      alerts. Please migrate, and do not use in new code. *)
+
+  (** This was renamed [reporter]. Hint: Run [ocamlmig migrate]. *)
+  val reported_by : t -> Vcs.User_handle.t
+  [@@migrate { repl = Rel.reporter }]
 end
 
 (** A [Cr_comment.t] is an immutable value holding the information and metadata
@@ -200,7 +218,7 @@ module Private : sig
     val create
       :  kind:Kind.t Loc.Txt.t
       -> due:Due.t Loc.Txt.t
-      -> reported_by:Vcs.User_handle.t Loc.Txt.t
+      -> reporter:Vcs.User_handle.t Loc.Txt.t
       -> for_:Vcs.User_handle.t Loc.Txt.t option
       -> header
   end

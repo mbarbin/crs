@@ -126,7 +126,7 @@ let%expect_test "multiple spaces CR" =
              (loc (
                (start my_file.ml:1:4)
                (stop  my_file.ml:1:6)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:1:7)
@@ -171,7 +171,7 @@ let%expect_test "empty CR" =
              (loc (
                (start my_file.ml:1:3)
                (stop  my_file.ml:1:5)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:1:6)
@@ -227,7 +227,7 @@ let () = ()
              (loc (
                (start my_file.ml:1:6)
                (stop  my_file.ml:1:10)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:1:11)
@@ -261,7 +261,7 @@ let () = ()
              (loc (
                (start my_file.ml:3:6)
                (stop  my_file.ml:3:13)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:3:14)
@@ -295,7 +295,7 @@ let () = ()
              (loc (
                (start my_file.ml:5:6)
                (stop  my_file.ml:5:10)))))
-           (reported_by (
+           (reporter (
              (txt user1)
              (loc (
                (start my_file.ml:5:11)
@@ -333,7 +333,7 @@ let () = ()
              (loc (
                (start my_file.ml:7:6)
                (stop  my_file.ml:7:13)))))
-           (reported_by (
+           (reporter (
              (txt user1)
              (loc (
                (start my_file.ml:7:14)
@@ -371,7 +371,7 @@ let () = ()
              (loc (
                (start my_file.ml:9:7)
                (stop  my_file.ml:9:11)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:9:12)
@@ -405,7 +405,7 @@ let () = ()
              (loc (
                (start my_file.ml:11:7)
                (stop  my_file.ml:11:14)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:11:15)
@@ -501,7 +501,7 @@ let () = ()
              (loc (
                (start my_file.ml:7:6)
                (stop  my_file.ml:7:12)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:7:13)
@@ -550,7 +550,7 @@ let () = ()
              (loc (
                (start my_file.ml:1:3)
                (stop  my_file.ml:1:5)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:1:6)
@@ -584,7 +584,7 @@ let () = ()
              (loc (
                (start my_file.ml:1:41)
                (stop  my_file.ml:1:43)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:1:44)
@@ -654,9 +654,9 @@ end
        (whole_loc _)
        (header (
          Ok (
-           (kind        CR)
-           (due         Now)
-           (reported_by user1)
+           (kind     CR)
+           (due      Now)
+           (reporter user1)
            (for_ ()))))
        (comment_prefix "(*")
        (digest_of_condensed_content 03997213173fb186a59985ae32f89cfd)
@@ -896,7 +896,7 @@ span multiple lines too.
              (loc (
                (start my_file.ml:1:3)
                (stop  my_file.ml:1:5)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:1:6)
@@ -931,7 +931,7 @@ span multiple lines too.
              (loc (
                (start my_file.ml:3:3)
                (stop  my_file.ml:3:6)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:3:7)
@@ -975,7 +975,7 @@ span multiple lines too.
              (loc (
                (start my_file.ml:1:3)
                (stop  my_file.ml:1:5)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:1:6)
@@ -1010,7 +1010,7 @@ span multiple lines too.
              (loc (
                (start my_file.ml:3:3)
                (stop  my_file.ml:3:6)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:3:7)
@@ -1065,7 +1065,7 @@ let%expect_test "single-hash-style" =
              (loc (
                (start my_file.ml:1:2)
                (stop  my_file.ml:1:4)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:1:5)
@@ -1100,7 +1100,7 @@ let%expect_test "single-hash-style" =
              (loc (
                (start my_file.ml:3:2)
                (stop  my_file.ml:3:5)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:3:6)
@@ -1148,7 +1148,7 @@ let%expect_test "double-hash-style" =
              (loc (
                (start my_file.ml:1:3)
                (stop  my_file.ml:1:5)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:1:6)
@@ -1183,7 +1183,7 @@ let%expect_test "double-hash-style" =
              (loc (
                (start my_file.ml:3:3)
                (stop  my_file.ml:3:6)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:3:7)
@@ -1226,7 +1226,7 @@ Hello ## $CR user: By the way, multiple hash is supported. The location for the 
              (loc (
                (start my_file.ml:1:9)
                (stop  my_file.ml:1:11)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:1:12)
@@ -1293,7 +1293,7 @@ Hello text -- $CR user: Comment may be left next to a non-empty line.
              (loc (
                (start my_file.ml:1:3)
                (stop  my_file.ml:1:5)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:1:6)
@@ -1328,7 +1328,7 @@ Hello text -- $CR user: Comment may be left next to a non-empty line.
              (loc (
                (start my_file.ml:3:3)
                (stop  my_file.ml:3:6)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:3:7)
@@ -1362,7 +1362,7 @@ Hello text -- $CR user: Comment may be left next to a non-empty line.
              (loc (
                (start my_file.ml:6:14)
                (stop  my_file.ml:6:16)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:6:17)
@@ -1415,7 +1415,7 @@ let%expect_test "single-semi-style" =
              (loc (
                (start my_file.ml:1:2)
                (stop  my_file.ml:1:4)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:1:5)
@@ -1450,7 +1450,7 @@ let%expect_test "single-semi-style" =
              (loc (
                (start my_file.ml:3:2)
                (stop  my_file.ml:3:5)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:3:6)
@@ -1484,7 +1484,7 @@ let%expect_test "single-semi-style" =
              (loc (
                (start my_file.ml:6:22)
                (stop  my_file.ml:6:24)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:6:25)
@@ -1519,7 +1519,7 @@ let%expect_test "single-semi-style" =
              (loc (
                (start my_file.ml:8:11)
                (stop  my_file.ml:8:13)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:8:14)
@@ -1567,7 +1567,7 @@ let%expect_test "double-semi-style" =
              (loc (
                (start my_file.ml:1:3)
                (stop  my_file.ml:1:5)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:1:6)
@@ -1602,7 +1602,7 @@ let%expect_test "double-semi-style" =
              (loc (
                (start my_file.ml:3:3)
                (stop  my_file.ml:3:6)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:3:7)
@@ -1654,7 +1654,7 @@ let%expect_test "xml-style" =
              (loc (
                (start my_file.ml:1:5)
                (stop  my_file.ml:1:7)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:1:8)
@@ -1689,7 +1689,7 @@ let%expect_test "xml-style" =
              (loc (
                (start my_file.ml:3:5)
                (stop  my_file.ml:3:8)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:3:9)
@@ -1723,7 +1723,7 @@ let%expect_test "xml-style" =
              (loc (
                (start my_file.ml:7:7)
                (stop  my_file.ml:7:10)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:7:11)
@@ -1782,7 +1782,7 @@ let%expect_test "nested-ml-style" =
              (loc (
                (start my_file.ml:3:6)
                (stop  my_file.ml:3:9)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:3:10)
@@ -1833,7 +1833,7 @@ let%expect_test "nested-ml-style" =
              (loc (
                (start my_file.ml:1:3)
                (stop  my_file.ml:1:5)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:1:6)
@@ -1942,7 +1942,7 @@ let%expect_test "not standard" =
              (loc (
                (start my_file.ml:1:5)
                (stop  my_file.ml:1:7)))))
-           (reported_by (
+           (reporter (
              (txt user)
              (loc (
                (start my_file.ml:1:8)
@@ -1985,7 +1985,7 @@ let%expect_test "not standard" =
              (loc (
                (start my_file.ml:1:4)
                (stop  my_file.ml:1:6)))))
-           (reported_by (
+           (reporter (
              (txt user1)
              (loc (
                (start my_file.ml:1:7)
@@ -2023,7 +2023,7 @@ let%expect_test "not standard" =
              (loc (
                (start my_file.ml:1:3)
                (stop  my_file.ml:1:5)))))
-           (reported_by (
+           (reporter (
              (txt user1)
              (loc (
                (start my_file.ml:1:6)
@@ -2065,7 +2065,7 @@ let%expect_test "not standard" =
              (loc (
                (start my_file.ml:2:5)
                (stop  my_file.ml:2:7)))))
-           (reported_by (
+           (reporter (
              (txt user1)
              (loc (
                (start my_file.ml:2:8)

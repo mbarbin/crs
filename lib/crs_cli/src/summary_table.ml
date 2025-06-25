@@ -156,7 +156,7 @@ module Key = struct
   [@@deriving compare]
 
   let of_header (h : Cr_comment.Header.t) =
-    { reporter = Cr_comment.Header.reported_by h; for_ = Cr_comment.Header.for_ h }
+    { reporter = Cr_comment.Header.reporter h; for_ = Cr_comment.Header.for_ h }
   ;;
 end
 

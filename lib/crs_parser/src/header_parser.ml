@@ -49,7 +49,7 @@
    * - Remove support for attributes.
    * - Remove assignee computation (left as external work).
    * - Replace [is_xcr] by a variant type [Kind.t].
-   * - Make [reported_by] mandatory.
+   * - Make [reporter] mandatory.
    * - Rename [Processed] to [Header].
    * - Remove support for 'v' separator in CR comment
    * - Include the leading '-' char in due's [Loc.t].
@@ -78,7 +78,7 @@ let comment_regex =
                        (alt [ repn digit 6 (Some 6); str "soon"; str "someday" ])
                    ])
             ; rep1 whitespace
-            ; group ~name:"reported_by" (rep1 word_t)
+            ; group ~name:"reporter" (rep1 word_t)
             ; opt
                 (seq
                    [ rep1 whitespace
@@ -125,10 +125,10 @@ let parse ~file_cache ~content_start_offset ~content =
         in
         Some (v, loc)
     in
-    let reported_by =
-      match get "reported_by" with
+    let reporter =
+      match get "reporter" with
       | None -> assert false (* Mandatory in the [comment_regexp]. *)
-      | Some (reported_by, loc) -> { Loc.Txt.txt = Vcs.User_handle.v reported_by; loc }
+      | Some (reporter, loc) -> { Loc.Txt.txt = Vcs.User_handle.v reporter; loc }
     in
     let kind =
       match get "cr_kind" with
@@ -155,7 +155,7 @@ let parse ~file_cache ~content_start_offset ~content =
         (* dated CR -> CR-someday *)
         { Loc.Txt.txt = Cr_comment.Due.Someday; loc }
     in
-    Or_error.return (Cr_comment.Private.Header.create ~kind ~due ~reported_by ~for_)
+    Or_error.return (Cr_comment.Private.Header.create ~kind ~due ~reporter ~for_)
   with
   | exn ->
     Or_error.error
