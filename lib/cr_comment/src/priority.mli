@@ -19,23 +19,27 @@
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
 
-(** The [Due.t] type represents an optional urgency or priority class that can
-    be attached to a code review comment (CR) using the CR syntax. This
-    classification is a general convenience provided by the library to help
-    organize and filter CRs, but the exact workflow and expectations
-    associated with each class — such as when a [Soon] or [Someday] comment
-    should be addressed — are intentionally left undefined here.
+(** The [Priority.t] type represents a priority classification that can be
+    associated with a code review comment (CR). Assignment of a priority is
+    not always direct; rather, it is typically computed as a function of other
+    elements such as the CR's kind, review context, and qualifier.
 
-    It is up to higher-level tools or code review systems built on top of CRs
-    to define and enforce specific policies or behaviors around these classes.
+    This classification is intended as a general convenience to help organize
+    and filter CRs by indicating the reviewers's intent or suggested importance,
+    but it does not prescribe a specific workflow or deadline.
 
-    As a rule of thumb:
-    - [Now]: Should be addressed promptly.
+    The meaning and enforcement of each priority class — such as when a [Soon]
+    or [Someday] comment should be addressed — are intentionally left undefined
+    at this level. Higher-level tools or code review systems built on top of CRs
+    may define their own policies or behaviors around these categories.
+
+    Typical interpretations:
+    - [Now]: Should be addressed promptly (while working on a PR for example).
     - [Soon]: Should be addressed in the near future.
     - [Someday]: Can be deferred until later.
 
-    These categories are intended to be flexible and adaptable to the needs of
-    various development process. *)
+    These categories are intentionally flexible and meant to support a variety of
+    development processes and team conventions. *)
 type t =
   | Now
   | Soon

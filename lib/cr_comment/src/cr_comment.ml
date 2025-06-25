@@ -19,8 +19,8 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-module Due = Due
 module Kind = Kind
 module Filter = Filter
+module Priority = Priority
 module Qualifier = Qualifier
 include Cr_comment0

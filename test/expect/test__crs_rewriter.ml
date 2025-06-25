@@ -275,7 +275,7 @@ let () = ()
   ()
 ;;
 
-let%expect_test "change due now to soon" =
+let%expect_test "change priority now to soon" =
   let file_contents =
     {|
 let () =
@@ -343,7 +343,7 @@ let () =
   ()
 ;;
 
-let%expect_test "change due soon to someday" =
+let%expect_test "change priority soon to someday" =
   let file_contents =
     {|
 let () =

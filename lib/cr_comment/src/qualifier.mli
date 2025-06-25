@@ -42,5 +42,6 @@ type t =
   | Someday
 [@@deriving compare, equal, enumerate, sexp_of]
 
-(** This returns the planned time to work on the CR according to the qualifier. *)
-val due : t -> Due.t
+(** This returns the priority according to the qualifier, if we were to take
+    nothing else into account. *)
+val priority : t -> Priority.t

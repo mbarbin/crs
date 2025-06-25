@@ -27,7 +27,7 @@ module Getters = struct
     ; content : string
     ; kind : Cr_comment.Kind.t
     ; qualifier : Cr_comment.Qualifier.t option
-    ; work_on : Cr_comment.Due.t
+    ; priority : Cr_comment.Priority.t
     }
   [@@deriving sexp_of]
 
@@ -39,7 +39,7 @@ module Getters = struct
         (match Cr_comment.header cr with
          | Error _ -> None
          | Ok h -> Some (Cr_comment.Header.qualifier h))
-    ; work_on = Cr_comment.work_on cr
+    ; priority = Cr_comment.priority cr
     }
   ;;
 end
@@ -96,7 +96,7 @@ let%expect_test "invalid syntax CR" =
        (content CR)
        (kind    CR)
        (qualifier ())
-       (work_on Now))))
+       (priority Now))))
     |}];
   ()
 ;;
@@ -143,7 +143,7 @@ let%expect_test "multiple spaces CR" =
        (content "CR user: Blah.")
        (kind    CR)
        (qualifier (None))
-       (work_on Now))))
+       (priority Now))))
     |}];
   ()
 ;;
@@ -188,7 +188,7 @@ let%expect_test "empty CR" =
        (content "CR user:")
        (kind    CR)
        (qualifier (None))
-       (work_on Now))))
+       (priority Now))))
     |}];
   ()
 ;;
@@ -244,7 +244,7 @@ let () = ()
        (content "CR-soon user: Some text")
        (kind    CR)
        (qualifier (Soon))
-       (work_on Soon))))
+       (priority Soon))))
     ========================
       CR-someday user: Some text
     ((raw (
@@ -278,7 +278,7 @@ let () = ()
        (content "CR-someday user: Some text")
        (kind    CR)
        (qualifier (Someday))
-       (work_on Someday))))
+       (priority Someday))))
     ========================
       CR-soon user1 for user2: Some text
     ((raw (
@@ -316,7 +316,7 @@ let () = ()
        (content "CR-soon user1 for user2: Some text")
        (kind    CR)
        (qualifier (Soon))
-       (work_on Soon))))
+       (priority Soon))))
     ========================
       CR-someday user1 for user2: Some text
     ((raw (
@@ -354,7 +354,7 @@ let () = ()
        (content "CR-someday user1 for user2: Some text")
        (kind    CR)
        (qualifier (Someday))
-       (work_on Someday))))
+       (priority Someday))))
     ========================
       XCR-soon user: Some text
     ((raw (
@@ -388,7 +388,7 @@ let () = ()
        (content "XCR-soon user: Some text")
        (kind    XCR)
        (qualifier (Soon))
-       (work_on Now))))
+       (priority Now))))
     ========================
       XCR-someday user: Some text
     ((raw (
@@ -422,7 +422,7 @@ let () = ()
        (content "XCR-someday user: Some text")
        (kind    XCR)
        (qualifier (Someday))
-       (work_on Now))))
+       (priority Now))))
     |}];
   ()
 ;;
@@ -466,7 +466,7 @@ let () = ()
         "CR-2026-01-31 user: This CR has a due date, by not correctly specified.")
        (kind CR)
        (qualifier ())
-       (work_on Now))))
+       (priority Now))))
     ========================
       CR-20260131 user: This is not it either..
     ((raw (
@@ -484,7 +484,7 @@ let () = ()
        (content "CR-20260131 user: This is not it either..")
        (kind    CR)
        (qualifier ())
-       (work_on Now))))
+       (priority Now))))
     ========================
       CR-202601 user: You would presumably only include the year and month.
     ((raw (
@@ -520,7 +520,7 @@ let () = ()
         "CR-202601 user: You would presumably only include the year and month.")
        (kind CR)
        (qualifier (Someday))
-       (work_on Someday))))
+       (priority Someday))))
     |}];
   ()
 ;;
@@ -567,7 +567,7 @@ let () = ()
        (content "CR user: A first CR")
        (kind    CR)
        (qualifier (None))
-       (work_on Now))))
+       (priority Now))))
     ========================
       CR user: Followed by another.
     ((raw (
@@ -601,7 +601,7 @@ let () = ()
        (content "CR user: Followed by another.")
        (kind    CR)
        (qualifier (None))
-       (work_on Now))))
+       (priority Now))))
     |}];
   ()
 ;;
@@ -913,7 +913,7 @@ span multiple lines too.
        (content "CR user: This is a comment.")
        (kind    CR)
        (qualifier (None))
-       (work_on Now))))
+       (priority Now))))
     ========================
       XCR user: And it can
       span multiple lines too.
@@ -948,7 +948,7 @@ span multiple lines too.
        (content "XCR user: And it can\nspan multiple lines too.")
        (kind XCR)
        (qualifier (None))
-       (work_on Now))))
+       (priority Now))))
     |}];
   test
     {|
@@ -992,7 +992,7 @@ span multiple lines too.
        (content "CR user: This is a single line comment.")
        (kind    CR)
        (qualifier (None))
-       (work_on Now))))
+       (priority Now))))
     ========================
       XCR user: This syntax can be used to write
       comments that span multiple lines too.
@@ -1029,7 +1029,7 @@ span multiple lines too.
         "XCR user: This syntax can be used to write\n// comments that span multiple lines too.")
        (kind XCR)
        (qualifier (None))
-       (work_on Now))))
+       (priority Now))))
     |}];
   test
     {|
@@ -1082,7 +1082,7 @@ let%expect_test "single-hash-style" =
        (content "CR user: This is a comment.")
        (kind    CR)
        (qualifier (None))
-       (work_on Now))))
+       (priority Now))))
     ========================
       XCR user: And it can
       span multiple lines too.
@@ -1117,7 +1117,7 @@ let%expect_test "single-hash-style" =
        (content "XCR user: And it can\n# span multiple lines too.")
        (kind XCR)
        (qualifier (None))
-       (work_on Now))))
+       (priority Now))))
     |}];
   ()
 ;;
@@ -1165,7 +1165,7 @@ let%expect_test "double-hash-style" =
        (content "CR user: This is a comment.")
        (kind    CR)
        (qualifier (None))
-       (work_on Now))))
+       (priority Now))))
     ========================
       XCR user: And it can
       span multiple lines too.
@@ -1200,7 +1200,7 @@ let%expect_test "double-hash-style" =
        (content "XCR user: And it can\n## span multiple lines too.")
        (kind XCR)
        (qualifier (None))
-       (work_on Now))))
+       (priority Now))))
     |}];
   test
     {|
@@ -1245,7 +1245,7 @@ Hello ## $CR user: By the way, multiple hash is supported. The location for the 
         "CR user: By the way, multiple hash is supported. The location for the entire\n      ## comment starts at the left-most hash character.")
        (kind CR)
        (qualifier (None))
-       (work_on Now))))
+       (priority Now))))
     |}];
   ()
 ;;
@@ -1310,7 +1310,7 @@ Hello text -- $CR user: Comment may be left next to a non-empty line.
        (content "CR user: This is a comment.")
        (kind    CR)
        (qualifier (None))
-       (work_on Now))))
+       (priority Now))))
     ========================
       XCR user: And it can
       span multiple lines too.
@@ -1345,7 +1345,7 @@ Hello text -- $CR user: Comment may be left next to a non-empty line.
        (content "XCR user: And it can\n-- span multiple lines too.")
        (kind XCR)
        (qualifier (None))
-       (work_on Now))))
+       (priority Now))))
     ========================
       CR user: Comment may be left next to a non-empty line.
     ((raw (
@@ -1379,7 +1379,7 @@ Hello text -- $CR user: Comment may be left next to a non-empty line.
        (content "CR user: Comment may be left next to a non-empty line.")
        (kind CR)
        (qualifier (None))
-       (work_on Now))))
+       (priority Now))))
     |}];
   ()
 ;;
@@ -1432,7 +1432,7 @@ let%expect_test "single-semi-style" =
        (content "CR user: This is a comment.")
        (kind    CR)
        (qualifier (None))
-       (work_on Now))))
+       (priority Now))))
     ========================
       XCR user: And it can
       span multiple lines too.
@@ -1467,7 +1467,7 @@ let%expect_test "single-semi-style" =
        (content "XCR user: And it can\n; span multiple lines too.")
        (kind XCR)
        (qualifier (None))
-       (work_on Now))))
+       (priority Now))))
     ========================
       CR user: Comment may be placed after a non-empty line.
     ((raw (
@@ -1501,7 +1501,7 @@ let%expect_test "single-semi-style" =
        (content "CR user: Comment may be placed after a non-empty line.")
        (kind CR)
        (qualifier (None))
-       (work_on Now))))
+       (priority Now))))
     ========================
       CR user: Comment may span multiple
       lines too.
@@ -1536,7 +1536,7 @@ let%expect_test "single-semi-style" =
        (content "CR user: Comment may span multiple\n         ; lines too.")
        (kind CR)
        (qualifier (None))
-       (work_on Now))))
+       (priority Now))))
     |}];
   ()
 ;;
@@ -1584,7 +1584,7 @@ let%expect_test "double-semi-style" =
        (content "CR user: This is a comment.")
        (kind    CR)
        (qualifier (None))
-       (work_on Now))))
+       (priority Now))))
     ========================
       XCR user: And it can
       span multiple lines too.
@@ -1619,7 +1619,7 @@ let%expect_test "double-semi-style" =
        (content "XCR user: And it can\n;; span multiple lines too.")
        (kind XCR)
        (qualifier (None))
-       (work_on Now))))
+       (priority Now))))
     |}];
   ()
 ;;
@@ -1671,7 +1671,7 @@ let%expect_test "xml-style" =
        (content "CR user: This is a comment.")
        (kind    CR)
        (qualifier (None))
-       (work_on Now))))
+       (priority Now))))
     ========================
       XCR user: And it can
       span multiple lines too.
@@ -1706,7 +1706,7 @@ let%expect_test "xml-style" =
        (content "XCR user: And it can\n     span multiple lines too.")
        (kind XCR)
        (qualifier (None))
-       (work_on Now))))
+       (priority Now))))
     ========================
       XCR user: What happens if it is nested?
     ((raw (
@@ -1740,7 +1740,7 @@ let%expect_test "xml-style" =
        (content "XCR user: What happens if it is nested?")
        (kind    XCR)
        (qualifier (None))
-       (work_on Now))))
+       (priority Now))))
     |}];
   (* Note a comment in [file_parser.ml] says:
 
@@ -1801,7 +1801,7 @@ let%expect_test "nested-ml-style" =
         "XCR user: CR comment may be nested inside other comment in OCaml.")
        (kind XCR)
        (qualifier (None))
-       (work_on Now))))
+       (priority Now))))
     |}];
   test
     {|
@@ -1852,7 +1852,7 @@ let%expect_test "nested-ml-style" =
         "CR user: Maybe the original use case is the opposite though.\n\n    That is, a (* comment inside a CR comment. *)\n\n    We'd like to cover this case too.")
        (kind CR)
        (qualifier (None))
-       (work_on Now))))
+       (priority Now))))
     |}];
   test
     {|
@@ -1961,7 +1961,7 @@ let%expect_test "not standard" =
         "CR user: This is recognized as a bash comment even though it is in what")
        (kind CR)
        (qualifier (None))
-       (work_on Now))))
+       (priority Now))))
     |}];
   test
     {|
@@ -2002,7 +2002,7 @@ let%expect_test "not standard" =
        (content "CR user1: A CR in a odoc comment.")
        (kind    CR)
        (qualifier (None))
-       (work_on Now))))
+       (priority Now))))
     |}];
   test "(*\tCR user1: A CR with a tab separator. *)";
   [%expect
@@ -2040,7 +2040,7 @@ let%expect_test "not standard" =
        (content "CR user1: A CR with a tab separator.")
        (kind    CR)
        (qualifier (None))
-       (work_on Now))))
+       (priority Now))))
     |}];
   test
     {|
@@ -2082,7 +2082,7 @@ let%expect_test "not standard" =
        (content "CR user1: A CR with spaces and newline separators.")
        (kind CR)
        (qualifier (None))
-       (work_on Now))))
+       (priority Now))))
     |}];
   ()
 ;;

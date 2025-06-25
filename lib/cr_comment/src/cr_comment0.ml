@@ -228,13 +228,13 @@ let kind t =
   | Ok p -> Header.kind p
 ;;
 
-let work_on t : Due.t =
+let priority t : Priority.t =
   match t.header with
   | Error _ -> Now
   | Ok p ->
     (match Header.kind p with
      | XCR -> Now
-     | CR -> Header.qualifier p |> Qualifier.due)
+     | CR -> Header.qualifier p |> Qualifier.priority)
 ;;
 
 let to_string t =
@@ -262,3 +262,7 @@ module Private = struct
 
   let create = create
 end
+
+(* Deprecated *)
+
+let work_on = priority

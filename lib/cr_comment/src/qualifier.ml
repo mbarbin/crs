@@ -25,7 +25,7 @@ type t =
   | Someday
 [@@deriving compare, equal, enumerate, sexp_of]
 
-let due : t -> Due.t = function
+let priority : t -> Priority.t = function
   | None -> Now
   | Soon -> Soon
   | Someday -> Someday
