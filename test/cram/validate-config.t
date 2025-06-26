@@ -55,25 +55,26 @@ Unknown field.
   > { unknown_field: "Hello" }
   > EOF
 
-  $ crs tools config validate crs-config.json
+  $ crs tools config validate crs-config.json >out 2>&1
+  [123]
+  $ cat out | sed 's/[a-zA-Z0-9._\/-]*config\.ml/<PATH>\/config.ml/g'
   File "crs-config.json", line 1, characters 0-0:
   Error: Invalid config.
   In: {"unknown_field":"Hello"}
   (Failure
-   "lib/crs_cli/src/config.ml.t_of_yojson: extra fields: unknown_field")
-  [123]
+   "<PATH>/config.ml.t_of_yojson: extra fields: unknown_field")
 
 Invalid value.
 
   $ cat > crs-config.json <<EOF
-  > { invalid_crs_annotation_severity: [ "Unknown" ]
-  > }
+  > { invalid_crs_annotation_severity: [ "Unknown" ] }
   > EOF
 
-  $ crs tools config validate crs-config.json
+  $ crs tools config validate crs-config.json >out 2>&1
+  [123]
+  $ cat out | sed 's/[a-zA-Z0-9._\/-]*config\.ml/<PATH>\/config.ml/g'
   File "crs-config.json", line 1, characters 0-0:
   Error: Invalid config.
   In: ["Unknown"]
   (Failure
-   "lib/crs_cli/src/config.ml.Annotation_severity.t_of_yojson: unexpected variant constructor")
-  [123]
+   "<PATH>/config.ml.Annotation_severity.t_of_yojson: unexpected variant constructor")
