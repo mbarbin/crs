@@ -28,6 +28,10 @@
    (and
     (>= 5.2)
     (< 5.4~)))
+  (ocamlformat
+   (and
+    :with-test
+    (= 0.27.0)))
   (base
    (>= v0.17))
   (cmdlang
@@ -40,8 +44,16 @@
    (>= 0.3.1))
   (loc
    (>= 0.2.2))
+  (ocaml-protoc
+   (and
+    :with-test
+    (>= 3.1)))
   (pageantty
    (>= 0.0.2))
+  (pbrt
+   (>= 3.1))
+  (pbrt_yojson
+   (>= 3.1))
   (pp
    (>= 2.0.0))
   (pplumbing
@@ -57,6 +69,8 @@
   (ppx_sexp_conv
    (>= v0.17))
   (ppx_sexp_value
+   (>= v0.17))
+  (ppx_yojson_conv
    (>= v0.17))
   (ppxlib
    (>= 0.33))
@@ -77,7 +91,11 @@
   (volgo-git-unix
    (>= 0.0.18))
   (volgo-hg-unix
-   (>= 0.0.18))))
+   (>= 0.0.18))
+  (yojson
+   (>= 2.1.1))
+  (yojson-five
+   (>= 2.1.1))))
 
 (package
  (name crs-tests)
@@ -93,6 +111,8 @@
    (>= v0.17))
   (cmdlang
    (>= 0.0.9))
+  (cmdlang-stdlib-runner
+   (>= 0.0.9))
   conf-git
   conf-hg
   (crs
@@ -107,10 +127,16 @@
    (>= 0.3.1))
   (loc
    (>= 0.2.2))
+  (ocaml-protoc
+   (>= 3.1))
   (pageantty
    (>= 0.0.2))
   (patdiff
    (>= v0.17))
+  (pbrt
+   (>= 3.1))
+  (pbrt_yojson
+   (>= 3.1))
   (pp
    (>= 2.0.0))
   (pplumbing
@@ -153,6 +179,8 @@
    (>= 0.0.18))
   (volgo-vcs
    (>= 0.0.18))
+  (yojson
+   (>= 2.1.1))
   (sherlodoc
    (and
     :with-doc
@@ -196,10 +224,16 @@
    (>= 0.2.2))
   (mdx
    (>= 2.4))
+  (ocaml-protoc
+   (>= 3.1))
   (pageantty
    (>= 0.0.2))
   (patdiff
    (>= v0.17))
+  (pbrt
+   (>= 3.1))
+  (pbrt_yojson
+   (>= 3.1))
   (pp
    (>= 2.0.0))
   (pplumbing

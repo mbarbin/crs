@@ -13,6 +13,7 @@ depends: [
   "ocamlformat" {with-dev-setup & = "0.27.0"}
   "base" {>= "v0.17"}
   "cmdlang" {>= "0.0.9"}
+  "cmdlang-stdlib-runner" {>= "0.0.9"}
   "conf-git"
   "conf-hg"
   "crs" {= version}
@@ -21,8 +22,11 @@ depends: [
   "fpath" {>= "0.7.3"}
   "fpath-base" {>= "0.3.1"}
   "loc" {>= "0.2.2"}
+  "ocaml-protoc" {>= "3.1"}
   "pageantty" {>= "0.0.2"}
   "patdiff" {>= "v0.17"}
+  "pbrt" {>= "3.1"}
+  "pbrt_yojson" {>= "3.1"}
   "pp" {>= "2.0.0"}
   "pplumbing" {>= "0.0.14"}
   "ppx_compare" {>= "v0.17"}
@@ -43,6 +47,7 @@ depends: [
   "volgo-git-unix" {>= "0.0.18"}
   "volgo-hg-unix" {>= "0.0.18"}
   "volgo-vcs" {>= "0.0.18"}
+  "yojson" {>= "2.1.1"}
   "sherlodoc" {with-doc & >= "0.2"}
   "odoc" {with-doc}
 ]
