@@ -2,6 +2,7 @@
 
 ### Added
 
+- Add support for CRs annotations and reviewdog diagnostics (#40, @mbarbin).
 - Add key binding 'r' in emacs crs-grep-mode to refresh from repo-root (#34, @mbarbin).
 - Show running directory and filters in emacs CRs messages (#34, @mbarbin).
 
