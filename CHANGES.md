@@ -7,6 +7,9 @@
 
 ### Changed
 
+- `Cr_comment.reindented_content` now takes an optional prefix which default to none (#39, @mbarbin).
+- A few breaking renaming changes in the terminology (#38, @mbarbin).
+
 ### Fixed
 
 - Remove comment prefix from lines of reindented content (#35, @mbarbin).
