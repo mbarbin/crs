@@ -10,7 +10,7 @@ bug-reports: "https://github.com/mbarbin/crs/issues"
 depends: [
   "dune" {>= "3.17"}
   "ocaml" {>= "5.2"}
-  "ocamlformat" {with-dev-setup & = "0.27.0"}
+  "ocamlformat" {= "0.27.0"}
   "base" {>= "v0.17"}
   "cmdlang" {>= "0.0.9"}
   "cmdlang-stdlib-runner" {>= "0.0.9"}

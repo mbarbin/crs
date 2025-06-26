@@ -104,9 +104,7 @@
   (ocaml
    (>= 5.2))
   (ocamlformat
-   (and
-    :with-dev-setup
-    (= 0.27.0)))
+   (= 0.27.0))
   (base
    (>= v0.17))
   (cmdlang
