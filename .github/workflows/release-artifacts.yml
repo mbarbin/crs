@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   build-and-upload:
-    name: Build and upload crs binary
+    name: Build and Upload Release Artifacts
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -33,7 +33,7 @@ jobs:
             echo "TAG_NAME=${{ github.ref_name }}" >> $GITHUB_ENV
           fi
 
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v4
         with:
           ref: ${{ env.TAG_NAME }}
@@ -46,14 +46,14 @@ jobs:
             default: https://github.com/ocaml/opam-repository.git
             mbarbin: https://github.com/mbarbin/opam-repository.git
 
-      - name: Build artifacts
+      - name: Build Artifacts
         run: |
           mkdir -p "$OPAM_DESTDIR"
           opam install ./crs.opam --destdir="$OPAM_DESTDIR"
         env:
           OPAMYES: "true"
 
-      - name: Copy crs binary
+      - name: Prepare Artifacts
         run: |
           os=$(echo "${{ runner.os }}" | tr '[:upper:]' '[:lower:]')
           arch=$(uname -m)
@@ -61,12 +61,12 @@ jobs:
           cp "$OPAM_DESTDIR/bin/crs" $bin_name
           echo "BIN_NAME=$bin_name" >> $GITHUB_ENV
 
-      - name: Generate artifact attestation
+      - name: Attest Build Provenance
         uses: actions/attest-build-provenance@v2
         with:
           subject-path: "${{ env.BIN_NAME }}"
 
-      - name: Upload release artifacts
+      - name: Upload Release Artifacts
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG_NAME }}
