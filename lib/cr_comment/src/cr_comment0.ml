@@ -165,7 +165,8 @@ end = struct
   ;;
 end
 
-let reindented_content t =
+let reindented_content ?(new_line_prefix = "") t =
+  let rstrip_prefix = String.rstrip new_line_prefix in
   let expect_comment_prefixed_lines =
     match t.comment_prefix with
     | "--" | ";" | ";;" | "//" | "#" | "##" -> true
@@ -195,7 +196,7 @@ let reindented_content t =
     List.map lines ~f:(fun line ->
       let line = String.rstrip line in
       if String.is_empty line
-      then ""
+      then rstrip_prefix
       else (
         let line =
           match String.chop_prefix line ~prefix:indent with
@@ -215,7 +216,7 @@ let reindented_content t =
              | None -> line
              | Some s -> s)
         in
-        "  " ^ line))
+        new_line_prefix ^ line))
   in
   String.concat lines ~sep:"\n"
 ;;
@@ -238,7 +239,9 @@ let priority t : Priority.t =
 ;;
 
 let to_string t =
-  String.concat ~sep:"\n" [ Loc.to_string t.whole_loc; reindented_content t; "" ]
+  String.concat
+    ~sep:"\n"
+    [ Loc.to_string t.whole_loc; reindented_content t ~new_line_prefix:"  "; "" ]
 ;;
 
 let output_one ~include_delim cr ~oc =
