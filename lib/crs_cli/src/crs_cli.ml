@@ -40,12 +40,31 @@ For more information, use the $(b,--help) flag on a subcommand.
     ; ( "tools"
       , Command.group
           ~summary:"Useful utils to integrate with other tools."
-          [ "emacs-grep", Cmd__tools__emacs_grep.main
+          [ ( "config"
+            , Command.group
+                ~summary:"Utils related to config files"
+                [ "validate", Cmd__tools__config__validate.main ] )
+          ; "emacs-grep", Cmd__tools__emacs_grep.main
           ; "enclosing-repo-info", Cmd__tools__enclosing_repo_info.main
+          ; ( "github"
+            , Command.group
+                ~summary:"Utils related to GitHub"
+                [ "annotate-crs", Cmd__tools__github__annotate_crs.main ] )
+          ; ( "reviewdog"
+            , Command.group
+                ~summary:"Utils related to Reviewdog"
+                [ "annotate-crs", Cmd__tools__reviewdog__annotate_crs.main ] )
           ] )
     ]
 ;;
 
 module Private = struct
   let grep_cmd = Cmd__grep.main
+
+  module Annotation = Annotation
+  module Assignee = Assignee
+  module Config = Config
+  module Github_annotation = Github_annotation
+  module Review_mode = Review_mode
+  module Reviewdog_utils = Reviewdog_utils
 end

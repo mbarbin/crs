@@ -32,11 +32,14 @@
   pplumbing.pp-tty
   printbox
   printbox-text
+  reviewdog_rdf
   stdio
   unix
   volgo-base
   volgo-git-unix
-  volgo-hg-unix)
+  volgo-hg-unix
+  yojson
+  yojson-five)
  (instrumentation
   (backend bisect_ppx))
  (lint
@@ -49,4 +52,5 @@
    ppx_hash
    ppx_here
    ppx_sexp_conv
-   ppx_sexp_value)))
+   ppx_sexp_value
+   ppx_yojson_conv)))

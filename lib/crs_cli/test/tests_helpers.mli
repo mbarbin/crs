@@ -19,21 +19,18 @@
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
 
-val main : unit Command.t
+(** In the tests we want to avoid test CRs to be mistaken for actual CRs, thus
+    we perform some dynamic string substitutions. Test CRs are prefixed by the
+    '$' symbol. For example:
 
-(** {1 Private}
+    {[
+      (* $CR user1 for user2: This is a test CR. *)
+    ]}
 
-    This module is exported to be used by tests and libraries with strong ties
-    to [crs]. Its signature may change in breaking ways at any time without
-    prior notice, and outside of the guidelines set by semver. *)
+    [parse_file ~path ~file_contents] first removes the '$' prefixes, and then
+    parse the contents using the regular code path to extract CRs from file.
 
-module Private : sig
-  val grep_cmd : unit Command.t
-
-  module Annotation = Annotation
-  module Assignee = Assignee
-  module Config = Config
-  module Github_annotation = Github_annotation
-  module Review_mode = Review_mode
-  module Reviewdog_utils = Reviewdog_utils
-end
+    The provided [path] is not accessed on disk, we simply use it to build
+    locations for the resulting CRs. The contents is solely read from
+    [file_contents]. *)
+val parse_file : path:Vcs.Path_in_repo.t -> file_contents:string -> Cr_comment.t list

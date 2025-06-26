@@ -1,0 +1,131 @@
+(********************************************************************************)
+(*  crs - A tool for managing code review comments embedded in source code      *)
+(*  Copyright (C) 2024-2025 Mathieu Barbin <mathieu.barbin@gmail.com>           *)
+(*                                                                              *)
+(*  This file is part of crs.                                                   *)
+(*                                                                              *)
+(*  crs is free software; you can redistribute it and/or modify it under the    *)
+(*  terms of the GNU Lesser General Public License as published by the Free     *)
+(*  Software Foundation either version 3 of the License, or any later version,  *)
+(*  with the LGPL-3.0 Linking Exception.                                        *)
+(*                                                                              *)
+(*  crs is distributed in the hope that it will be useful, but WITHOUT ANY      *)
+(*  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS   *)
+(*  FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License and     *)
+(*  the file `NOTICE.md` at the root of this repository for more details.       *)
+(*                                                                              *)
+(*  You should have received a copy of the GNU Lesser General Public License    *)
+(*  and the LGPL-3.0 Linking Exception along with this library. If not, see     *)
+(*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
+(********************************************************************************)
+
+module Annotation = Crs_cli.Private.Annotation
+module Config = Crs_cli.Private.Config
+module Github_annotation = Crs_cli.Private.Github_annotation
+
+let path = Vcs.Path_in_repo.v "my_file.ml"
+
+let test file_contents ~config ~review_mode ~with_user_mentions =
+  let crs = Tests_helpers.parse_file ~path ~file_contents in
+  Ref.set_temporarily Loc.include_sexp_of_locs true ~f:(fun () ->
+    List.iter crs ~f:(fun cr ->
+      print_endline "========================";
+      print_endline (Cr_comment.reindented_content cr);
+      match Annotation.of_cr ~cr ~config ~review_mode ~with_user_mentions with
+      | None -> print_endline "No annotation generated."
+      | Some annotation ->
+        let github_annotation = Annotation.to_github_annotation annotation in
+        print_s [%sexp { github_annotation : Github_annotation.t }];
+        print_endline (Github_annotation.to_string github_annotation)))
+;;
+
+let test_cases =
+  {|
+(* $CR user: Hello. *)
+(* $CR user for user2: Hello. *)
+(* $XCR user for user2: Hello. *)
+(* $CR-user: Invalid. *)
+(* $CR-soon user: Hello. *)
+(* $CR-someday user: Hello. *)
+|}
+;;
+
+let%expect_test "compute" =
+  test test_cases ~config:Config.empty ~review_mode:Commit ~with_user_mentions:true;
+  [%expect
+    {|
+    ========================
+    CR user: Hello.
+    ((
+      github_annotation (
+        (loc (
+          (start my_file.ml:1:0)
+          (stop  my_file.ml:1:21)))
+        (severity Notice)
+        (title    CR)
+        (message "This CR is unassigned (no default repo owner configured)."))))
+    ::notice file=my_file.ml,line=1,col=1,endLine=1,endColumn=22,title=CR::This CR is unassigned (no default repo owner configured).
+    ========================
+    CR user for user2: Hello.
+    ((
+      github_annotation (
+        (loc (
+          (start my_file.ml:2:0)
+          (stop  my_file.ml:2:31)))
+        (severity Notice)
+        (title    CR)
+        (message "This CR is assigned to user2 (CR recipient)."))))
+    ::notice file=my_file.ml,line=2,col=1,endLine=2,endColumn=32,title=CR::This CR is assigned to user2 (CR recipient).
+    ========================
+    XCR user for user2: Hello.
+    ((
+      github_annotation (
+        (loc (
+          (start my_file.ml:3:0)
+          (stop  my_file.ml:3:32)))
+        (severity Notice)
+        (title    XCR)
+        (message "This XCR is assigned to user (CR reporter)."))))
+    ::notice file=my_file.ml,line=3,col=1,endLine=3,endColumn=33,title=XCR::This XCR is assigned to user (CR reporter).
+    ========================
+    CR-user: Invalid.
+    ((
+      github_annotation (
+        (loc (
+          (start my_file.ml:4:0)
+          (stop  my_file.ml:4:23)))
+        (severity Warning)
+        (title    "Invalid CR")
+        (message
+         "This invalid CR is unassigned (no default repo owner configured)."))))
+    ::warning file=my_file.ml,line=4,col=1,endLine=4,endColumn=24,title=Invalid CR::This invalid CR is unassigned (no default repo owner configured).
+    ========================
+    CR-soon user: Hello.
+    No annotation generated.
+    ========================
+    CR-someday user: Hello.
+    No annotation generated.
+    |}];
+  let config = Config.create ~invalid_crs_annotation_severity:Error () in
+  test
+    {|(* $CR-invalid : Invalid *)|}
+    ~config
+    ~review_mode:Commit
+    ~with_user_mentions:false;
+  [%expect
+    {|
+    ========================
+    CR-invalid : Invalid
+    ((
+      github_annotation (
+        (loc (
+          (start my_file.ml:1:0)
+          (stop  my_file.ml:2:0)))
+        (severity Error)
+        (title    "Invalid CR")
+        (message
+         "This invalid CR is unassigned (no default repo owner configured)."))))
+    ::error file=my_file.ml,line=1,col=1,endLine=2,endColumn=1,title=Invalid CR::This invalid CR is unassigned (no default repo owner configured).
+    |}];
+  ()
+;;
