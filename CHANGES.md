@@ -1,4 +1,4 @@
-## 0.0.2025XXXX (unreleased)
+## 0.0.20250626 (2025-06-26)
 
 ### Added
 
@@ -16,8 +16,6 @@
 
 - Remove comment prefix from lines of reindented content (#35, @mbarbin).
 - Fix handling of xargs exit code 123 (#33, @mbarbin).
-
-### Removed
 
 ## 0.0.20250620 (2025-06-20)
 
