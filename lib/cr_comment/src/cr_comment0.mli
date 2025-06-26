@@ -192,8 +192,11 @@ val to_string : t -> string
 
 (** [reindented_content t] returns the content of the CR with leading
     indentation removed or normalized. This is useful for displaying multiple
-    CRs together in a unified format, such as in [crs grep]. *)
-val reindented_content : t -> string
+    CRs together in a unified format, such as in [crs grep]. [new_line_prefix]
+    allows to control the indentation or margin used to produce the new output.
+    It defaults to [""]. Trailing whitespace are removed from [new_line_prefix]
+    as needed. *)
+val reindented_content : ?new_line_prefix:string -> t -> string
 
 (** Sorts the supplied list of CRs and outputs it to the supplied out channel,
     separated by newline characters. *)

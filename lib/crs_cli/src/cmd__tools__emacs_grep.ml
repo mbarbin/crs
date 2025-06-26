@@ -55,7 +55,7 @@ let to_string t ~repo_root ~below ~path_display_mode =
   String.concat
     ~sep:"\n"
     [ loc_to_string (Cr_comment.whole_loc t) ~repo_root ~below ~path_display_mode
-    ; Cr_comment.reindented_content t
+    ; Cr_comment.reindented_content t ~new_line_prefix:"  "
     ; ""
     ]
 ;;
