@@ -31,6 +31,7 @@
   pplumbing.err
   pplumbing.pp-tty
   printbox
+  printbox-md
   printbox-text
   reviewdog_rdf
   stdio

@@ -19,21 +19,4 @@
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
 
-module Box : sig
-  type t
-
-  val to_string : t -> string
-  val to_markdown : t -> config:PrintBox_md.Config.t -> string
-end
-
-module By_type : sig
-  type t
-
-  val make : Cr_comment.t list -> t
-  val to_box : t -> Box.t option
-end
-
-type t
-
-val make : Cr_comment.t list -> t
-val to_box : t -> Box.t option
+val main : unit Command.t

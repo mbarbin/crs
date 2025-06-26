@@ -100,12 +100,14 @@ let%expect_test "getters" =
     [%sexp
       { severity = (Annotation.severity t : Annotation.Severity.t)
       ; assignee = (Annotation.assignee t : Assignee.t)
+      ; with_user_mention = (Annotation.with_user_mention t : bool)
       ; message = (Annotation.message t : string)
       }];
   [%expect
     {|
     ((severity Info)
      (assignee ((user (user2)) (reason Recipient)))
+     (with_user_mention false)
      (message "This CR is assigned to user2 (CR recipient)."))
     |}];
   ()

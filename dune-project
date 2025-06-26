@@ -78,6 +78,8 @@
    (>= 0.12))
   (printbox-text
    (>= 0.12))
+  (printbox-md
+   (>= 0.12))
   (re
    (>= 1.12.0))
   (spawn

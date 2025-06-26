@@ -21,10 +21,12 @@
 
 let main =
   Command.make
-    ~summary:"Output Reviewdog Annotations for CRs in the repo."
+    ~summary:"Print a comment with a summary of CRs in the repo."
     ~readme:(fun () ->
       {|
-This command searches for CRs in the tree and prints Reviewdog Annotations for them to $(b,stdout) in $(b,rdjson) format for use in CIs.
+This command searches for CRs in the tree and prints a summary using the GitHub Flavored Markdown syntax.
+
+This command is meant to be used to generate contents to include to the history of a pull request on GitHub, for example in conversation comments or checks panels.
 |})
     (let open Command.Std in
      let+ with_user_mentions = Common_helpers.with_user_mentions_arg
@@ -40,22 +42,42 @@ This command searches for CRs in the tree and prints Reviewdog Annotations for t
        | None -> Config.empty
        | Some path -> Config.load_exn ~path:(Fpath.v path)
      in
-     let crs =
-       Crs_parser.grep ~vcs ~repo_root ~below:Vcs.Path_in_repo.root |> Cr_comment.sort
+     let annotated_crs =
+       Crs_parser.grep ~vcs ~repo_root ~below:Vcs.Path_in_repo.root
+       |> Cr_comment.sort
+       |> List.filter_map ~f:(fun cr ->
+         match Annotation.of_cr ~cr ~config ~review_mode ~with_user_mentions with
+         | None -> None
+         | Some annotation -> Some (cr, annotation))
      in
-     let diagnostics =
-       List.filter_map crs ~f:(fun cr ->
-         Annotation.of_cr ~cr ~config ~review_mode ~with_user_mentions
-         |> Option.map ~f:Annotation.to_reviewdog_diagnostic)
+     let crs, annotations = List.unzip annotated_crs in
+     let md_config = PrintBox_md.Config.uniform in
+     let by_type = Summary_table.By_type.make crs |> Summary_table.By_type.to_box in
+     let summary = Summary_table.make crs |> Summary_table.to_box in
+     let tables =
+       List.filter_opt [ by_type; summary ]
+       |> List.map ~f:(fun t -> Summary_table.Box.to_markdown t ~config:md_config)
+       |> String.concat ~sep:"\n"
      in
-     let diagnostic_result =
-       Reviewdog_rdf.make_diagnostic_result
-         ~diagnostics
-         ~source:(Some Reviewdog_utils.source)
-         ~severity:Info
-         ()
+     let assignees =
+       List.filter_map annotations ~f:(fun t ->
+         let assignee = (Annotation.assignee t).user in
+         match assignee with
+         | None -> None
+         | Some user -> Some (user, t))
+       |> List.Assoc.sort_and_group ~compare:Vcs.User_handle.compare
+       |> List.map ~f:(fun (user, ts) ->
+         let with_user_mention = List.exists ts ~f:Annotation.with_user_mention in
+         Annotation.write_username ~user ~with_user_mention)
      in
-     let json = Reviewdog_rdf.encode_json_diagnostic_result diagnostic_result in
-     print_endline (Yojson.Basic.pretty_to_string ~std:true json);
+     print_endline tables;
+     let () =
+       if not (List.is_empty assignees)
+       then
+         print_endline
+           (Printf.sprintf
+              "Users with active CRs/XCRs: %s"
+              (String.concat ~sep:", " assignees))
+     in
      ())
 ;;

@@ -58,6 +58,7 @@ type t =
 let message t = t.message
 let severity t = t.severity
 let assignee t = t.assignee
+let with_user_mention t = t.with_user_mention
 
 let write_username ~user ~with_user_mention =
   (if with_user_mention then "@" else "") ^ Vcs.User_handle.to_string user

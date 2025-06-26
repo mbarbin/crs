@@ -19,6 +19,17 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
+module Box = struct
+  type t = PrintBox.t
+
+  let to_string t = PrintBox_text.to_string t ^ "\n"
+
+  let to_markdown t ~config =
+    let md = PrintBox_md.to_string config t in
+    String.strip md ^ "\n"
+  ;;
+end
+
 module Column = struct
   type 'a t =
     { header : string
@@ -123,11 +134,7 @@ module By_type = struct
       ]
   ;;
 
-  let to_string t =
-    if List.is_empty t.rows
-    then ""
-    else PrintBox_text.to_string (make_table columns t.rows) ^ "\n"
-  ;;
+  let to_box t = if List.is_empty t.rows then None else Some (make_table columns t.rows)
 end
 
 module Type = struct
@@ -233,8 +240,4 @@ let columns =
     ]
 ;;
 
-let to_string t =
-  if List.is_empty t.rows
-  then ""
-  else PrintBox_text.to_string (make_table columns t.rows) ^ "\n"
-;;
+let to_box t = if List.is_empty t.rows then None else Some (make_table columns t.rows)

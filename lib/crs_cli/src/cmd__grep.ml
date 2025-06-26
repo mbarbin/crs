@@ -93,13 +93,13 @@ All types of CRs are printed by default. You can restrict the selection using fi
              Out_channel.output_line oc (Sexp.to_string_hum [%sexp (cr : Cr_comment.t)])))
        else if summary
        then (
-         let by_type =
-           Summary_table.By_type.make crs |> Summary_table.By_type.to_string
-         in
-         let summary = Summary_table.make crs |> Summary_table.to_string in
+         let by_type = Summary_table.By_type.make crs |> Summary_table.By_type.to_box in
+         let summary = Summary_table.make crs |> Summary_table.to_box in
          let tables =
-           List.filter [ by_type; summary ] ~f:(fun t -> not (String.is_empty t))
+           List.filter_opt [ by_type; summary ]
+           |> List.map ~f:Summary_table.Box.to_string
+           |> String.concat ~sep:"\n"
          in
-         Out_channel.output_string oc (String.concat ~sep:"\n" tables))
+         Out_channel.output_string oc tables)
        else Cr_comment.output_list crs ~oc))
 ;;
