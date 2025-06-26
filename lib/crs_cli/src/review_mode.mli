@@ -19,21 +19,19 @@
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
 
-val main : unit Command.t
+(** [Review_mode.t] describes the context in which CR assignment and annotation
+    logic is executed. This is not strictly tied to the CI event that
+    triggered the workflow, but rather to the review/assignment semantics:
 
-(** {1 Private}
+    - [Pull_request]: The workflow is running in the context of a pull request,
+      and the [author] is the user who opened the PR.
 
-    This module is exported to be used by tests and libraries with strong ties
-    to [crs]. Its signature may change in breaking ways at any time without
-    prior notice, and outside of the guidelines set by semver. *)
+    - [Commit]: The workflow is running in the context of a commit to a branch
+      (e.g., main), and there is no specific PR author. *)
 
-module Private : sig
-  val grep_cmd : unit Command.t
+type t =
+  | Pull_request of { author : Vcs.User_handle.t }
+  | Commit
+[@@deriving equal, sexp_of]
 
-  module Annotation = Annotation
-  module Assignee = Assignee
-  module Config = Config
-  module Github_annotation = Github_annotation
-  module Review_mode = Review_mode
-  module Reviewdog_utils = Reviewdog_utils
-end
+val arg : t Command.Arg.t

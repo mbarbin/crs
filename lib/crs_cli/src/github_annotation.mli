@@ -19,21 +19,32 @@
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
 
-val main : unit Command.t
+(** GitHub Annotations are created when encountering special log lines produced
+    by actions during workflow executions.
 
-(** {1 Private}
+    Examples:
 
-    This module is exported to be used by tests and libraries with strong ties
-    to [crs]. Its signature may change in breaking ways at any time without
-    prior notice, and outside of the guidelines set by semver. *)
+    {v
+     ::notice file={name},line={line},endLine={endLine},title={title}::{message}
+     ::warning file={name},line={line},endLine={endLine},title={title}::{message}
+    v}
 
-module Private : sig
-  val grep_cmd : unit Command.t
+    This module allow creating and producing workflow commands that can create
+    annotations. *)
 
-  module Annotation = Annotation
-  module Assignee = Assignee
-  module Config = Config
-  module Github_annotation = Github_annotation
-  module Review_mode = Review_mode
-  module Reviewdog_utils = Reviewdog_utils
+module Severity : sig
+  type t =
+    | Error
+    | Warning
+    | Notice
+  [@@deriving sexp_of]
 end
+
+type t [@@deriving sexp_of]
+
+val create : loc:Loc.t -> severity:Severity.t -> title:string -> message:string -> t
+
+(** {1 Serialize} *)
+
+(** Create the syntax to be produced by log lines, without the trailing "\n". *)
+val to_string : t -> string

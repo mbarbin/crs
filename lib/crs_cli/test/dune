@@ -10,8 +10,24 @@
   -open
   Base
   -open
-  Expect_test_helpers_base)
- (libraries base crs_cli expect_test_helpers_core.expect_test_helpers_base)
+  Cmdlang
+  -open
+  Expect_test_helpers_base
+  -open
+  Volgo)
+ (libraries
+  base
+  cmdlang
+  cmdlang-stdlib-runner
+  cr_comment
+  crs_cli
+  crs_parser
+  expect_test_helpers_core.expect_test_helpers_base
+  loc
+  pplumbing.err
+  reviewdog_rdf
+  volgo
+  yojson)
  (inline_tests)
  (instrumentation
   (backend bisect_ppx))

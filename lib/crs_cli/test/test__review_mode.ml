@@ -1,0 +1,56 @@
+(********************************************************************************)
+(*  crs - A tool for managing code review comments embedded in source code      *)
+(*  Copyright (C) 2024-2025 Mathieu Barbin <mathieu.barbin@gmail.com>           *)
+(*                                                                              *)
+(*  This file is part of crs.                                                   *)
+(*                                                                              *)
+(*  crs is free software; you can redistribute it and/or modify it under the    *)
+(*  terms of the GNU Lesser General Public License as published by the Free     *)
+(*  Software Foundation either version 3 of the License, or any later version,  *)
+(*  with the LGPL-3.0 Linking Exception.                                        *)
+(*                                                                              *)
+(*  crs is distributed in the hope that it will be useful, but WITHOUT ANY      *)
+(*  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS   *)
+(*  FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License and     *)
+(*  the file `NOTICE.md` at the root of this repository for more details.       *)
+(*                                                                              *)
+(*  You should have received a copy of the GNU Lesser General Public License    *)
+(*  and the LGPL-3.0 Linking Exception along with this library. If not, see     *)
+(*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
+(********************************************************************************)
+
+module Review_mode = Crs_cli.Private.Review_mode
+
+let test args =
+  match
+    let cmd = Command.make Review_mode.arg ~summary:"return the args" in
+    Cmdlang_stdlib_runner.eval cmd ~argv:(Array.of_list ("./main.exe" :: args))
+  with
+  | Ok a -> print_s [%sexp (a : Review_mode.t)]
+  | Error (`Help _ | `Bad _) -> assert false
+;;
+
+let%expect_test "arg" =
+  Err.For_test.protect (fun () -> test []);
+  [%expect {| Commit |}];
+  Err.For_test.protect (fun () -> test [ "--pull-request-author=jdoe" ]);
+  [%expect
+    {|
+    Error: Argument [--pull-request-author] should not be set when review mode is
+    [commit].
+    [124]
+    |}];
+  Err.For_test.protect (fun () -> test [ "--review-mode=commit" ]);
+  [%expect {| Commit |}];
+  Err.For_test.protect (fun () -> test [ "--review-mode=pull-request" ]);
+  [%expect
+    {|
+    Error: Argument [--pull-request-author] should be set when review mode is
+    [pull-request].
+    [124]
+    |}];
+  Err.For_test.protect (fun () ->
+    test [ "--review-mode=pull-request"; "--pull-request-author=jdoe" ]);
+  [%expect {| (Pull_request (author jdoe)) |}];
+  ()
+;;

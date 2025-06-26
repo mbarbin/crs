@@ -19,21 +19,47 @@
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
 
-val main : unit Command.t
+(** A type to hold information about a CR that is assigned in the ci event (pull
+    request or push to ongoing branch).
 
-(** {1 Private}
+    This is used by workflow that integrate with platforms or tools supporting
+    annotations, such as GitHub Annotations, and Reviewdog Diagnostics. *)
 
-    This module is exported to be used by tests and libraries with strong ties
-    to [crs]. Its signature may change in breaking ways at any time without
-    prior notice, and outside of the guidelines set by semver. *)
+module Severity : sig
+  type t = Config.Annotation_severity.t =
+    | Error
+    | Warning
+    | Info
+  [@@deriving enumerate, sexp_of]
 
-module Private : sig
-  val grep_cmd : unit Command.t
+  (** Capitalized like the constructor (e.g. ["Error"]). *)
+  val to_string : t -> string
 
-  module Annotation = Annotation
-  module Assignee = Assignee
-  module Config = Config
-  module Github_annotation = Github_annotation
-  module Review_mode = Review_mode
-  module Reviewdog_utils = Reviewdog_utils
+  val to_github : t -> Github_annotation.Severity.t
+  val to_reviewdog : t -> Reviewdog_rdf.severity
 end
+
+type t [@@deriving sexp_of]
+
+(** When [with_user_mentions] is [true] we use the syntax '@user' in the
+    annotation message to trigger a notification in the environment that will
+    end up rendering this string. This doesn't always work, even when this is
+    the correct syntax. For example, mentioning a user with '@' in a GitHub
+    Annotations Panels does nothing. *)
+val of_cr
+  :  cr:Cr_comment.t
+  -> config:Config.t
+  -> review_mode:Review_mode.t
+  -> with_user_mentions:bool
+  -> t option
+
+(** {1 Getters} *)
+
+val message : t -> string
+val severity : t -> Severity.t
+val assignee : t -> Assignee.t
+
+(** Export to supported consumers / backend. *)
+
+val to_github_annotation : t -> Github_annotation.t
+val to_reviewdog_diagnostic : t -> Reviewdog_rdf.diagnostic
