@@ -38,3 +38,5 @@ val relativize
 (** Allows to use flags to supply CR filters. For example: [--xcrs] or [--now].
     If no filter flags are supplied, this returns [`All]. *)
 val filters : [ `All | `Only of Cr_comment.Filter.t list ] Command.Arg.t
+
+val with_user_mentions_arg : bool Command.Arg.t

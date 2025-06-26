@@ -49,7 +49,9 @@ For more information, use the $(b,--help) flag on a subcommand.
           ; ( "github"
             , Command.group
                 ~summary:"Utils related to GitHub"
-                [ "annotate-crs", Cmd__tools__github__annotate_crs.main ] )
+                [ "annotate-crs", Cmd__tools__github__annotate_crs.main
+                ; "summary-comment", Cmd__tools__github__summary_comment.main
+                ] )
           ; ( "reviewdog"
             , Command.group
                 ~summary:"Utils related to Reviewdog"

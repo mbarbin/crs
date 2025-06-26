@@ -41,11 +41,8 @@ end
 
 type t [@@deriving sexp_of]
 
-(** When [with_user_mentions] is [true] we use the syntax '@user' in the
-    annotation message to trigger a notification in the environment that will
-    end up rendering this string. This doesn't always work, even when this is
-    the correct syntax. For example, mentioning a user with '@' in a GitHub
-    Annotations Panels does nothing. *)
+(** When [with_user_mentions] is true, we prefix user names by '@' in
+    annotations messages. See also {!val:write_username}. *)
 val of_cr
   :  cr:Cr_comment.t
   -> config:Config.t
@@ -53,11 +50,21 @@ val of_cr
   -> with_user_mentions:bool
   -> t option
 
+(** {1 Utils} *)
+
+(** When [with_user_mention] is [true] we use the syntax '@user' in the
+    annotation message to trigger a notification in the environment that will
+    end up rendering this string. This doesn't always work, even when this is
+    the correct syntax. For example, mentioning a user with '@' in a GitHub
+    Annotations Panels does nothing. *)
+val write_username : user:Vcs.User_handle.t -> with_user_mention:bool -> string
+
 (** {1 Getters} *)
 
 val message : t -> string
 val severity : t -> Severity.t
 val assignee : t -> Assignee.t
+val with_user_mention : t -> bool
 
 (** Export to supported consumers / backend. *)
 

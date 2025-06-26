@@ -184,3 +184,40 @@ Let's test the reviewdog annotations too.
   ---
   >       "message": "This CR is assigned to @user2 (CR recipient)."
   [1]
+
+We can also print a summary comment,
+
+  $ crs tools github summary-comment | tee without-config
+  ```
+  ┌─────────┬───────┐
+  │ CR Type │ Count │
+  ├─────────┼───────┤
+  │ CR      │     3 │
+  │ XCR     │     1 │
+  └─────────┴───────┘
+  ```
+  
+  ```
+  ┌──────────┬───────┬─────┬──────┬───────┐
+  │ Reporter │ For   │ CRs │ XCRs │ Total │
+  ├──────────┼───────┼─────┼──────┼───────┤
+  │ user1    │       │   1 │    1 │     2 │
+  │ user1    │ user2 │   1 │      │     1 │
+  │ user1    │ user3 │   1 │      │     1 │
+  └──────────┴───────┴─────┴──────┴───────┘
+  ```
+  
+  Users with active CRs/XCRs: user1, user2, user3
+
+  $ crs tools github summary-comment --config=crs-config.json \
+  >   --review-mode=pull-request \
+  >   --pull-request-author="pr-author" \
+  >   --with-user-mentions=true \
+  >  > for-pull-request
+
+  $ diff without-config for-pull-request
+  20c20
+  < Users with active CRs/XCRs: user1, user2, user3
+  ---
+  > Users with active CRs/XCRs: @pr-author, @user1, @user2, user3
+  [1]
