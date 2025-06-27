@@ -6,7 +6,7 @@
 ;; Maintainer: Mathieu Barbin <mathieu.barbin@gmail.com>
 ;; URL: https://github.com/mbarbin/crs
 ;; Keywords: tools
-;; Version: 0.0.2
+;; Version: 0.0.3
 ;; Package-Requires: ((emacs "29.1"))
 ;; SPDX-License-Identifier: GPL-3.0-or-later
 ;;
@@ -57,6 +57,24 @@ Should be one of: all, crs, xcrs, now, soon, someday, invalid."
     (const "soon")
     (const "someday")
     (const "invalid"))
+  :group 'crs-grep)
+
+(defcustom crs-grep-enable-next-error-follow nil
+  "If non-nil, enable `next-error-follow-minor-mode' in the CRs buffer by default."
+  :type 'boolean
+  :group 'crs-grep)
+
+(defcustom crs-grep-buffer-opening-behavior "split"
+  "How to open the CRs buffer when it does not already exist.
+
+If set to \"replace\", the CRs buffer will open in the current window,
+replacing the buffer at point.  If set to \"split\", the CRs buffer will open
+in a new window (the default behavior).  When the buffer already exists,
+its window placement is preserved.  Allowed values are: \"replace\", \"split\"."
+  :type
+  '(choice
+    (const :tag "Replace current buffer" "replace")
+    (const :tag "Split window" "split"))
   :group 'crs-grep)
 
 (defvar crs-grep-buffer-name "*CRs*"
@@ -130,6 +148,8 @@ Always a string, e.g. \"now\", \"all\", etc.")
           (if (eq exit-code 0)
               (progn
                 (crs-grep-mode)
+                (when crs-grep-enable-next-error-follow
+                  (next-error-follow-minor-mode 1))
                 (goto-char (point-min))
                 (message
                  (format
@@ -137,7 +157,13 @@ Always a string, e.g. \"now\", \"all\", etc.")
                   crs-grep-current-filter crs-grep-path-in-repo)))
             (message
              "Failed to run `crs grep`. Check the CLI path or repository state.")))))
-    (pop-to-buffer output-buffer)))
+    (if (get-buffer-window output-buffer)
+        (select-window (get-buffer-window output-buffer))
+      (cond
+       ((string= crs-grep-buffer-opening-behavior "replace")
+        (switch-to-buffer output-buffer))
+       (t
+        (pop-to-buffer output-buffer))))))
 
 ;;;###autoload
 (defun crs-grep-run ()
