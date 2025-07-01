@@ -856,7 +856,7 @@ this as part of our tests. *)
 
     File "my_file.ml", lines 11-13, characters 0-141:
       CR user: What we do is that we base it on the number of delimiters
-      ;; of the first line.
+      ; of the first line.
       So, lines that have more will keep their prefix.
 
     File "my_file.ml", lines 15-16, characters 0-62:
@@ -893,7 +893,7 @@ this as part of our tests. *)
   [%expect
     {|
     | XCR user: We test that we produce correctly rstripped lines when using margins.
-    | ;;
+    |
     | And the cr contains empty lines. *)
     |}];
   ()
@@ -1193,7 +1193,7 @@ Hello text # $CR user: Comment may be left next to a non-empty line.
        (priority Now))))
     ========================
     CR user: Let's cover the case
-    #
+
     Where there are empty lines that are part of the comment.
     This happens when the CR has multiple paragraphs.
     ((raw (
@@ -1356,7 +1356,7 @@ Hello text ## $CR user: Comment may be left next to a non-empty line.
        (priority Now))))
     ========================
     CR user: Let's cover the case
-    ##
+
     Where there are empty lines that are part of the comment.
     This happens when the CR has multiple paragraphs.
     ((raw (
@@ -1736,7 +1736,7 @@ let%expect_test "single-semi-style" =
        (priority Now))))
     ========================
     CR user: Let's cover the case
-    ;
+
     Where there are empty lines that are part of the comment.
     This happens when the CR has multiple paragraphs.
     ((raw (
@@ -1937,7 +1937,7 @@ let%expect_test "double-semi-style" =
        (priority Now))))
     ========================
     CR user: Let's cover the case
-    ;;
+
     Where there are empty lines that are part of the comment.
     This happens when the CR has multiple paragraphs.
     ((raw (
