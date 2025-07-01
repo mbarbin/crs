@@ -811,9 +811,9 @@ this as part of our tests. *)
 
       user2: Hi! Good tests, good times.
     |}];
-  (* There is an issue with multiple lines comments when each line starts with
-     the comment delimiter. Currently the delimiter is captured as being part of
-     the contents, and thus the CR is rendered incorrectly. *)
+  (* There was an issue with multiple lines comments when each line starts with
+     the comment delimiter. The delimiter used to be captured as being part of
+     the contents. This was fixed. Keeping as monitoring tests. *)
   test
     {|
 // $CR user: This is a multiple lines CR in the c-style
