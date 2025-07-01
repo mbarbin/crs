@@ -101,6 +101,94 @@ let%expect_test "invalid syntax CR" =
   ()
 ;;
 
+let%expect_test "zero spaces CR" =
+  (* Although this should be eventually rejected by a crs linter, having
+     multiple spaces leading the the CR is allowed. *)
+  test
+    {|
+(*$CR user: Hey. *)
+|};
+  [%expect
+    {|
+    ========================
+    CR user: Hey.
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:1:0)
+         (stop  my_file.ml:2:0)))
+       (header (
+         Ok (
+           (kind (
+             (txt CR)
+             (loc (
+               (start my_file.ml:1:2)
+               (stop  my_file.ml:1:4)))))
+           (qualifier (
+             (txt None)
+             (loc (
+               (start my_file.ml:1:2)
+               (stop  my_file.ml:1:4)))))
+           (reporter (
+             (txt user)
+             (loc (
+               (start my_file.ml:1:5)
+               (stop  my_file.ml:1:9)))))
+           (recipient ()))))
+       (comment_prefix "(*")
+       (digest_of_condensed_content bcdc93702bfd70659516c872b7186f26)
+       (content "CR user: Hey.")))
+     (getters (
+       (path    my_file.ml)
+       (content "CR user: Hey.")
+       (kind    CR)
+       (qualifier (None))
+       (priority Now))))
+    |}];
+  test
+    {|
+#$CR user: Hey.
+|};
+  [%expect
+    {|
+    ========================
+    CR user: Hey.
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:1:0)
+         (stop  my_file.ml:2:0)))
+       (header (
+         Ok (
+           (kind (
+             (txt CR)
+             (loc (
+               (start my_file.ml:1:1)
+               (stop  my_file.ml:1:3)))))
+           (qualifier (
+             (txt None)
+             (loc (
+               (start my_file.ml:1:1)
+               (stop  my_file.ml:1:3)))))
+           (reporter (
+             (txt user)
+             (loc (
+               (start my_file.ml:1:4)
+               (stop  my_file.ml:1:8)))))
+           (recipient ()))))
+       (comment_prefix #)
+       (digest_of_condensed_content bcdc93702bfd70659516c872b7186f26)
+       (content "CR user: Hey.")))
+     (getters (
+       (path    my_file.ml)
+       (content "CR user: Hey.")
+       (kind    CR)
+       (qualifier (None))
+       (priority Now))))
+    |}];
+  ()
+;;
+
 let%expect_test "multiple spaces CR" =
   (* Although this should be eventually rejected by a crs linter, having
      multiple spaces leading the the CR is allowed. *)
@@ -760,6 +848,17 @@ this as part of our tests. *)
        v}
 
    user2: Hi! Good tests, good times. *)
+
+(*$CR user: A cr that aligns its lines with CR that has no spaces.
+  Hey *)
+
+#$CR user: A cr that aligns its lines with CR that has no spaces.
+#
+#Hey
+
+# $CR user: A cr that has a line that has no spaces.
+#
+#Hey
 |};
   [%expect
     {|
@@ -797,7 +896,7 @@ this as part of our tests. *)
       CR-user but still we include
       this as part of our tests.
 
-    File "my_file.ml", lines 35-47, characters 0-302:
+    File "my_file.ml", lines 35-46, characters 0-302:
       CR user: Let's add a couple with trailing spaces
 
       at the end of some lines.
@@ -810,6 +909,20 @@ this as part of our tests. *)
           v}
 
       user2: Hi! Good tests, good times.
+
+    File "my_file.ml", lines 48-49, characters 0-74:
+      CR user: A cr that aligns its lines with CR that has no spaces.
+      Hey
+
+    File "my_file.ml", lines 51-53, characters 0-71:
+      CR user: A cr that aligns its lines with CR that has no spaces.
+
+      Hey
+
+    File "my_file.ml", lines 55-58, characters 0-58:
+      CR user: A cr that has a line that has no spaces.
+
+      Hey
     |}];
   (* There was an issue with multiple lines comments when each line starts with
      the comment delimiter. The delimiter used to be captured as being part of
