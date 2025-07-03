@@ -62,7 +62,7 @@
    * - Remove support for extra headers.
    * - Remove support for attributes.
    * - Remove assignee computation (left as external work).
-   * - Replace [is_xcr] by a variant type [Kind.t].
+   * - Replace [is_xcr] by a variant type [Status.t].
    * - Make [reporter] mandatory.
    * - Refactor [Raw], make [t] a record with a processed part that may fail.
    * - Compute [digest_of_condensed_content] for all CR kinds.
@@ -85,7 +85,7 @@ module Header = struct
     [@@@coverage off]
 
     type t =
-      { kind : Kind.t Loc.Txt.t
+      { status : Status.t Loc.Txt.t
       ; qualifier : Qualifier.t Loc.Txt.t
       ; reporter : Vcs.User_handle.t Loc.Txt.t
       ; recipient : Vcs.User_handle.t Loc.Txt.t option
@@ -98,27 +98,30 @@ module Header = struct
   module With_loc = struct
     let reporter t = t.reporter
     let recipient t = t.recipient
-    let kind t = t.kind
+    let status t = t.status
     let qualifier t = t.qualifier
 
     (* Deprecated. *)
     let reported_by = reporter
     let for_ = recipient
     let due = qualifier
+    let kind = status
   end
 
-  let create ~kind ~qualifier ~reporter ~recipient =
-    { kind; qualifier; reporter; recipient }
+  let create ~status ~qualifier ~reporter ~recipient =
+    { status; qualifier; reporter; recipient }
   ;;
 
   let reporter t = t.reporter.txt
   let recipient t = Option.map t.recipient ~f:Loc.Txt.txt
-  let kind t = t.kind.txt
+  let status t = t.status.txt
   let qualifier t = t.qualifier.txt
+  let priority t = qualifier t |> Qualifier.priority
 
   (* Deprecated. *)
   let reported_by = reporter
   let for_ = recipient
+  let kind = status
 end
 
 module T = struct
@@ -185,7 +188,7 @@ let reindented_content ?(new_line_prefix = "") t =
           (* The len of the indentation is a heuristic in this case. *)
           start.pos_cnum - start.pos_bol + String.length t.comment_prefix + 1
         | Ok h ->
-          let start = Loc.start h.kind.loc in
+          let start = Loc.start h.status.loc in
           start.pos_cnum - start.pos_bol)
     in
     String.make len ' '
@@ -226,19 +229,19 @@ let reindented_content ?(new_line_prefix = "") t =
 
 let sort ts = List.sort ts ~compare:For_sorted_output.compare
 
-let kind t =
+let status t : Status.t =
   match t.header with
-  | Error _ -> Kind.CR
-  | Ok p -> Header.kind p
+  | Error _ -> CR
+  | Ok p -> Header.status p
 ;;
 
 let priority t : Priority.t =
   match t.header with
   | Error _ -> Now
   | Ok p ->
-    (match Header.kind p with
+    (match Header.status p with
      | XCR -> Now
-     | CR -> Header.qualifier p |> Qualifier.priority)
+     | CR -> Header.priority p)
 ;;
 
 let to_string t =
@@ -272,3 +275,4 @@ end
 (* Deprecated *)
 
 let work_on = priority
+let kind = status

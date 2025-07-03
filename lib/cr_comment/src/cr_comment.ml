@@ -19,7 +19,7 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-module Kind = Kind
+module Status = Status
 module Filter = Filter
 module Priority = Priority
 module Qualifier = Qualifier

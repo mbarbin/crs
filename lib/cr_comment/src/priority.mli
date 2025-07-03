@@ -22,7 +22,7 @@
 (** The [Priority.t] type represents a priority classification that can be
     associated with a code review comment (CR). Assignment of a priority is
     not always direct; rather, it is typically computed as a function of other
-    elements such as the CR's kind, review context, and qualifier.
+    elements such as the CR's status, review context, and qualifier.
 
     This classification is intended as a general convenience to help organize
     and filter CRs by indicating the reviewers's intent or suggested importance,
@@ -32,6 +32,10 @@
     or [Someday] comment should be addressed — are intentionally left undefined
     at this level. Higher-level tools or code review systems built on top of CRs
     may define their own policies or behaviors around these categories.
+
+    In the terminology used in the project, you'll sometimes come across
+    language that makes a direct parallel between the CR's priority, and when
+    work on it is expected to be "due" or meant to happen.
 
     Typical interpretations:
     - [Now]: Should be addressed promptly (while working on a PR for example).

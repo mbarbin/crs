@@ -57,7 +57,7 @@ let matches t ~cr =
     (match Cr_comment0.header cr with
      | Error _ -> false
      | Ok h ->
-       (match Cr_comment0.Header.kind h with
+       (match Cr_comment0.Header.status h with
         | XCR -> false
         | CR ->
           (match Cr_comment0.Header.qualifier h with
@@ -67,14 +67,14 @@ let matches t ~cr =
     (match Cr_comment0.header cr with
      | Error _ -> false
      | Ok h ->
-       (match Cr_comment0.Header.kind h with
+       (match Cr_comment0.Header.status h with
         | CR -> false
         | XCR -> true))
   | Now ->
     (match Cr_comment0.header cr with
      | Error _ -> false
      | Ok h ->
-       (match Cr_comment0.Header.kind h with
+       (match Cr_comment0.Header.status h with
         | XCR -> true
         | CR ->
           (match Cr_comment0.Header.qualifier h with
@@ -84,7 +84,7 @@ let matches t ~cr =
     (match Cr_comment0.header cr with
      | Error _ -> false
      | Ok h ->
-       (match Cr_comment0.Header.kind h with
+       (match Cr_comment0.Header.status h with
         | XCR -> false
         | CR ->
           (match Cr_comment0.Header.qualifier h with
@@ -94,7 +94,7 @@ let matches t ~cr =
     (match Cr_comment0.header cr with
      | Error _ -> false
      | Ok h ->
-       (match Cr_comment0.Header.kind h with
+       (match Cr_comment0.Header.status h with
         | XCR -> false
         | CR ->
           (match Cr_comment0.Header.qualifier h with

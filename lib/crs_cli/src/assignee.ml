@@ -34,7 +34,7 @@ module Raw_assignee = struct
       (match Cr_comment.header cr with
        | Error _ -> Invalid
        | Ok h ->
-         (match Cr_comment.Header.kind h with
+         (match Cr_comment.Header.status h with
           | XCR -> Reporter (Cr_comment.Header.reporter h)
           | CR ->
             (match Cr_comment.Header.recipient h with

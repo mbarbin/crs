@@ -89,12 +89,16 @@ module Header : sig
       out, such as in [CR user1: Comment]. *)
   val recipient : t -> Vcs.User_handle.t option
 
-  val kind : t -> Kind.t
+  val status : t -> Status.t
 
   (** This returns the qualifier if present ([Soon] for [CR-soon] or [Someday]
       for [CR-someday]). If there is no qualifier specified, this returns
       [None]. *)
   val qualifier : t -> Qualifier.t
+
+  (** [priority t] represents the expectation as to when work on the CR is meant
+      to happen. It is based on the header's qualifier. *)
+  val priority : t -> Priority.t
 
   module With_loc : sig
     (** These getters allows you to access the position of each elements of the
@@ -113,20 +117,24 @@ module Header : sig
     (** The location includes the entire keyword ["CR"] or ["XCR"] depending on
         the case. It stops right before the following char, that being a space
         or a ['-'] (and thus does not include it). *)
-    val kind : t -> Kind.t Loc.Txt.t
+    val status : t -> Status.t Loc.Txt.t
 
     (** When the CR is qualified as [Soon] or [Someday], the location returned
         starts right after the dash separator (but does not include it), and
         contains the entire qualifier keyword. For example, the location will
         include ["soon"] for a [CR-soon]. When the CR has no qualifier, there
         is no keyword to attach a location to : conventionally, we return
-        instead the location of the CR [kind] in this case. *)
+        instead the location of the CR [status] in this case. *)
     val qualifier : t -> Qualifier.t Loc.Txt.t
 
     (** {1 Deprecated}
 
         The following is deprecated and will be soon annotated as such with ocaml
         alerts. Please migrate, and do not use in new code. *)
+
+    (** This was renamed [status]. Hint: Run [ocamlmig migrate]. *)
+    val kind : t -> Status.t Loc.Txt.t
+    [@@migrate { repl = Rel.status }]
 
     (** This was renamed [reporter]. Hint: Run [ocamlmig migrate]. *)
     val reported_by : t -> Vcs.User_handle.t Loc.Txt.t
@@ -138,7 +146,7 @@ module Header : sig
 
     (** This was renamed [qualifier]. Hint: Run [ocamlmig migrate]. *)
     val due : t -> Qualifier.t Loc.Txt.t
-    [@@migrate { repl = Rel.recipient }]
+    [@@migrate { repl = Rel.qualifier }]
   end
 
   (** {1 Deprecated}
@@ -153,6 +161,10 @@ module Header : sig
   (** This was renamed [recipient]. Hint: Run [ocamlmig migrate]. *)
   val for_ : t -> Vcs.User_handle.t option
   [@@migrate { repl = Rel.recipient }]
+
+  (** This was renamed [status]. Hint: Run [ocamlmig migrate]. *)
+  val kind : t -> Status.t
+  [@@migrate { repl = Rel.status }]
 end
 
 (** A [Cr_comment.t] is an immutable value holding the information and metadata
@@ -172,7 +184,7 @@ val content : t -> string
 val whole_loc : t -> Loc.t
 
 val header : t -> Header.t Or_error.t
-val kind : t -> Kind.t
+val status : t -> Status.t
 
 (** [priority t] represents the expectation as to when work on the CR is meant
     to happen. It is based on the header's qualifier except that XCRs and
@@ -228,7 +240,7 @@ module Private : sig
 
   module Header : sig
     val create
-      :  kind:Kind.t Loc.Txt.t
+      :  status:Status.t Loc.Txt.t
       -> qualifier:Qualifier.t Loc.Txt.t
       -> reporter:Vcs.User_handle.t Loc.Txt.t
       -> recipient:Vcs.User_handle.t Loc.Txt.t option
@@ -253,3 +265,7 @@ end
 (** This was renamed [priority]. Hint: Run [ocamlmig migrate]. *)
 val work_on : t -> Priority.t
 [@@migrate { repl = Rel.priority }]
+
+(** This was renamed [status]. Hint: Run [ocamlmig migrate]. *)
+val kind : t -> Status.t
+[@@migrate { repl = Rel.status }]

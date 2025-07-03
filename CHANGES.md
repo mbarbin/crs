@@ -6,6 +6,7 @@
 
 ### Changed
 
+- A breaking renaming in the terminology (kind => status) (#46, @mbarbin).
 - Add buffer line header in emacs crs-grep-mode by default (#44, @mbarbin).
 
 ### Fixed
