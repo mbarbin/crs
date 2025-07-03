@@ -213,8 +213,11 @@ let reindented_content ?(new_line_prefix = "") t =
           | false -> line
           | true ->
             (match String.chop_prefix line ~prefix:(t.comment_prefix ^ " ") with
-             | None -> line
-             | Some s -> s)
+             | Some s -> s
+             | None ->
+               (match String.chop_prefix line ~prefix:t.comment_prefix with
+                | Some s -> s
+                | None -> line))
         in
         new_line_prefix ^ line))
   in

@@ -101,6 +101,94 @@ let%expect_test "invalid syntax CR" =
   ()
 ;;
 
+let%expect_test "zero spaces CR" =
+  (* Although this should be eventually rejected by a crs linter, having
+     multiple spaces leading the the CR is allowed. *)
+  test
+    {|
+(*$CR user: Hey. *)
+|};
+  [%expect
+    {|
+    ========================
+    CR user: Hey.
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:1:0)
+         (stop  my_file.ml:2:0)))
+       (header (
+         Ok (
+           (kind (
+             (txt CR)
+             (loc (
+               (start my_file.ml:1:2)
+               (stop  my_file.ml:1:4)))))
+           (qualifier (
+             (txt None)
+             (loc (
+               (start my_file.ml:1:2)
+               (stop  my_file.ml:1:4)))))
+           (reporter (
+             (txt user)
+             (loc (
+               (start my_file.ml:1:5)
+               (stop  my_file.ml:1:9)))))
+           (recipient ()))))
+       (comment_prefix "(*")
+       (digest_of_condensed_content bcdc93702bfd70659516c872b7186f26)
+       (content "CR user: Hey.")))
+     (getters (
+       (path    my_file.ml)
+       (content "CR user: Hey.")
+       (kind    CR)
+       (qualifier (None))
+       (priority Now))))
+    |}];
+  test
+    {|
+#$CR user: Hey.
+|};
+  [%expect
+    {|
+    ========================
+    CR user: Hey.
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:1:0)
+         (stop  my_file.ml:2:0)))
+       (header (
+         Ok (
+           (kind (
+             (txt CR)
+             (loc (
+               (start my_file.ml:1:1)
+               (stop  my_file.ml:1:3)))))
+           (qualifier (
+             (txt None)
+             (loc (
+               (start my_file.ml:1:1)
+               (stop  my_file.ml:1:3)))))
+           (reporter (
+             (txt user)
+             (loc (
+               (start my_file.ml:1:4)
+               (stop  my_file.ml:1:8)))))
+           (recipient ()))))
+       (comment_prefix #)
+       (digest_of_condensed_content bcdc93702bfd70659516c872b7186f26)
+       (content "CR user: Hey.")))
+     (getters (
+       (path    my_file.ml)
+       (content "CR user: Hey.")
+       (kind    CR)
+       (qualifier (None))
+       (priority Now))))
+    |}];
+  ()
+;;
+
 let%expect_test "multiple spaces CR" =
   (* Although this should be eventually rejected by a crs linter, having
      multiple spaces leading the the CR is allowed. *)
@@ -760,6 +848,17 @@ this as part of our tests. *)
        v}
 
    user2: Hi! Good tests, good times. *)
+
+(*$CR user: A cr that aligns its lines with CR that has no spaces.
+  Hey *)
+
+#$CR user: A cr that aligns its lines with CR that has no spaces.
+#
+#Hey
+
+# $CR user: A cr that has a line that has no spaces.
+#
+#Hey
 |};
   [%expect
     {|
@@ -797,7 +896,7 @@ this as part of our tests. *)
       CR-user but still we include
       this as part of our tests.
 
-    File "my_file.ml", lines 35-47, characters 0-302:
+    File "my_file.ml", lines 35-46, characters 0-302:
       CR user: Let's add a couple with trailing spaces
 
       at the end of some lines.
@@ -810,10 +909,24 @@ this as part of our tests. *)
           v}
 
       user2: Hi! Good tests, good times.
+
+    File "my_file.ml", lines 48-49, characters 0-74:
+      CR user: A cr that aligns its lines with CR that has no spaces.
+      Hey
+
+    File "my_file.ml", lines 51-53, characters 0-71:
+      CR user: A cr that aligns its lines with CR that has no spaces.
+
+      Hey
+
+    File "my_file.ml", lines 55-58, characters 0-58:
+      CR user: A cr that has a line that has no spaces.
+
+      Hey
     |}];
-  (* There is an issue with multiple lines comments when each line starts with
-     the comment delimiter. Currently the delimiter is captured as being part of
-     the contents, and thus the CR is rendered incorrectly. *)
+  (* There was an issue with multiple lines comments when each line starts with
+     the comment delimiter. The delimiter used to be captured as being part of
+     the contents. This was fixed. Keeping as monitoring tests. *)
   test
     {|
 // $CR user: This is a multiple lines CR in the c-style
@@ -856,7 +969,7 @@ this as part of our tests. *)
 
     File "my_file.ml", lines 11-13, characters 0-141:
       CR user: What we do is that we base it on the number of delimiters
-      ;; of the first line.
+      ; of the first line.
       So, lines that have more will keep their prefix.
 
     File "my_file.ml", lines 15-16, characters 0-62:
@@ -883,6 +996,18 @@ this as part of our tests. *)
     | XCR user: We test that we produce correctly rstripped lines when using margins.
     |
     | And the cr contains empty lines.
+    |}];
+  with_margin
+    {|
+;; $XCR user: We test that we produce correctly rstripped lines when using margins.
+;;
+;; And the cr contains empty lines. *)
+|};
+  [%expect
+    {|
+    | XCR user: We test that we produce correctly rstripped lines when using margins.
+    |
+    | And the cr contains empty lines. *)
     |}];
   ()
 ;;
@@ -1066,6 +1191,13 @@ let%expect_test "single-hash-style" =
 
 # $XCR user: And it can
 # span multiple lines too.
+
+Hello text # $CR user: Comment may be left next to a non-empty line.
+
+  # $CR user: Let's cover the case
+  #
+  # Where there are empty lines that are part of the comment.
+  # This happens when the CR has multiple paragraphs.
 |};
   [%expect
     {|
@@ -1110,7 +1242,7 @@ let%expect_test "single-hash-style" =
        (path my_file.ml)
        (whole_loc (
          (start my_file.ml:3:0)
-         (stop  my_file.ml:5:0)))
+         (stop  my_file.ml:4:26)))
        (header (
          Ok (
            (kind (
@@ -1138,6 +1270,79 @@ let%expect_test "single-hash-style" =
        (kind XCR)
        (qualifier (None))
        (priority Now))))
+    ========================
+    CR user: Comment may be left next to a non-empty line.
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:6:11)
+         (stop  my_file.ml:6:67)))
+       (header (
+         Ok (
+           (kind (
+             (txt CR)
+             (loc (
+               (start my_file.ml:6:13)
+               (stop  my_file.ml:6:15)))))
+           (qualifier (
+             (txt None)
+             (loc (
+               (start my_file.ml:6:13)
+               (stop  my_file.ml:6:15)))))
+           (reporter (
+             (txt user)
+             (loc (
+               (start my_file.ml:6:16)
+               (stop  my_file.ml:6:20)))))
+           (recipient ()))))
+       (comment_prefix #)
+       (digest_of_condensed_content 578d4a5fa32ea8eb96dcfadd364f5970)
+       (content "CR user: Comment may be left next to a non-empty line.")))
+     (getters (
+       (path my_file.ml)
+       (content "CR user: Comment may be left next to a non-empty line.")
+       (kind CR)
+       (qualifier (None))
+       (priority Now))))
+    ========================
+    CR user: Let's cover the case
+
+    Where there are empty lines that are part of the comment.
+    This happens when the CR has multiple paragraphs.
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:8:2)
+         (stop  my_file.ml:12:0)))
+       (header (
+         Ok (
+           (kind (
+             (txt CR)
+             (loc (
+               (start my_file.ml:8:4)
+               (stop  my_file.ml:8:6)))))
+           (qualifier (
+             (txt None)
+             (loc (
+               (start my_file.ml:8:4)
+               (stop  my_file.ml:8:6)))))
+           (reporter (
+             (txt user)
+             (loc (
+               (start my_file.ml:8:7)
+               (stop  my_file.ml:8:11)))))
+           (recipient ()))))
+       (comment_prefix #)
+       (digest_of_condensed_content 5112e33a61329692231b5bf143b141a5)
+       (content
+        "CR user: Let's cover the case\n  #\n  # Where there are empty lines that are part of the comment.\n  # This happens when the CR has multiple paragraphs.")))
+     (getters (
+       (path my_file.ml)
+       (content
+        "CR user: Let's cover the case\n  #\n  # Where there are empty lines that are part of the comment.\n  # This happens when the CR has multiple paragraphs.")
+       (kind CR)
+       (qualifier (None))
+       (priority Now))))
     |}];
   ()
 ;;
@@ -1149,6 +1354,13 @@ let%expect_test "double-hash-style" =
 
 ## $XCR user: And it can
 ## span multiple lines too.
+
+Hello text ## $CR user: Comment may be left next to a non-empty line.
+
+  ## $CR user: Let's cover the case
+  ##
+  ## Where there are empty lines that are part of the comment.
+  ## This happens when the CR has multiple paragraphs.
 |};
   [%expect
     {|
@@ -1193,7 +1405,7 @@ let%expect_test "double-hash-style" =
        (path my_file.ml)
        (whole_loc (
          (start my_file.ml:3:0)
-         (stop  my_file.ml:5:0)))
+         (stop  my_file.ml:4:27)))
        (header (
          Ok (
            (kind (
@@ -1219,6 +1431,79 @@ let%expect_test "double-hash-style" =
        (path my_file.ml)
        (content "XCR user: And it can\n## span multiple lines too.")
        (kind XCR)
+       (qualifier (None))
+       (priority Now))))
+    ========================
+    CR user: Comment may be left next to a non-empty line.
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:6:11)
+         (stop  my_file.ml:6:68)))
+       (header (
+         Ok (
+           (kind (
+             (txt CR)
+             (loc (
+               (start my_file.ml:6:14)
+               (stop  my_file.ml:6:16)))))
+           (qualifier (
+             (txt None)
+             (loc (
+               (start my_file.ml:6:14)
+               (stop  my_file.ml:6:16)))))
+           (reporter (
+             (txt user)
+             (loc (
+               (start my_file.ml:6:17)
+               (stop  my_file.ml:6:21)))))
+           (recipient ()))))
+       (comment_prefix ##)
+       (digest_of_condensed_content 578d4a5fa32ea8eb96dcfadd364f5970)
+       (content "CR user: Comment may be left next to a non-empty line.")))
+     (getters (
+       (path my_file.ml)
+       (content "CR user: Comment may be left next to a non-empty line.")
+       (kind CR)
+       (qualifier (None))
+       (priority Now))))
+    ========================
+    CR user: Let's cover the case
+
+    Where there are empty lines that are part of the comment.
+    This happens when the CR has multiple paragraphs.
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:8:2)
+         (stop  my_file.ml:12:0)))
+       (header (
+         Ok (
+           (kind (
+             (txt CR)
+             (loc (
+               (start my_file.ml:8:5)
+               (stop  my_file.ml:8:7)))))
+           (qualifier (
+             (txt None)
+             (loc (
+               (start my_file.ml:8:5)
+               (stop  my_file.ml:8:7)))))
+           (reporter (
+             (txt user)
+             (loc (
+               (start my_file.ml:8:8)
+               (stop  my_file.ml:8:12)))))
+           (recipient ()))))
+       (comment_prefix ##)
+       (digest_of_condensed_content c996cd4ecdb0a43a61975f81638e5107)
+       (content
+        "CR user: Let's cover the case\n  ##\n  ## Where there are empty lines that are part of the comment.\n  ## This happens when the CR has multiple paragraphs.")))
+     (getters (
+       (path my_file.ml)
+       (content
+        "CR user: Let's cover the case\n  ##\n  ## Where there are empty lines that are part of the comment.\n  ## This happens when the CR has multiple paragraphs.")
+       (kind CR)
        (qualifier (None))
        (priority Now))))
     |}];
@@ -1416,6 +1701,11 @@ let%expect_test "single-semi-style" =
   spanning multiple
   lines) ; $CR user: Comment may span multiple
          ; lines too.
+
+  ; $CR user: Let's cover the case
+  ;
+  ; Where there are empty lines that are part of the comment.
+  ; This happens when the CR has multiple paragraphs.
 |};
   [%expect
     {|
@@ -1529,7 +1819,7 @@ let%expect_test "single-semi-style" =
        (path my_file.ml)
        (whole_loc (
          (start my_file.ml:8:9)
-         (stop  my_file.ml:10:0)))
+         (stop  my_file.ml:9:21)))
        (header (
          Ok (
            (kind (
@@ -1557,6 +1847,45 @@ let%expect_test "single-semi-style" =
        (kind CR)
        (qualifier (None))
        (priority Now))))
+    ========================
+    CR user: Let's cover the case
+
+    Where there are empty lines that are part of the comment.
+    This happens when the CR has multiple paragraphs.
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:11:2)
+         (stop  my_file.ml:15:0)))
+       (header (
+         Ok (
+           (kind (
+             (txt CR)
+             (loc (
+               (start my_file.ml:11:4)
+               (stop  my_file.ml:11:6)))))
+           (qualifier (
+             (txt None)
+             (loc (
+               (start my_file.ml:11:4)
+               (stop  my_file.ml:11:6)))))
+           (reporter (
+             (txt user)
+             (loc (
+               (start my_file.ml:11:7)
+               (stop  my_file.ml:11:11)))))
+           (recipient ()))))
+       (comment_prefix ";")
+       (digest_of_condensed_content eef985611075b182b3f77ab176ad2bab)
+       (content
+        "CR user: Let's cover the case\n  ;\n  ; Where there are empty lines that are part of the comment.\n  ; This happens when the CR has multiple paragraphs.")))
+     (getters (
+       (path my_file.ml)
+       (content
+        "CR user: Let's cover the case\n  ;\n  ; Where there are empty lines that are part of the comment.\n  ; This happens when the CR has multiple paragraphs.")
+       (kind CR)
+       (qualifier (None))
+       (priority Now))))
     |}];
   ()
 ;;
@@ -1568,6 +1897,16 @@ let%expect_test "double-semi-style" =
 
 ;; $XCR user: And it can
 ;; span multiple lines too.
+
+(This is a sexp     ;; $CR user: Comment may be placed after a non-empty line.
+  spanning multiple
+  lines) ;; $CR user: Comment may span multiple
+         ;; lines too.
+
+  ;; $CR user: Let's cover the case
+  ;;
+  ;; Where there are empty lines that are part of the comment.
+  ;; This happens when the CR has multiple paragraphs.
 |};
   [%expect
     {|
@@ -1612,7 +1951,7 @@ let%expect_test "double-semi-style" =
        (path my_file.ml)
        (whole_loc (
          (start my_file.ml:3:0)
-         (stop  my_file.ml:5:0)))
+         (stop  my_file.ml:4:27)))
        (header (
          Ok (
            (kind (
@@ -1638,6 +1977,114 @@ let%expect_test "double-semi-style" =
        (path my_file.ml)
        (content "XCR user: And it can\n;; span multiple lines too.")
        (kind XCR)
+       (qualifier (None))
+       (priority Now))))
+    ========================
+    CR user: Comment may be placed after a non-empty line.
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:6:20)
+         (stop  my_file.ml:6:77)))
+       (header (
+         Ok (
+           (kind (
+             (txt CR)
+             (loc (
+               (start my_file.ml:6:23)
+               (stop  my_file.ml:6:25)))))
+           (qualifier (
+             (txt None)
+             (loc (
+               (start my_file.ml:6:23)
+               (stop  my_file.ml:6:25)))))
+           (reporter (
+             (txt user)
+             (loc (
+               (start my_file.ml:6:26)
+               (stop  my_file.ml:6:30)))))
+           (recipient ()))))
+       (comment_prefix ";;")
+       (digest_of_condensed_content 66bfce0646f71201f4c5d0a1bea8b4e7)
+       (content "CR user: Comment may be placed after a non-empty line.")))
+     (getters (
+       (path my_file.ml)
+       (content "CR user: Comment may be placed after a non-empty line.")
+       (kind CR)
+       (qualifier (None))
+       (priority Now))))
+    ========================
+    CR user: Comment may span multiple
+    lines too.
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:8:9)
+         (stop  my_file.ml:9:22)))
+       (header (
+         Ok (
+           (kind (
+             (txt CR)
+             (loc (
+               (start my_file.ml:8:12)
+               (stop  my_file.ml:8:14)))))
+           (qualifier (
+             (txt None)
+             (loc (
+               (start my_file.ml:8:12)
+               (stop  my_file.ml:8:14)))))
+           (reporter (
+             (txt user)
+             (loc (
+               (start my_file.ml:8:15)
+               (stop  my_file.ml:8:19)))))
+           (recipient ()))))
+       (comment_prefix ";;")
+       (digest_of_condensed_content 6f8e9e350677c2f81d33e6a3ec6d588b)
+       (content "CR user: Comment may span multiple\n         ;; lines too.")))
+     (getters (
+       (path my_file.ml)
+       (content "CR user: Comment may span multiple\n         ;; lines too.")
+       (kind CR)
+       (qualifier (None))
+       (priority Now))))
+    ========================
+    CR user: Let's cover the case
+
+    Where there are empty lines that are part of the comment.
+    This happens when the CR has multiple paragraphs.
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:11:2)
+         (stop  my_file.ml:15:0)))
+       (header (
+         Ok (
+           (kind (
+             (txt CR)
+             (loc (
+               (start my_file.ml:11:5)
+               (stop  my_file.ml:11:7)))))
+           (qualifier (
+             (txt None)
+             (loc (
+               (start my_file.ml:11:5)
+               (stop  my_file.ml:11:7)))))
+           (reporter (
+             (txt user)
+             (loc (
+               (start my_file.ml:11:8)
+               (stop  my_file.ml:11:12)))))
+           (recipient ()))))
+       (comment_prefix ";;")
+       (digest_of_condensed_content db3e65d596c50205442c2d6b223f1817)
+       (content
+        "CR user: Let's cover the case\n  ;;\n  ;; Where there are empty lines that are part of the comment.\n  ;; This happens when the CR has multiple paragraphs.")))
+     (getters (
+       (path my_file.ml)
+       (content
+        "CR user: Let's cover the case\n  ;;\n  ;; Where there are empty lines that are part of the comment.\n  ;; This happens when the CR has multiple paragraphs.")
+       (kind CR)
        (qualifier (None))
        (priority Now))))
     |}];
