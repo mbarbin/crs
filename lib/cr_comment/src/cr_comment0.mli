@@ -90,12 +90,15 @@ module Header : sig
   val recipient : t -> Vcs.User_handle.t option
 
   val status : t -> Status.t
-  val priority : t -> Priority.t
 
   (** This returns the qualifier if present ([Soon] for [CR-soon] or [Someday]
       for [CR-someday]). If there is no qualifier specified, this returns
       [None]. *)
   val qualifier : t -> Qualifier.t
+
+  (** [priority t] represents the expectation as to when work on the CR is meant
+      to happen. It is based on the header's qualifier. *)
+  val priority : t -> Priority.t
 
   module With_loc : sig
     (** These getters allows you to access the position of each elements of the
@@ -182,10 +185,6 @@ val whole_loc : t -> Loc.t
 
 val header : t -> Header.t Or_error.t
 val status : t -> Status.t
-
-(* CR mbarbin: Add a comment indicating that CRs that have a priority of P are
-   sometimes referred to as being "due" on P. For example, "This CR is due
-   now.", or "This CR is due to be resolved someday". *)
 
 (** [priority t] represents the expectation as to when work on the CR is meant
     to happen. It is based on the header's qualifier except that XCRs and

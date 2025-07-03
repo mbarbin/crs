@@ -33,6 +33,10 @@
     at this level. Higher-level tools or code review systems built on top of CRs
     may define their own policies or behaviors around these categories.
 
+    In the terminology used in the project, you'll sometimes come across
+    language that makes a direct parallel between the CR's priority, and when
+    work on it is expected to be "due" or meant to happen.
+
     Typical interpretations:
     - [Now]: Should be addressed promptly (while working on a PR for example).
     - [Soon]: Should be addressed in the near future.
