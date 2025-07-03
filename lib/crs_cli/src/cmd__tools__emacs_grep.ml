@@ -95,6 +95,10 @@ By default the file paths are displayed relative to the command's $(b,cwd).
          ~docv:"MODE"
          ~doc:"Specify how the paths are displayed."
          ~default:Relative_to_cwd
+     and+ summary =
+       Arg.flag
+         [ "summary" ]
+         ~doc:"Print CR counts in summary tables instead of listing each CR."
      and+ filters = Common_helpers.filters in
      let cwd = Unix.getcwd () |> Absolute_path.v in
      let { Enclosing_repo.vcs_kind = _; repo_root; vcs } =
@@ -111,10 +115,21 @@ By default the file paths are displayed relative to the command's $(b,cwd).
          List.filter all_crs ~f:(fun cr ->
            List.exists filters ~f:(fun filter -> Cr_comment.Filter.matches filter ~cr))
      in
-     output_list
-       crs
-       ~oc:Out_channel.stdout
-       ~repo_root
-       ~below:(Vcs.Path_in_repo.to_relative_path below)
-       ~path_display_mode)
+     if summary
+     then (
+       let by_type = Summary_table.By_type.make crs |> Summary_table.By_type.to_box in
+       let summary = Summary_table.make crs |> Summary_table.to_box in
+       let tables =
+         List.filter_opt [ by_type; summary ]
+         |> List.map ~f:Summary_table.Box.to_string
+         |> String.concat ~sep:"\n"
+       in
+       Out_channel.output_string Stdio.stdout tables)
+     else
+       output_list
+         crs
+         ~oc:Out_channel.stdout
+         ~repo_root
+         ~below:(Vcs.Path_in_repo.to_relative_path below)
+         ~path_display_mode)
 ;;

@@ -117,3 +117,39 @@ It is however also possible to display the path using some other styles.
 
 We do not exercise here the display of absolute path because it would make this
 test unstable, however this rendering option is available.
+
+The emacs grep command supports showing summary tables.
+
+  $ crs tools emacs-grep --summary
+  ┌─────────┬───────┐
+  │ CR Type │ Count │
+  ├─────────┼───────┤
+  │ CR      │     2 │
+  │ XCR     │     1 │
+  │ Soon    │     1 │
+  │ Someday │     1 │
+  └─────────┴───────┘
+  
+  ┌──────────┬───────┬─────┬──────┬──────┬─────────┬───────┐
+  │ Reporter │ For   │ CRs │ XCRs │ Soon │ Someday │ Total │
+  ├──────────┼───────┼─────┼──────┼──────┼─────────┼───────┤
+  │ user1    │       │     │    1 │    1 │       1 │     3 │
+  │ user1    │ user2 │   1 │      │      │         │     1 │
+  │ user1    │ user3 │   1 │      │      │         │     1 │
+  └──────────┴───────┴─────┴──────┴──────┴─────────┴───────┘
+
+This option may be combined with other filters when calling from the command
+line, however when used through emacs, the filter applied is always "all".
+
+  $ crs tools emacs-grep --summary --xcrs
+  ┌─────────┬───────┐
+  │ CR Type │ Count │
+  ├─────────┼───────┤
+  │ XCR     │     1 │
+  └─────────┴───────┘
+  
+  ┌──────────┬──────┬───────┐
+  │ Reporter │ XCRs │ Total │
+  ├──────────┼──────┼───────┤
+  │ user1    │    1 │     1 │
+  └──────────┴──────┴───────┘
