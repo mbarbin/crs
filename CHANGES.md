@@ -1,8 +1,12 @@
 ## 0.0.2025XXXX (unreleased)
 
+### Added
+
+- Add 's' for summary tables in emacs crs-grep-mode (#45, @mbarbin).
+
 ### Changed
 
-- Add buffer line header in emacs crs-grep-mode by default (@mbarbin).
+- Add buffer line header in emacs crs-grep-mode by default (#44, @mbarbin).
 
 ### Fixed
 
