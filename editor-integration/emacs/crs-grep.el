@@ -62,7 +62,8 @@ Should be one of: all, crs, xcrs, now, soon, someday, invalid."
 (defcustom crs-grep-enable-next-error-follow nil
   "If non-nil, enable `next-error-follow-minor-mode' in the CRs buffer by default."
   :type 'boolean
-  :group 'crs-grep)
+  :group 'crs-grep
+  :package-version '("crs-grep" . "0.0.3"))
 
 (defcustom crs-grep-buffer-opening-behavior "split"
   "How to open the CRs buffer when it does not already exist.
@@ -75,7 +76,8 @@ its window placement is preserved.  Allowed values are: \"replace\", \"split\"."
   '(choice
     (const :tag "Replace current buffer" "replace")
     (const :tag "Split window" "split"))
-  :group 'crs-grep)
+  :group 'crs-grep
+  :package-version '("crs-grep" . "0.0.3"))
 
 (defcustom crs-grep-enable-header-line t
   "If non-nil, show a header line in the CRs buffer.
