@@ -159,6 +159,8 @@ Always a string, e.g. \"now\", \"all\", etc.")
                              "emacs-grep"
                              "--path-display-mode=absolute"
                              (concat "--" crs-grep-current-filter))))
+          (when (fboundp 'ansi-color-apply-on-region)
+            (ansi-color-apply-on-region (point-min) (point-max)))
           (if (eq exit-code 0)
               (progn
                 (crs-grep-mode)
