@@ -134,7 +134,7 @@ module Header : sig
 
     (** This was renamed [status]. Hint: Run [ocamlmig migrate]. *)
     val kind : t -> Status.t Loc.Txt.t
-    [@@migrate { repl = Rel.reporter }]
+    [@@migrate { repl = Rel.status }]
 
     (** This was renamed [reporter]. Hint: Run [ocamlmig migrate]. *)
     val reported_by : t -> Vcs.User_handle.t Loc.Txt.t
@@ -146,7 +146,7 @@ module Header : sig
 
     (** This was renamed [qualifier]. Hint: Run [ocamlmig migrate]. *)
     val due : t -> Qualifier.t Loc.Txt.t
-    [@@migrate { repl = Rel.recipient }]
+    [@@migrate { repl = Rel.qualifier }]
   end
 
   (** {1 Deprecated}
