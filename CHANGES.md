@@ -1,6 +1,6 @@
 ## 0.0.2025XXXX (unreleased)
 
-#### Fixed
+### Fixed
 
 - Fix rendering of empty lines in multilines CRs with comment prefix (@mbarbin).
 
