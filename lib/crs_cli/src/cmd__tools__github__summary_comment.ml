@@ -76,7 +76,7 @@ This command is meant to be used to generate contents to include to the history 
        then
          print_endline
            (Printf.sprintf
-              "Users with active CRs/XCRs: %s"
+              "Users with assigned CRs/XCRs: %s"
               (String.concat ~sep:", " assignees))
      in
      ())

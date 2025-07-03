@@ -207,7 +207,7 @@ We can also print a summary comment,
   └──────────┴───────┴─────┴──────┴───────┘
   ```
   
-  Users with active CRs/XCRs: user1, user2, user3
+  Users with assigned CRs/XCRs: user1, user2, user3
 
   $ crs tools github summary-comment --config=crs-config.json \
   >   --review-mode=pull-request \
@@ -217,7 +217,7 @@ We can also print a summary comment,
 
   $ diff without-config for-pull-request
   20c20
-  < Users with active CRs/XCRs: user1, user2, user3
+  < Users with assigned CRs/XCRs: user1, user2, user3
   ---
-  > Users with active CRs/XCRs: @pr-author, @user1, @user2, user3
+  > Users with assigned CRs/XCRs: @pr-author, @user1, @user2, user3
   [1]
