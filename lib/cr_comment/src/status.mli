@@ -19,7 +19,7 @@
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
 
-(** The [Kind.t] type distinguishes between resolved and unresolved code review
+(** The [Status.t] type distinguishes between resolved and unresolved code review
     comments.
 
     - [CR]: An unresolved code review comment.

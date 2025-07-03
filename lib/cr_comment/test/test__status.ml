@@ -20,17 +20,17 @@
 (********************************************************************************)
 
 let%expect_test "to_string" =
-  List.iter Cr_comment.Kind.all ~f:(fun kind ->
+  List.iter Cr_comment.Status.all ~f:(fun status ->
     print_s
       [%sexp
-        { kind : Cr_comment.Kind.t
-        ; to_string = (Cr_comment.Kind.to_string kind : string)
+        { status : Cr_comment.Status.t
+        ; to_string = (Cr_comment.Status.to_string status : string)
         }]);
   [%expect
     {|
-    ((kind      CR)
+    ((status    CR)
      (to_string CR))
-    ((kind      XCR)
+    ((status    XCR)
      (to_string XCR))
     |}];
   ()

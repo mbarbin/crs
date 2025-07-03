@@ -95,13 +95,13 @@ let () = ()
     List.iter crs ~f:(fun cr ->
       Or_error.iter (Cr_comment.header cr) ~f:(fun p ->
         let text =
-          match Cr_comment.Header.kind p with
+          match Cr_comment.Header.status p with
           | CR -> "XCR"
           | XCR -> "CR"
         in
         File_rewriter.replace
           file_rewriter
-          ~range:(Loc.range (Cr_comment.Header.With_loc.kind p).loc)
+          ~range:(Loc.range (Cr_comment.Header.With_loc.status p).loc)
           ~text)));
   [%expect
     {|
@@ -303,7 +303,7 @@ let () =
   test file_contents ~f:(fun ~crs ~file_rewriter ->
     List.iter crs ~f:(fun cr ->
       Or_error.iter (Cr_comment.header cr) ~f:(fun p ->
-        match Cr_comment.Header.kind p with
+        match Cr_comment.Header.status p with
         | XCR -> ()
         | CR ->
           (match Cr_comment.Header.With_loc.qualifier p with
@@ -369,7 +369,7 @@ let () = ()
   test file_contents ~f:(fun ~crs ~file_rewriter ->
     List.iter crs ~f:(fun cr ->
       Or_error.iter (Cr_comment.header cr) ~f:(fun p ->
-        match Cr_comment.Header.kind p with
+        match Cr_comment.Header.status p with
         | XCR -> ()
         | CR ->
           (match Cr_comment.Header.With_loc.qualifier p with
@@ -435,7 +435,7 @@ let () = ()
           File_rewriter.remove
             file_rewriter
             ~range:
-              { start = Loc.stop_offset (Cr_comment.Header.With_loc.kind p).loc
+              { start = Loc.stop_offset (Cr_comment.Header.With_loc.status p).loc
               ; stop = Loc.stop_offset loc
               })));
   [%expect

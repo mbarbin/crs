@@ -77,7 +77,7 @@ let of_cr ~cr ~(config : Config.t) ~review_mode ~with_user_mentions =
     let title =
       match header with
       | Error _ -> "Invalid CR"
-      | Ok h -> Cr_comment.Kind.to_string (Cr_comment.Header.kind h)
+      | Ok h -> Cr_comment.Status.to_string (Cr_comment.Header.status h)
     in
     let assignee = Assignee.compute ~cr ~config ~review_mode in
     let with_user_mention =
@@ -97,7 +97,7 @@ let of_cr ~cr ~(config : Config.t) ~review_mode ~with_user_mentions =
         [ "This"
         ; (match header with
            | Error _ -> "invalid CR"
-           | Ok h -> Cr_comment.Kind.to_string (Cr_comment.Header.kind h))
+           | Ok h -> Cr_comment.Status.to_string (Cr_comment.Header.status h))
         ; "is"
         ; (match assignee.user with
            | None -> "unassigned"

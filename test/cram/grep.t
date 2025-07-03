@@ -93,7 +93,7 @@ A basic [sexp] output is available.
   ((path foo/a.txt) (whole_loc ((start foo/a.txt:2:0) (stop foo/a.txt:2:38)))
    (header
     (Ok
-     ((kind ((txt XCR) (loc ((start foo/a.txt:2:3) (stop foo/a.txt:2:6)))))
+     ((status ((txt XCR) (loc ((start foo/a.txt:2:3) (stop foo/a.txt:2:6)))))
       (qualifier
        ((txt None) (loc ((start foo/a.txt:2:3) (stop foo/a.txt:2:6)))))
       (reporter
@@ -105,7 +105,7 @@ A basic [sexp] output is available.
   ((path foo/b.txt) (whole_loc ((start foo/b.txt:1:0) (stop foo/b.txt:1:71)))
    (header
     (Ok
-     ((kind ((txt CR) (loc ((start foo/b.txt:1:3) (stop foo/b.txt:1:5)))))
+     ((status ((txt CR) (loc ((start foo/b.txt:1:3) (stop foo/b.txt:1:5)))))
       (qualifier
        ((txt Someday) (loc ((start foo/b.txt:1:6) (stop foo/b.txt:1:13)))))
       (reporter
@@ -119,7 +119,7 @@ A basic [sexp] output is available.
    (whole_loc ((start foo/bar/b.txt:2:0) (stop foo/bar/b.txt:2:55)))
    (header
     (Ok
-     ((kind
+     ((status
        ((txt CR) (loc ((start foo/bar/b.txt:2:3) (stop foo/bar/b.txt:2:5)))))
       (qualifier
        ((txt Soon) (loc ((start foo/bar/b.txt:2:6) (stop foo/bar/b.txt:2:10)))))
@@ -150,7 +150,7 @@ A basic [sexp] output is available.
   ((path foo/foo.c) (whole_loc ((start foo/foo.c:1:0) (stop foo/foo.c:1:60)))
    (header
     (Ok
-     ((kind ((txt CR) (loc ((start foo/foo.c:1:3) (stop foo/foo.c:1:5)))))
+     ((status ((txt CR) (loc ((start foo/foo.c:1:3) (stop foo/foo.c:1:5)))))
       (qualifier
        ((txt None) (loc ((start foo/foo.c:1:3) (stop foo/foo.c:1:5)))))
       (reporter
@@ -163,7 +163,7 @@ A basic [sexp] output is available.
   ((path hello) (whole_loc ((start hello:2:0) (stop hello:2:60)))
    (header
     (Ok
-     ((kind ((txt CR) (loc ((start hello:2:3) (stop hello:2:5)))))
+     ((status ((txt CR) (loc ((start hello:2:3) (stop hello:2:5)))))
       (qualifier ((txt None) (loc ((start hello:2:3) (stop hello:2:5)))))
       (reporter ((txt user1) (loc ((start hello:2:6) (stop hello:2:11)))))
       (recipient (((txt user2) (loc ((start hello:2:16) (stop hello:2:21)))))))))

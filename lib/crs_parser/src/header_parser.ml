@@ -48,7 +48,7 @@
    * - Remove support for extra headers.
    * - Remove support for attributes.
    * - Remove assignee computation (left as external work).
-   * - Replace [is_xcr] by a variant type [Kind.t].
+   * - Replace [is_xcr] by a variant type [Status.t].
    * - Make [reporter] mandatory.
    * - Rename [Processed] to [Header].
    * - Remove support for 'v' separator in CR comment
@@ -69,7 +69,7 @@ let comment_regex =
        whole_string
          (seq
             [ rep whitespace
-            ; group ~name:"cr_kind" (seq [ opt (char 'X'); str "CR" ])
+            ; group ~name:"status" (seq [ opt (char 'X'); str "CR" ])
             ; opt
                 (seq
                    [ char '-'
@@ -130,14 +130,14 @@ let parse ~file_cache ~content_start_offset ~content =
       | None -> assert false (* Mandatory in the [comment_regexp]. *)
       | Some (reporter, loc) -> { Loc.Txt.txt = Vcs.User_handle.v reporter; loc }
     in
-    let kind =
-      match get "cr_kind" with
+    let status =
+      match get "status" with
       | None -> assert false (* Mandatory in the [comment_regexp]. *)
-      | Some (kind, loc) ->
-        let txt =
-          match kind with
-          | "CR" -> Cr_comment.Kind.CR
-          | "XCR" -> Cr_comment.Kind.XCR
+      | Some (status, loc) ->
+        let txt : Cr_comment.Status.t =
+          match status with
+          | "CR" -> CR
+          | "XCR" -> XCR
           | _ -> assert false (* Cannot be parsed according to the regexp. *)
         in
         { Loc.Txt.txt; loc }
@@ -148,7 +148,7 @@ let parse ~file_cache ~content_start_offset ~content =
     in
     let qualifier =
       match get "qualifier" with
-      | None -> { Loc.Txt.txt = Cr_comment.Qualifier.None; loc = kind.loc }
+      | None -> { Loc.Txt.txt = Cr_comment.Qualifier.None; loc = status.loc }
       | Some ("soon", loc) -> { Loc.Txt.txt = Cr_comment.Qualifier.Soon; loc }
       | Some ("someday", loc) -> { Loc.Txt.txt = Cr_comment.Qualifier.Someday; loc }
       | Some (_, loc) ->
@@ -156,7 +156,7 @@ let parse ~file_cache ~content_start_offset ~content =
         { Loc.Txt.txt = Cr_comment.Qualifier.Someday; loc }
     in
     Or_error.return
-      (Cr_comment.Private.Header.create ~kind ~qualifier ~reporter ~recipient)
+      (Cr_comment.Private.Header.create ~status ~qualifier ~reporter ~recipient)
   with
   | exn ->
     Or_error.error

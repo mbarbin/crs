@@ -92,7 +92,7 @@ module By_type = struct
       match Cr_comment.header cr with
       | Error _ -> Invalid
       | Ok h ->
-        (match Cr_comment.Header.kind h with
+        (match Cr_comment.Header.status h with
          | XCR -> XCR
          | CR ->
            (match Cr_comment.Header.qualifier h with
@@ -145,7 +145,7 @@ module Type = struct
     | Someday
 
   let of_header h =
-    match Cr_comment.Header.kind h with
+    match Cr_comment.Header.status h with
     | XCR -> XCR
     | CR ->
       (match Cr_comment.Header.qualifier h with

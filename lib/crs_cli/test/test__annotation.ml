@@ -47,7 +47,7 @@ let%expect_test "sexp_of_t" =
         (whole_loc _)
         (header (
           Ok (
-            (kind      CR)
+            (status    CR)
             (qualifier None)
             (reporter  user1)
             (recipient (user2)))))
