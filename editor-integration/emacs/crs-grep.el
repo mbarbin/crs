@@ -6,7 +6,7 @@
 ;; Maintainer: Mathieu Barbin <mathieu.barbin@gmail.com>
 ;; URL: https://github.com/mbarbin/crs
 ;; Keywords: tools
-;; Version: 0.0.3
+;; Version: 0.0.4
 ;; Package-Requires: ((emacs "29.1"))
 ;; SPDX-License-Identifier: GPL-3.0-or-later
 ;;
@@ -62,7 +62,8 @@ Should be one of: all, crs, xcrs, now, soon, someday, invalid."
 (defcustom crs-grep-enable-next-error-follow nil
   "If non-nil, enable `next-error-follow-minor-mode' in the CRs buffer by default."
   :type 'boolean
-  :group 'crs-grep)
+  :group 'crs-grep
+  :package-version '("crs-grep" . "0.0.3"))
 
 (defcustom crs-grep-buffer-opening-behavior "split"
   "How to open the CRs buffer when it does not already exist.
@@ -75,7 +76,19 @@ its window placement is preserved.  Allowed values are: \"replace\", \"split\"."
   '(choice
     (const :tag "Replace current buffer" "replace")
     (const :tag "Split window" "split"))
-  :group 'crs-grep)
+  :group 'crs-grep
+  :package-version '("crs-grep" . "0.0.3"))
+
+(defcustom crs-grep-enable-header-line t
+  "If non-nil, show a header line in the CRs buffer.
+
+When enabled, the header line in the CRs buffer displays
+contextual information such as the currently active CRs filter
+and the root path from which the search is run.  This provides
+persistent state awareness for the buffer contents."
+  :type 'boolean
+  :group 'crs-grep
+  :package-version '("crs-grep" . "0.0.4"))
 
 (defvar crs-grep-buffer-name "*CRs*"
   "Name of the buffer used to display Code Review Comments (CRs).")
@@ -148,13 +161,14 @@ Always a string, e.g. \"now\", \"all\", etc.")
           (if (eq exit-code 0)
               (progn
                 (crs-grep-mode)
+                (when crs-grep-enable-header-line
+                  (setq header-line-format
+                        (format "CRs: type \"%s\"   path \"%s\""
+                                crs-grep-current-filter
+                                crs-grep-path-in-repo)))
                 (when crs-grep-enable-next-error-follow
                   (next-error-follow-minor-mode 1))
-                (goto-char (point-min))
-                (message
-                 (format
-                  "CRs loaded successfully (type: \"%s\", below: \"%s\")."
-                  crs-grep-current-filter crs-grep-path-in-repo)))
+                (goto-char (point-min)))
             (message
              "Failed to run `crs grep`. Check the CLI path or repository state.")))))
     (if (get-buffer-window output-buffer)

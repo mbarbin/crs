@@ -1,6 +1,10 @@
 ## 0.0.2025XXXX (unreleased)
 
-#### Fixed
+### Changed
+
+- Add buffer line header in emacs crs-grep-mode by default (@mbarbin).
+
+### Fixed
 
 - Fix rendering of empty lines in multilines CRs with comment prefix (@mbarbin).
 
