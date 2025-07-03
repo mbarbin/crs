@@ -42,19 +42,19 @@ For more information, use the $(b,--help) flag on a subcommand.
           ~summary:"Useful utils to integrate with other tools."
           [ ( "config"
             , Command.group
-                ~summary:"Utils related to config files"
+                ~summary:"Utils related to config files."
                 [ "validate", Cmd__tools__config__validate.main ] )
           ; "emacs-grep", Cmd__tools__emacs_grep.main
           ; "enclosing-repo-info", Cmd__tools__enclosing_repo_info.main
           ; ( "github"
             , Command.group
-                ~summary:"Utils related to GitHub"
+                ~summary:"Utils related to GitHub."
                 [ "annotate-crs", Cmd__tools__github__annotate_crs.main
                 ; "summary-comment", Cmd__tools__github__summary_comment.main
                 ] )
           ; ( "reviewdog"
             , Command.group
-                ~summary:"Utils related to Reviewdog"
+                ~summary:"Utils related to Reviewdog."
                 [ "annotate-crs", Cmd__tools__reviewdog__annotate_crs.main ] )
           ] )
     ]
