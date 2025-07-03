@@ -47,7 +47,7 @@ Set this to an absolute path if the executable is not in your `PATH`."
 
 (defcustom crs-grep-default-filter "now"
   "Default filter for `crs-grep` when opening the CRs buffer.
-Should be one of: all, crs, xcrs, now, soon, someday, invalid."
+Should be one of: all, crs, xcrs, now, soon, someday, invalid, summary."
   :type
   '(choice
     (const "all")
@@ -56,7 +56,8 @@ Should be one of: all, crs, xcrs, now, soon, someday, invalid."
     (const "now")
     (const "soon")
     (const "someday")
-    (const "invalid"))
+    (const "invalid")
+    (const "summary"))
   :group 'crs-grep)
 
 (defcustom crs-grep-enable-next-error-follow nil
@@ -208,12 +209,13 @@ If `crs-grep-repo-root` is nil, shows an error message."
 (defun crs-grep-set-filter (filter-name)
   "Set the CRs type filter to FILTER-NAME (string) and refresh the CRs buffer.
 Prompts if called interactively."
-  (interactive (list
-                (completing-read
-                 "Filter (all, crs, xcrs, now, soon, someday, invalid): "
-                 '("all" "crs" "xcrs" "now" "soon" "someday" "invalid")
-                 nil
-                 t)))
+  (interactive
+   (list
+    (completing-read
+     "Filter (all, crs, xcrs, now, soon, someday, invalid, summary): "
+     '("all" "crs" "xcrs" "now" "soon" "someday" "invalid" "summary")
+     nil
+     t)))
   (setq crs-grep-current-filter filter-name)
   (crs-grep-refresh))
 
@@ -266,6 +268,13 @@ Further refreshing the buffer will continue to show invalid CRs only."
   (interactive)
   (crs-grep-set-filter "invalid"))
 
+(defun crs-grep-set-filter-summary ()
+  "Set the CRs type filter to \"summary\" and refresh the CRs buffer.
+This will show only the summary box.
+Further refreshing the buffer will continue to show the summary only."
+  (interactive)
+  (crs-grep-set-filter "summary"))
+
 ;;; Mode
 
 (defvar crs-grep-mode-map
@@ -280,6 +289,7 @@ Further refreshing the buffer will continue to show invalid CRs only."
     (define-key map "d" 'crs-grep-set-filter-someday)
     (define-key map "i" 'crs-grep-set-filter-invalid)
     (define-key map "a" 'crs-grep-set-filter-all)
+    (define-key map "s" 'crs-grep-set-filter-summary)
     map)
   "Keymap for `crs-grep-mode`.
 
@@ -293,6 +303,7 @@ Keys:
   o   Show only CRs to be worked on \"soon\" (set filter)
   d   Show only CRs to be worked on \"someday\" (set filter)
   i   Show only invalid CRs (set filter)
+  s   Show only the summary box (set filter)
   q   Quit")
 
 ;;;###autoload
@@ -310,6 +321,7 @@ Keys:
   o   Show only CRs to be worked on \"soon\" (set filter)
   d   Show only CRs to be worked on \"someday\" (set filter)
   i   Show only invalid CRs (set filter)
+  s   Show only the summary box (set filter)
   q   Quit"
  :keymap crs-grep-mode-map)
 
