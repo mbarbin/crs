@@ -19,22 +19,9 @@
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
 
-val main : unit Command.t
+(** Implement the rendering of text tables using ansi encoding for the
+    terminal. *)
 
-(** {1 Private}
+type t = Text_table_ast.t
 
-    This module is exported to be used by tests and libraries with strong ties
-    to [crs]. Its signature may change in breaking ways at any time without
-    prior notice, and outside of the guidelines set by semver. *)
-
-module Private : sig
-  val grep_cmd : unit Command.t
-
-  module Annotation = Annotation
-  module Assignee = Assignee
-  module Config = Config
-  module Github_annotation = Github_annotation
-  module Review_mode = Review_mode
-  module Reviewdog_utils = Reviewdog_utils
-  module Summary_table = Summary_table
-end
+val to_string : t -> string

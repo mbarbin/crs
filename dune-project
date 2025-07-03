@@ -74,12 +74,6 @@
    (>= v0.17))
   (ppxlib
    (>= 0.33))
-  (printbox
-   (>= 0.12))
-  (printbox-md
-   (>= 0.12))
-  (printbox-text
-   (>= 0.12))
   (re
    (>= 1.12.0))
   (spawn
@@ -163,12 +157,20 @@
    (>= v0.17))
   (ppxlib
    (>= 0.33))
+  (printbox
+   (>= 0.12))
+  (printbox-md
+   (>= 0.12))
+  (printbox-text
+   (>= 0.12))
   (re
    (>= 1.12.0))
   (spawn
    (>= v0.17))
   (stdio
    (>= v0.17))
+  (uutf
+   (>= 1.0.4))
   (volgo
    (>= 0.0.18))
   (volgo-base
