@@ -10,6 +10,7 @@
 
 (rule
  (targets reviewdog.ml reviewdog.mli)
+ (package crs-tests)
  (deps
   .ocamlformat
   (glob_files *.proto))

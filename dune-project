@@ -28,10 +28,6 @@
    (and
     (>= 5.2)
     (< 5.4~)))
-  (ocamlformat
-   (and
-    :with-test
-    (= 0.27.0)))
   (base
    (>= v0.17))
   (cmdlang
@@ -44,10 +40,6 @@
    (>= 0.3.1))
   (loc
    (>= 0.2.2))
-  (ocaml-protoc
-   (and
-    :with-test
-    (>= 3.1)))
   (pageantty
    (>= 0.0.2))
   (pbrt
