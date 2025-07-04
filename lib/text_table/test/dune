@@ -1,6 +1,6 @@
 (library
- (name crs_cli)
- (public_name crs.crs-cli)
+ (name text_table_test)
+ (public_name crs-tests.text_table_test)
  (flags
   :standard
   -w
@@ -10,35 +10,24 @@
   -open
   Base
   -open
-  Fpath_base
+  Expect_test_helpers_base
   -open
-  Stdio
-  -open
-  Volgo_base
-  -open
-  Cmdlang)
+  Volgo)
  (libraries
   base
-  cmdlang
   cr_comment
+  crs_cli
   crs_parser
-  file-rewriter
-  fpath
-  fpath-base
+  expect_test_helpers_core.expect_test_helpers_base
   loc
-  pageantty.git-pager
-  pp
   pplumbing.err
-  pplumbing.pp-tty
-  reviewdog_rdf
-  stdio
+  printbox
+  printbox-md
+  printbox-text
   text_table
-  unix
-  volgo-base
-  volgo-git-unix
-  volgo-hg-unix
-  yojson
-  yojson-five)
+  uutf
+  volgo)
+ (inline_tests)
  (instrumentation
   (backend bisect_ppx))
  (lint
@@ -48,8 +37,9 @@
    -unused-code-warnings=force
    ppx_compare
    ppx_enumerate
+   ppx_expect
    ppx_hash
    ppx_here
+   ppx_let
    ppx_sexp_conv
-   ppx_sexp_value
-   ppx_yojson_conv)))
+   ppx_sexp_value)))

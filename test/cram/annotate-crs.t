@@ -188,24 +188,16 @@ Let's test the reviewdog annotations too.
 We can also print a summary comment,
 
   $ crs tools github summary-comment | tee without-config
-  ```
-  ┌─────────┬───────┐
-  │ CR Type │ Count │
-  ├─────────┼───────┤
-  │ CR      │     3 │
-  │ XCR     │     1 │
-  └─────────┴───────┘
-  ```
+  | CR Type | Count |
+  |:--------|------:|
+  | CR      |     3 |
+  | XCR     |     1 |
   
-  ```
-  ┌──────────┬───────┬─────┬──────┬───────┐
-  │ Reporter │ For   │ CRs │ XCRs │ Total │
-  ├──────────┼───────┼─────┼──────┼───────┤
-  │ user1    │       │   1 │    1 │     2 │
-  │ user1    │ user2 │   1 │      │     1 │
-  │ user1    │ user3 │   1 │      │     1 │
-  └──────────┴───────┴─────┴──────┴───────┘
-  ```
+  | Reporter | For   | CRs | XCRs | Total |
+  |:---------|:------|----:|-----:|------:|
+  | user1    |       |   1 |    1 |     2 |
+  | user1    | user2 |   1 |      |     1 |
+  | user1    | user3 |   1 |      |     1 |
   
   Users with assigned CRs/XCRs: user1, user2, user3
 
@@ -216,7 +208,7 @@ We can also print a summary comment,
   >  > for-pull-request
 
   $ diff without-config for-pull-request
-  20c20
+  12c12
   < Users with assigned CRs/XCRs: user1, user2, user3
   ---
   > Users with assigned CRs/XCRs: @pr-author, @user1, @user2, user3

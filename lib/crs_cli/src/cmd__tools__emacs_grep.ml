@@ -117,11 +117,13 @@ By default the file paths are displayed relative to the command's $(b,cwd).
      in
      if summary
      then (
-       let by_type = Summary_table.By_type.make crs |> Summary_table.By_type.to_box in
-       let summary = Summary_table.make crs |> Summary_table.to_box in
+       let by_type =
+         Summary_table.By_type.make crs |> Summary_table.By_type.to_text_table
+       in
+       let summary = Summary_table.make crs |> Summary_table.to_text_table in
        let tables =
          List.filter_opt [ by_type; summary ]
-         |> List.map ~f:Summary_table.Box.to_string
+         |> List.map ~f:Text_table.to_string_ansi
          |> String.concat ~sep:"\n"
        in
        Out_channel.output_string Stdio.stdout tables)

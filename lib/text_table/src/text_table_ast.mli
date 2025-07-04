@@ -19,22 +19,38 @@
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
 
-val main : unit Command.t
-
-(** {1 Private}
-
-    This module is exported to be used by tests and libraries with strong ties
-    to [crs]. Its signature may change in breaking ways at any time without
-    prior notice, and outside of the guidelines set by semver. *)
-
-module Private : sig
-  val grep_cmd : unit Command.t
-
-  module Annotation = Annotation
-  module Assignee = Assignee
-  module Config = Config
-  module Github_annotation = Github_annotation
-  module Review_mode = Review_mode
-  module Reviewdog_utils = Reviewdog_utils
-  module Summary_table = Summary_table
+module Style : sig
+  type t =
+    | Default
+    | Fg_red
 end
+
+module Cell : sig
+  type t =
+    { style : Style.t
+    ; text : string
+    }
+end
+
+module Align : sig
+  type t =
+    | Left
+    | Center
+    | Right
+end
+
+module Column : sig
+  (** A type for a column extractor, parameterized by the type of the lines. *)
+  type 'a t =
+    { header : string
+    ; align : Align.t
+    ; make_cell : 'a -> Cell.t
+    }
+end
+
+type t =
+  | T :
+      { columns : 'a Column.t list
+      ; rows : 'a list
+      }
+      -> t

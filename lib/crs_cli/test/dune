@@ -26,6 +26,8 @@
   loc
   pplumbing.err
   reviewdog_rdf
+  text_table
+  uutf
   volgo
   yojson)
  (inline_tests)

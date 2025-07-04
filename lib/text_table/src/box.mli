@@ -19,22 +19,27 @@
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
 
-val main : unit Command.t
+(** An intermediate data structure used in the rendering of text tables. *)
 
-(** {1 Private}
-
-    This module is exported to be used by tests and libraries with strong ties
-    to [crs]. Its signature may change in breaking ways at any time without
-    prior notice, and outside of the guidelines set by semver. *)
-
-module Private : sig
-  val grep_cmd : unit Command.t
-
-  module Annotation = Annotation
-  module Assignee = Assignee
-  module Config = Config
-  module Github_annotation = Github_annotation
-  module Review_mode = Review_mode
-  module Reviewdog_utils = Reviewdog_utils
-  module Summary_table = Summary_table
+module Column : sig
+  type t = private
+    { header : string
+    ; align : Text_table_ast.Align.t
+    ; cells : Text_table_ast.Cell.t list
+    ; length : int
+    }
 end
+
+(** Due to the type being [private] we can guarantee that each column has the
+    same number of cells. *)
+type t = private { columns : Column.t array }
+
+val of_text_table : Text_table_ast.t -> t
+
+(** {1 Utils} *)
+
+(** [pad input ~len ~align] returns a new string with spaces either to the left,
+    right or both so that it contains the original string at the specified
+    alignment. For example [pad "hello" 10 ~align:Right] is equivalent to
+    [String.make 5 ' ' ^ "hello"]. *)
+val pad : string -> len:int -> align:Text_table_ast.Align.t -> string

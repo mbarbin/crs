@@ -19,59 +19,6 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-module Box = struct
-  type t = PrintBox.t
-
-  let to_string t = PrintBox_text.to_string t ^ "\n"
-
-  let to_markdown t ~config =
-    let md = PrintBox_md.to_string config t in
-    String.strip md ^ "\n"
-  ;;
-end
-
-module Column = struct
-  type 'a t =
-    { header : string
-    ; make_box : 'a -> PrintBox.t
-    ; align_h : [ `Left | `Center | `Right ]
-    }
-
-  let make header ?(align = `Left) f = { header; make_box = f; align_h = align }
-end
-
-let make_table columns rows =
-  let pad_cell box = PrintBox.hpad 1 box in
-  PrintBox.(
-    frame
-      (hlist
-         (List.filter_map columns ~f:(fun { Column.header; make_box; align_h } ->
-            let rows = List.map rows ~f:make_box in
-            if
-              List.for_all rows ~f:(fun box ->
-                match PrintBox.view box with
-                | Empty -> true
-                | _ -> false)
-            then None
-            else
-              Some
-                (vlist
-                   [ align ~h:align_h ~v:`Center (pad_cell (line header))
-                   ; grid_l
-                       ~bars:false
-                       (List.map rows ~f:(fun box ->
-                          let box =
-                            (* When encountering an empty cell, [grid_l] shifts
-                               the remaining rows up one level, which creates a
-                               misalignment. Thus we use a workaround here. *)
-                            match PrintBox.view box with
-                            | Empty -> line " "
-                            | _ -> box
-                          in
-                          [ align ~h:align_h ~v:`Center (pad_cell box) ]))
-                   ])))))
-;;
-
 module By_type = struct
   module Type = struct
     type t =
@@ -123,18 +70,22 @@ module By_type = struct
   ;;
 
   let columns =
-    PrintBox.
-      [ Column.make "CR Type" (fun (row : Row.t) -> line (Type.to_string row.type_))
-      ; Column.make "Count" ~align:`Right (fun (row : Row.t) ->
-          line_with_style
-            (match row.type_ with
-             | Invalid -> Style.fg_color Red
-             | CR | XCR | Soon | Someday -> Style.default)
+    Text_table.O.
+      [ Column.make ~header:"CR Type" (fun (row : Row.t) ->
+          Cell.text (Type.to_string row.type_))
+      ; Column.make ~header:"Count" ~align:Right (fun (row : Row.t) ->
+          Cell.text
+            ~style:
+              (match row.type_ with
+               | Invalid -> Style.fg_red
+               | CR | XCR | Soon | Someday -> Style.default)
             (Int.to_string_hum row.count))
       ]
   ;;
 
-  let to_box t = if List.is_empty t.rows then None else Some (make_table columns t.rows)
+  let to_text_table t =
+    if List.is_empty t.rows then None else Some (Text_table.make ~columns ~rows:t.rows)
+  ;;
 end
 
 module Type = struct
@@ -219,25 +170,27 @@ let make (crs : Cr_comment.t list) =
 ;;
 
 let columns =
-  let count label count =
-    PrintBox.(
-      Column.make label ~align:`Right (fun (row : Row.t) ->
+  let count ~header count =
+    Text_table.O.(
+      Column.make ~header ~align:Right (fun (row : Row.t) ->
         let count = count row in
-        if count = 0 then empty else line (Int.to_string_hum count)))
+        if count = 0 then Cell.empty else Cell.text (Int.to_string_hum count)))
   in
-  PrintBox.
-    [ Column.make "Reporter" (fun (row : Row.t) ->
-        line (Vcs.User_handle.to_string row.reporter))
-    ; Column.make "For" (fun (row : Row.t) ->
+  Text_table.O.
+    [ Column.make ~header:"Reporter" (fun (row : Row.t) ->
+        Cell.text (Vcs.User_handle.to_string row.reporter))
+    ; Column.make ~header:"For" (fun (row : Row.t) ->
         match row.recipient with
-        | None -> empty
-        | Some user -> line (Vcs.User_handle.to_string user))
-    ; count "CRs" (fun row -> row.cr_count)
-    ; count "XCRs" (fun row -> row.xcr_count)
-    ; count "Soon" (fun row -> row.soon_count)
-    ; count "Someday" (fun row -> row.someday_count)
-    ; count "Total" (fun row -> row.total_count)
+        | None -> Cell.empty
+        | Some user -> Cell.text (Vcs.User_handle.to_string user))
+    ; count ~header:"CRs" (fun row -> row.cr_count)
+    ; count ~header:"XCRs" (fun row -> row.xcr_count)
+    ; count ~header:"Soon" (fun row -> row.soon_count)
+    ; count ~header:"Someday" (fun row -> row.someday_count)
+    ; count ~header:"Total" (fun row -> row.total_count)
     ]
 ;;
 
-let to_box t = if List.is_empty t.rows then None else Some (make_table columns t.rows)
+let to_text_table t =
+  if List.is_empty t.rows then None else Some (Text_table.make ~columns ~rows:t.rows)
+;;

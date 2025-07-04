@@ -1,0 +1,132 @@
+(********************************************************************************)
+(*  crs - A tool for managing code review comments embedded in source code      *)
+(*  Copyright (C) 2024-2025 Mathieu Barbin <mathieu.barbin@gmail.com>           *)
+(*                                                                              *)
+(*  This file is part of crs.                                                   *)
+(*                                                                              *)
+(*  crs is free software; you can redistribute it and/or modify it under the    *)
+(*  terms of the GNU Lesser General Public License as published by the Free     *)
+(*  Software Foundation either version 3 of the License, or any later version,  *)
+(*  with the LGPL-3.0 Linking Exception.                                        *)
+(*                                                                              *)
+(*  crs is distributed in the hope that it will be useful, but WITHOUT ANY      *)
+(*  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS   *)
+(*  FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License and     *)
+(*  the file `NOTICE.md` at the root of this repository for more details.       *)
+(*                                                                              *)
+(*  You should have received a copy of the GNU Lesser General Public License    *)
+(*  and the LGPL-3.0 Linking Exception along with this library. If not, see     *)
+(*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
+(********************************************************************************)
+
+module Summary_table = Crs_cli.Private.Summary_table
+
+let path = Vcs.Path_in_repo.v "my_file.ml"
+
+let test_cases =
+  {|
+(* $CR user: Hello. *)
+(* $CR user for user2: Hello. *)
+(* $XCR user for user2: Hello. *)
+(* $CR-user: Invalid. *)
+(* $CR-soon user: Hello. *)
+(* $CR-someday user: Hello. *)
+|}
+;;
+
+let parse_file ~path ~file_contents =
+  let file_contents =
+    file_contents
+    |> String.strip
+    |> String.substr_replace_all ~pattern:"$CR" ~with_:"CR"
+    |> String.substr_replace_all ~pattern:"$XCR" ~with_:"XCR"
+    |> Vcs.File_contents.create
+  in
+  Crs_parser.parse_file ~path ~file_contents |> Cr_comment.sort
+;;
+
+(* Here we monitor a few rendering options for text tables as a reference, to
+   help visualize and experiment with which makes the most sense to use for this
+   project depending on the context. *)
+
+let%expect_test "to_string" =
+  let crs = parse_file ~path ~file_contents:test_cases in
+  let table = Summary_table.make crs in
+  let text_table = Summary_table.to_text_table table |> Option.value_exn in
+  (* Ansi *)
+  print_endline (Text_table.to_string_ansi text_table);
+  [%expect
+    {|
+    ┌──────────┬───────┬─────┬──────┬──────┬─────────┬───────┐
+    │ Reporter │ For   │ CRs │ XCRs │ Soon │ Someday │ Total │
+    ├──────────┼───────┼─────┼──────┼──────┼─────────┼───────┤
+    │ user     │       │   1 │      │    1 │       1 │     3 │
+    │ user     │ user2 │   1 │    1 │      │         │     2 │
+    └──────────┴───────┴─────┴──────┴──────┴─────────┴───────┘
+    |}];
+  (* GitHub Markdown *)
+  print_endline (Text_table.to_string_markdown text_table);
+  [%expect
+    {|
+    | Reporter | For   | CRs | XCRs | Soon | Someday | Total |
+    |:---------|:------|----:|-----:|-----:|--------:|------:|
+    | user     |       |   1 |      |    1 |       1 |     3 |
+    | user     | user2 |   1 |    1 |      |         |     2 |
+    |}];
+  (* Ansi via Printbox. *)
+  let printbox = Printbox_table.of_text_table text_table in
+  print_endline (PrintBox_text.to_string printbox ^ "\n");
+  [%expect
+    {|
+    ┌──────────┬───────┬─────┬──────┬──────┬─────────┬───────┐
+    │ Reporter │ For   │ CRs │ XCRs │ Soon │ Someday │ Total │
+    ├──────────┼───────┼─────┼──────┼──────┼─────────┼───────┤
+    │ user     │       │   1 │      │    1 │       1 │     3 │
+    │ user     │ user2 │   1 │    1 │      │         │     2 │
+    └──────────┴───────┴─────┴──────┴──────┴─────────┴───────┘
+    |}];
+  (* GitHub Markdown via Printbox. *)
+  print_endline (Printbox_table.to_string_markdown printbox);
+  [%expect
+    {|
+    |----------|-------|-----|------|------|---------|-------|
+    | Reporter | For   | CRs | XCRs | Soon | Someday | Total |
+    |----------|-------|-----|------|------|---------|-------|
+    | user     |       |   1 |      |    1 |       1 |     3 |
+    | user     | user2 |   1 |    1 |      |         |     2 |
+    |----------|-------|-----|------|------|---------|-------|
+    |}];
+  let with_md_config ~config =
+    let md = PrintBox_md.to_string config printbox in
+    print_endline (String.strip md ^ "\n")
+  in
+  (* Markdown via Printbox - default config. *)
+  with_md_config ~config:PrintBox_md.Config.default;
+  [%expect
+    {|
+    >
+    > ```
+    >  Reporter │ For   │ CRs │ XCRs │ Soon │ Someday │ Total
+    > ──────────┼───────┼─────┼──────┼──────┼─────────┼───────
+    >  user     │       │   1 │      │    1 │       1 │     3
+    >  user     │ user2 │   1 │    1 │      │         │     2
+    > ```
+    >
+    >
+    >
+    |}];
+  (* Markdown via Printbox - uniform config. *)
+  with_md_config ~config:PrintBox_md.Config.uniform;
+  [%expect
+    {|
+    ```
+    ┌──────────┬───────┬─────┬──────┬──────┬─────────┬───────┐
+    │ Reporter │ For   │ CRs │ XCRs │ Soon │ Someday │ Total │
+    ├──────────┼───────┼─────┼──────┼──────┼─────────┼───────┤
+    │ user     │       │   1 │      │    1 │       1 │     3 │
+    │ user     │ user2 │   1 │    1 │      │         │     2 │
+    └──────────┴───────┴─────┴──────┴──────┴─────────┴───────┘
+    ```
+    |}];
+  ()
+;;

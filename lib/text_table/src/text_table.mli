@@ -19,22 +19,66 @@
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
 
-val main : unit Command.t
+(** A minimalist interface to create ascii tables with Ansi and GitHub Flavored
+    Markdown rendering.
 
-(** {1 Private}
+    This library is inspired by [Textutils.Ascii_table] and [PrintBox]. We
+    created it to implement the rendering to GitHub Markdown, which was not
+    handled by either libraries.
 
-    This module is exported to be used by tests and libraries with strong ties
-    to [crs]. Its signature may change in breaking ways at any time without
-    prior notice, and outside of the guidelines set by semver. *)
+    In the tests we show various rendering possible and compare it to [PrintBox]
+    rendering (ansi, and markdown) for reference and experimentation. *)
+
+type t
+
+(** {1 Render} *)
+
+val to_string_ansi : t -> string
+val to_string_markdown : t -> string
+
+(** {1 Builders} *)
+
+module Style : sig
+  type t
+
+  val default : t
+  val fg_red : t
+end
+
+module Cell : sig
+  type t
+
+  val empty : t
+  val text : ?style:Style.t -> string -> t
+end
+
+module Align : sig
+  type t =
+    | Left
+    | Center
+    | Right
+end
+
+module Column : sig
+  (** A type for a column extractor, parameterized by the type of the lines. *)
+  type 'a t
+
+  val make : header:string -> ?align:Align.t -> ('a -> Cell.t) -> 'a t
+end
+
+val make : columns:'a Column.t list -> rows:'a list -> t
+
+module O : sig
+  module Align = Align
+  module Cell = Cell
+  module Column = Column
+  module Style = Style
+end
+
+(** {1 Private} *)
 
 module Private : sig
-  val grep_cmd : unit Command.t
+  module Ast = Text_table_ast
 
-  module Annotation = Annotation
-  module Assignee = Assignee
-  module Config = Config
-  module Github_annotation = Github_annotation
-  module Review_mode = Review_mode
-  module Reviewdog_utils = Reviewdog_utils
-  module Summary_table = Summary_table
+  val to_ast : t -> Ast.t
 end

@@ -9,6 +9,8 @@ dirs=(
     "lib/crs_cli/test"
     "lib/crs_parser/src"
     "lib/crs_parser/test"
+    "lib/text_table/src"
+    "lib/text_table/test"
     "test/expect"
 )
 
