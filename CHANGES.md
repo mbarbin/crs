@@ -1,7 +1,8 @@
-## 0.0.2025XXXX (unreleased)
+## 0.0.20250704 (2025-07-04)
 
 ### Added
 
+- Display the repo-root in the emacs-mode header (#47, @mbarbin).
 - Add 's' for summary tables in emacs crs-grep-mode (#45, @mbarbin).
 
 ### Changed
