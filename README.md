@@ -57,7 +57,7 @@ Published [here](https://mbarbin.github.io/crs).
 
 ## Current State
 
-It's currently in the early stages of development.
+:construction: *crs* is currently under construction and should be considered experimental and unstable. During the early `0.0.X` stages of development, the interfaces and behavior are subject to breaking changes. Feedback from adventurous users is welcome to help shape future versions.
 
 ## Get Involved
 
