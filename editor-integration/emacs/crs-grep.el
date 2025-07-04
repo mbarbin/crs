@@ -166,9 +166,10 @@ Always a string, e.g. \"now\", \"all\", etc.")
                 (crs-grep-mode)
                 (when crs-grep-enable-header-line
                   (setq header-line-format
-                        (format "CRs: type \"%s\"   path \"%s\""
+                        (format "CRs: type \"%s\"   path \"%s\"   repo \"%s\""
                                 crs-grep-current-filter
-                                crs-grep-path-in-repo)))
+                                crs-grep-path-in-repo
+                                crs-grep-repo-root)))
                 (when crs-grep-enable-next-error-follow
                   (next-error-follow-minor-mode 1))
                 (goto-char (point-min)))
