@@ -33,14 +33,13 @@ let test file_contents ~config ~review_mode ~with_user_mentions =
       |> Option.map ~f:Annotation.to_reviewdog_diagnostic)
   in
   let diagnostic_result =
-    Reviewdog_rdf.make_diagnostic_result
-      ~diagnostics
-      ~source:(Some Reviewdog_utils.source)
-      ~severity:Info
-      ()
+    { Reviewdog.Diagnostic_result.source = Some Reviewdog_utils.source
+    ; severity = Some Info
+    ; diagnostics
+    }
   in
-  let json = Reviewdog_rdf.encode_json_diagnostic_result diagnostic_result in
-  print_endline (Yojson.Basic.pretty_to_string ~std:true json)
+  let json = Reviewdog.Diagnostic_result.yojson_of_t diagnostic_result in
+  print_endline (Yojson.Safe.pretty_to_string ~std:true json)
 ;;
 
 let test_cases =
@@ -59,64 +58,56 @@ let%expect_test "compute" =
   [%expect
     {|
     {
+      "source": { "name": "crs", "url": "https://github.com/mbarbin/crs" },
       "severity": "INFO",
-      "source": { "url": "https://github.com/mbarbin/crs", "name": "crs" },
       "diagnostics": [
         {
-          "relatedLocations": [],
-          "originalOutput": "CR user: Hello.",
-          "suggestions": [],
-          "severity": "INFO",
+          "message": "This CR is unassigned (no default repo owner configured).",
           "location": {
+            "path": "my_file.ml",
             "range": {
-              "end": { "column": 22, "line": 1 },
-              "start": { "column": 1, "line": 1 }
-            },
-            "path": "my_file.ml"
+              "start": { "line": 1, "column": 1 },
+              "end": { "line": 1, "column": 22 }
+            }
           },
-          "message": "This CR is unassigned (no default repo owner configured)."
+          "severity": "INFO",
+          "originalOutput": "CR user: Hello."
         },
         {
-          "relatedLocations": [],
-          "originalOutput": "CR user for user2: Hello.",
-          "suggestions": [],
-          "severity": "INFO",
+          "message": "This CR is assigned to user2 (CR recipient).",
           "location": {
+            "path": "my_file.ml",
             "range": {
-              "end": { "column": 32, "line": 2 },
-              "start": { "column": 1, "line": 2 }
-            },
-            "path": "my_file.ml"
+              "start": { "line": 2, "column": 1 },
+              "end": { "line": 2, "column": 32 }
+            }
           },
-          "message": "This CR is assigned to user2 (CR recipient)."
+          "severity": "INFO",
+          "originalOutput": "CR user for user2: Hello."
         },
         {
-          "relatedLocations": [],
-          "originalOutput": "XCR user for user2: Hello.",
-          "suggestions": [],
-          "severity": "INFO",
+          "message": "This XCR is assigned to user (CR reporter).",
           "location": {
+            "path": "my_file.ml",
             "range": {
-              "end": { "column": 33, "line": 3 },
-              "start": { "column": 1, "line": 3 }
-            },
-            "path": "my_file.ml"
+              "start": { "line": 3, "column": 1 },
+              "end": { "line": 3, "column": 33 }
+            }
           },
-          "message": "This XCR is assigned to user (CR reporter)."
+          "severity": "INFO",
+          "originalOutput": "XCR user for user2: Hello."
         },
         {
-          "relatedLocations": [],
-          "originalOutput": "CR-user: Invalid.",
-          "suggestions": [],
+          "message": "This invalid CR is unassigned (no default repo owner configured).",
+          "location": {
+            "path": "my_file.ml",
+            "range": {
+              "start": { "line": 4, "column": 1 },
+              "end": { "line": 4, "column": 24 }
+            }
+          },
           "severity": "WARNING",
-          "location": {
-            "range": {
-              "end": { "column": 24, "line": 4 },
-              "start": { "column": 1, "line": 4 }
-            },
-            "path": "my_file.ml"
-          },
-          "message": "This invalid CR is unassigned (no default repo owner configured)."
+          "originalOutput": "CR-user: Invalid."
         }
       ]
     }
@@ -130,22 +121,20 @@ let%expect_test "compute" =
   [%expect
     {|
     {
+      "source": { "name": "crs", "url": "https://github.com/mbarbin/crs" },
       "severity": "INFO",
-      "source": { "url": "https://github.com/mbarbin/crs", "name": "crs" },
       "diagnostics": [
         {
-          "relatedLocations": [],
-          "originalOutput": "CR-invalid : Invalid",
-          "suggestions": [],
-          "severity": "ERROR",
+          "message": "This invalid CR is unassigned (no default repo owner configured).",
           "location": {
+            "path": "my_file.ml",
             "range": {
-              "end": { "column": 1, "line": 2 },
-              "start": { "column": 1, "line": 1 }
-            },
-            "path": "my_file.ml"
+              "start": { "line": 1, "column": 1 },
+              "end": { "line": 2, "column": 1 }
+            }
           },
-          "message": "This invalid CR is unassigned (no default repo owner configured)."
+          "severity": "ERROR",
+          "originalOutput": "CR-invalid : Invalid"
         }
       ]
     }

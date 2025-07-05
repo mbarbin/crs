@@ -1,6 +1,6 @@
 (library
- (name crs_cli_test)
- (public_name crs-tests.crs_cli_test)
+ (name reviewdog_test)
+ (public_name crs-tests.reviewdog_test)
  (flags
   :standard
   -w
@@ -10,25 +10,16 @@
   -open
   Base
   -open
-  Cmdlang
-  -open
   Expect_test_helpers_base
   -open
-  Volgo)
+  Base_quickcheck)
  (libraries
   base
-  cmdlang
-  cmdlang-stdlib-runner
-  cr_comment
-  crs_cli
-  crs_parser
+  base_quickcheck
   expect_test_helpers_core.expect_test_helpers_base
-  loc
-  pplumbing.err
+  ppx_yojson_conv_lib
   reviewdog
-  text_table
-  uutf
-  volgo
+  reviewdog_rdf
   yojson)
  (inline_tests)
  (instrumentation
@@ -41,8 +32,7 @@
    ppx_compare
    ppx_enumerate
    ppx_expect
-   ppx_hash
    ppx_here
-   ppx_let
+   base_quickcheck.ppx_quickcheck
    ppx_sexp_conv
    ppx_sexp_value)))

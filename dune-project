@@ -42,10 +42,6 @@
    (>= 0.2.2))
   (pageantty
    (>= 0.0.2))
-  (pbrt
-   (>= 3.1))
-  (pbrt_yojson
-   (>= 3.1))
   (pp
    (>= 2.0.0))
   (pplumbing
@@ -146,6 +142,10 @@
   (ppx_sexp_conv
    (>= v0.17))
   (ppx_sexp_value
+   (>= v0.17))
+  (ppx_yojson_conv
+   (>= v0.17))
+  (ppx_yojson_conv_lib
    (>= v0.17))
   (ppxlib
    (>= 0.33))
@@ -251,6 +251,10 @@
   (ppx_sexp_conv
    (>= v0.17))
   (ppx_sexp_value
+   (>= v0.17))
+  (ppx_yojson_conv
+   (>= v0.17))
+  (ppx_yojson_conv_lib
    (>= v0.17))
   (ppxlib
    (>= 0.33))

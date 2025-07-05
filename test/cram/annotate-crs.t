@@ -93,64 +93,56 @@ Let's test the reviewdog annotations too.
 
   $ crs tools reviewdog annotate-crs | tee without-config
   {
+    "source": { "name": "crs", "url": "https://github.com/mbarbin/crs" },
     "severity": "INFO",
-    "source": { "url": "https://github.com/mbarbin/crs", "name": "crs" },
     "diagnostics": [
       {
-        "relatedLocations": [],
-        "originalOutput": "XCR user1: Fix this. Edit: Done.",
-        "suggestions": [],
-        "severity": "INFO",
+        "message": "This XCR is assigned to user1 (CR reporter).",
         "location": {
+          "path": "foo/a.txt",
           "range": {
-            "end": { "column": 39, "line": 2 },
-            "start": { "column": 1, "line": 2 }
-          },
-          "path": "foo/a.txt"
+            "start": { "line": 2, "column": 1 },
+            "end": { "line": 2, "column": 39 }
+          }
         },
-        "message": "This XCR is assigned to user1 (CR reporter)."
+        "severity": "INFO",
+        "originalOutput": "XCR user1: Fix this. Edit: Done."
       },
       {
-        "relatedLocations": [],
-        "originalOutput": "CR user1 for user3: Hey, this is a code review comment",
-        "suggestions": [],
-        "severity": "INFO",
+        "message": "This CR is assigned to user3 (CR recipient).",
         "location": {
+          "path": "foo/foo.c",
           "range": {
-            "end": { "column": 61, "line": 1 },
-            "start": { "column": 1, "line": 1 }
-          },
-          "path": "foo/foo.c"
+            "start": { "line": 1, "column": 1 },
+            "end": { "line": 1, "column": 61 }
+          }
         },
-        "message": "This CR is assigned to user3 (CR recipient)."
+        "severity": "INFO",
+        "originalOutput": "CR user1 for user3: Hey, this is a code review comment"
       },
       {
-        "relatedLocations": [],
-        "originalOutput": "CR user1: Hey, this is a code review comment",
-        "suggestions": [],
-        "severity": "INFO",
+        "message": "This CR is unassigned (no default repo owner configured).",
         "location": {
+          "path": "foo/pr.ml",
           "range": {
-            "end": { "column": 51, "line": 1 },
-            "start": { "column": 1, "line": 1 }
-          },
-          "path": "foo/pr.ml"
+            "start": { "line": 1, "column": 1 },
+            "end": { "line": 1, "column": 51 }
+          }
         },
-        "message": "This CR is unassigned (no default repo owner configured)."
+        "severity": "INFO",
+        "originalOutput": "CR user1: Hey, this is a code review comment"
       },
       {
-        "relatedLocations": [],
-        "originalOutput": "CR user1 for user2: Hey, this is a code review comment",
-        "suggestions": [],
-        "severity": "INFO",
+        "message": "This CR is assigned to user2 (CR recipient).",
         "location": {
+          "path": "hello",
           "range": {
-            "end": { "column": 61, "line": 2 },
-            "start": { "column": 1, "line": 2 }
-          },
-          "path": "hello"
+            "start": { "line": 2, "column": 1 },
+            "end": { "line": 2, "column": 61 }
+          }
         },
-        "message": "This CR is assigned to user2 (CR recipient)."
+        "severity": "INFO",
+        "originalOutput": "CR user1 for user2: Hey, this is a code review comment"
       }
     ]
   }
@@ -158,10 +150,10 @@ Let's test the reviewdog annotations too.
   $ crs tools reviewdog annotate-crs --config=crs-config.json > with-config
 
   $ diff without-config with-config
-  45c45
-  <       "message": "This CR is unassigned (no default repo owner configured)."
+  30c30
+  <       "message": "This CR is unassigned (no default repo owner configured).",
   ---
-  >       "message": "This CR is assigned to user1 (default repo owner)."
+  >       "message": "This CR is assigned to user1 (default repo owner).",
   [1]
 
   $ crs tools reviewdog annotate-crs --config=crs-config.json \
@@ -171,18 +163,18 @@ Let's test the reviewdog annotations too.
   >  > for-pull-request
 
   $ diff with-config for-pull-request
-  17c17
-  <       "message": "This XCR is assigned to user1 (CR reporter)."
+  6c6
+  <       "message": "This XCR is assigned to user1 (CR reporter).",
   ---
-  >       "message": "This XCR is assigned to @user1 (CR reporter)."
-  45c45
-  <       "message": "This CR is assigned to user1 (default repo owner)."
+  >       "message": "This XCR is assigned to @user1 (CR reporter).",
+  30c30
+  <       "message": "This CR is assigned to user1 (default repo owner).",
   ---
-  >       "message": "This CR is assigned to @pr-author (PR author)."
-  59c59
-  <       "message": "This CR is assigned to user2 (CR recipient)."
+  >       "message": "This CR is assigned to @pr-author (PR author).",
+  42c42
+  <       "message": "This CR is assigned to user2 (CR recipient).",
   ---
-  >       "message": "This CR is assigned to @user2 (CR recipient)."
+  >       "message": "This CR is assigned to @user2 (CR recipient).",
   [1]
 
 We can also print a summary comment,

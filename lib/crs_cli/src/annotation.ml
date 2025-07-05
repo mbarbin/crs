@@ -38,7 +38,7 @@ module Severity = struct
     | Info -> Notice
   ;;
 
-  let to_reviewdog : t -> Reviewdog_rdf.severity = function
+  let to_reviewdog : t -> Reviewdog.Severity.t = function
     | Error -> Error
     | Warning -> Warning
     | Info -> Info
@@ -117,13 +117,14 @@ let to_github_annotation t : Github_annotation.t =
     ~message:t.message
 ;;
 
-let to_reviewdog_diagnostic t : Reviewdog_rdf.diagnostic =
-  Reviewdog_rdf.make_diagnostic
-    ~message:t.message
-    ~location:(Cr_comment.whole_loc t.cr |> Reviewdog_utils.make_location |> Option.some)
-    ~severity:(Severity.to_reviewdog t.severity)
-    ~suggestions:[]
-    ~original_output:(Cr_comment.reindented_content t.cr)
-    ~related_locations:[]
-    ()
+let to_reviewdog_diagnostic t : Reviewdog.Diagnostic.t =
+  { Reviewdog.Diagnostic.message = t.message
+  ; location = Cr_comment.whole_loc t.cr |> Reviewdog_utils.make_location
+  ; severity = Some (Severity.to_reviewdog t.severity)
+  ; source = None
+  ; code = None
+  ; suggestions = None
+  ; original_output = Some (Cr_comment.reindented_content t.cr)
+  ; related_locations = None
+  }
 ;;

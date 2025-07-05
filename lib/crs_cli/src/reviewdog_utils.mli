@@ -19,5 +19,5 @@
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
 
-val source : Reviewdog_rdf.source
-val make_location : Loc.t -> Reviewdog_rdf.location
+val source : Reviewdog.Source.t
+val make_location : Loc.t -> Reviewdog.Location.t

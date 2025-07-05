@@ -1,6 +1,6 @@
 (library
  (name reviewdog_rdf)
- (public_name crs.reviewdog-rdf)
+ (public_name crs-tests.reviewdog-rdf)
  (flags :standard -w +a-4-40-41-42-44-45-48-66 -warn-error +a)
  (libraries pbrt pbrt_yojson)
  (preprocess no_preprocessing))
