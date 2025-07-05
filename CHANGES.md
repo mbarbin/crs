@@ -1,3 +1,15 @@
+## 0.0.20250705 (2025-07-05)
+
+### Added
+
+- Added some CRs workflow to test PR changes (#51, @mbarbin).
+
+### Changed
+
+- Switch from protoc to yojson_conv to serialize to reviewdog (#50, @mbarbin).
+- Reduce `:test` deps of the main `crs.opam` package (#49, @mbarbin).
+- Refactor text table handling and support GitHub Flavored md (#48, @mbarbin)
+
 ## 0.0.20250704 (2025-07-04)
 
 ### Added
