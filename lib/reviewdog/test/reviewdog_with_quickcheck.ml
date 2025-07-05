@@ -4,6 +4,8 @@
 (*  SPDX-License-Identifier: MIT                                            *)
 (****************************************************************************)
 
+[@@@coverage off]
+
 module Code = struct
   type t = Reviewdog.Code.t =
     { value : string

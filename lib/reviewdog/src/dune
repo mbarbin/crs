@@ -12,8 +12,6 @@
   -open
   Ppx_yojson_conv_lib.Yojson_conv.Primitives)
  (libraries base yojson)
- (instrumentation
-  (backend bisect_ppx))
  (lint
   (pps ppx_js_style -allow-let-operators -check-doc-comments))
  (preprocess

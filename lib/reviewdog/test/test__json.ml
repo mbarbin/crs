@@ -17,8 +17,9 @@ let round t =
   with
   | t -> t
   | exception Ppx_yojson_conv_lib.Yojson_conv.Of_yojson_error (exn, json) ->
-    let json = Yojson.Safe.to_string json in
-    raise_s [%sexp "Of_yojson_error", { exn : Exn.t; json : string }]
+    (let json = Yojson.Safe.to_string json in
+     raise_s [%sexp "Of_yojson_error", { exn : Exn.t; json : string }])
+    [@coverage off]
 ;;
 
 let%expect_test "roundtrip" =
