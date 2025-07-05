@@ -12,6 +12,7 @@ depends: [
   "ocaml" {>= "5.2"}
   "ocamlformat" {= "0.27.0"}
   "base" {>= "v0.17"}
+  "base_quickcheck" {>= "v0.17"}
   "cmdlang" {>= "0.0.9"}
   "cmdlang-stdlib-runner" {>= "0.0.9"}
   "conf-git"
@@ -38,6 +39,8 @@ depends: [
   "ppx_let" {>= "v0.17"}
   "ppx_sexp_conv" {>= "v0.17"}
   "ppx_sexp_value" {>= "v0.17"}
+  "ppx_yojson_conv" {>= "v0.17"}
+  "ppx_yojson_conv_lib" {>= "v0.17"}
   "ppxlib" {>= "0.33"}
   "printbox" {>= "0.12"}
   "printbox-md" {>= "0.12"}

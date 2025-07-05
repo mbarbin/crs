@@ -19,20 +19,18 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-let source : Reviewdog_rdf.source =
-  { name = "crs"; url = "https://github.com/mbarbin/crs" }
+let source : Reviewdog.Source.t =
+  { name = "crs"; url = Some "https://github.com/mbarbin/crs" }
 ;;
 
 let make_position (pos : Lexing.position) =
-  let line = Int32.of_int_exn pos.pos_lnum in
-  let column = Int32.of_int_exn (pos.pos_cnum - pos.pos_bol + 1) in
-  Reviewdog_rdf.make_position ~line ~column ()
+  { Reviewdog.Position.line = pos.pos_lnum; column = pos.pos_cnum - pos.pos_bol + 1 }
 ;;
 
 let make_location (loc : Loc.t) =
   let path = Fpath.to_string (Loc.path loc) in
   let start_pos = Loc.start loc |> make_position in
   let end_pos = Loc.stop loc |> make_position in
-  let range = Reviewdog_rdf.make_range ~start:(Some start_pos) ~end_:(Some end_pos) () in
-  Reviewdog_rdf.make_location ~path ~range:(Some range) ()
+  let range = { Reviewdog.Range.start = start_pos; end_ = Some end_pos } in
+  { Reviewdog.Location.path; range = Some range }
 ;;

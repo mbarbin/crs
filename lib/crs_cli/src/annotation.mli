@@ -36,7 +36,7 @@ module Severity : sig
   val to_string : t -> string
 
   val to_github : t -> Github_annotation.Severity.t
-  val to_reviewdog : t -> Reviewdog_rdf.severity
+  val to_reviewdog : t -> Reviewdog.Severity.t
 end
 
 type t [@@deriving sexp_of]
@@ -69,4 +69,4 @@ val with_user_mention : t -> bool
 (** Export to supported consumers / backend. *)
 
 val to_github_annotation : t -> Github_annotation.t
-val to_reviewdog_diagnostic : t -> Reviewdog_rdf.diagnostic
+val to_reviewdog_diagnostic : t -> Reviewdog.Diagnostic.t

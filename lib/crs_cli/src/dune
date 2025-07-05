@@ -30,7 +30,7 @@
   pp
   pplumbing.err
   pplumbing.pp-tty
-  reviewdog_rdf
+  reviewdog
   stdio
   text_table
   unix

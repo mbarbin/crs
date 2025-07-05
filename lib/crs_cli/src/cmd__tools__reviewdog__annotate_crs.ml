@@ -49,13 +49,12 @@ This command searches for CRs in the tree and prints Reviewdog Annotations for t
          |> Option.map ~f:Annotation.to_reviewdog_diagnostic)
      in
      let diagnostic_result =
-       Reviewdog_rdf.make_diagnostic_result
-         ~diagnostics
-         ~source:(Some Reviewdog_utils.source)
-         ~severity:Info
-         ()
+       { Reviewdog.Diagnostic_result.source = Some Reviewdog_utils.source
+       ; severity = Some Info
+       ; diagnostics
+       }
      in
-     let json = Reviewdog_rdf.encode_json_diagnostic_result diagnostic_result in
-     print_endline (Yojson.Basic.pretty_to_string ~std:true json);
+     let json = Reviewdog.Diagnostic_result.yojson_of_t diagnostic_result in
+     print_endline (Yojson.Safe.pretty_to_string ~std:true json);
      ())
 ;;

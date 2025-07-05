@@ -11,9 +11,10 @@ bug-reports: "https://github.com/mbarbin/crs/issues"
 depends: [
   "dune" {>= "3.17"}
   "ocaml" {>= "5.2"}
-  "ocamlformat" {with-dev-setup & = "0.27.0"}
+  "ocamlformat" {= "0.27.0"}
   "base" {>= "v0.17"}
-  "bisect_ppx" {with-dev-setup & >= "2.8.3"}
+  "base_quickcheck" {>= "v0.17"}
+  "bisect_ppx" {>= "2.8.3"}
   "cmdlang" {>= "0.0.9"}
   "conf-git"
   "conf-hg"
@@ -37,10 +38,12 @@ depends: [
   "ppx_expect" {>= "v0.17"}
   "ppx_hash" {>= "v0.17"}
   "ppx_here" {>= "v0.17"}
-  "ppx_js_style" {with-dev-setup & >= "v0.17"}
+  "ppx_js_style" {>= "v0.17"}
   "ppx_let" {>= "v0.17"}
   "ppx_sexp_conv" {>= "v0.17"}
   "ppx_sexp_value" {>= "v0.17"}
+  "ppx_yojson_conv" {>= "v0.17"}
+  "ppx_yojson_conv_lib" {>= "v0.17"}
   "ppxlib" {>= "0.33"}
   "re" {>= "1.12.0"}
   "spawn" {>= "v0.17"}
