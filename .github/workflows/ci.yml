@@ -44,6 +44,10 @@ jobs:
       - name: Install reviewdog
         uses: reviewdog/action-setup@v1
 
+      # CR mbarbin: Hello CR. Here we can have a few CRs workflow that should
+      # permit to test the crs built from that PR and its interaction with other
+      # tools like reviewdog, and GitHub annotations.
+
       - name: Annotate CRs with reviewdog
         if: github.event_name == 'pull_request'
         run: |
