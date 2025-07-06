@@ -29,23 +29,12 @@ let%expect_test "empty table" =
   | Some _ -> assert false
 ;;
 
-let test_cases =
-  {|
-(* $CR user: Hello. *)
-(* $CR user for user2: Hello. *)
-(* $XCR user for user2: Hello. *)
-(* $CR-user: Invalid. *)
-(* $CR-soon user: Hello. *)
-(* $CR-someday user: Hello. *)
-|}
-;;
-
 (* We already have a comprehensive test to monitor the various rendering
    implementation of tables in [text_table/test]. Here we only monitor the one
    that are used by the [crs] cli and actively in use by the project. *)
 
 let%expect_test "to_string" =
-  let crs = Tests_helpers.parse_file ~path ~file_contents:test_cases in
+  let crs = Tests_helpers.parse_file ~path ~file_contents:Tests_helpers.test_cases in
   let table = Summary_table.make crs in
   let text_table = Summary_table.to_text_table table |> Option.value_exn in
   (* Ansi *)
@@ -55,7 +44,7 @@ let%expect_test "to_string" =
     ┌──────────┬───────┬─────┬──────┬──────┬─────────┬───────┐
     │ Reporter │ For   │ CRs │ XCRs │ Soon │ Someday │ Total │
     ├──────────┼───────┼─────┼──────┼──────┼─────────┼───────┤
-    │ user     │       │   1 │      │    1 │       1 │     3 │
+    │ user     │       │   1 │    3 │    1 │       1 │     6 │
     │ user     │ user2 │   1 │    1 │      │         │     2 │
     └──────────┴───────┴─────┴──────┴──────┴─────────┴───────┘
     |}];
@@ -65,7 +54,7 @@ let%expect_test "to_string" =
     {|
     | Reporter | For   | CRs | XCRs | Soon | Someday | Total |
     |:---------|:------|----:|-----:|-----:|--------:|------:|
-    | user     |       |   1 |      |    1 |       1 |     3 |
+    | user     |       |   1 |    3 |    1 |       1 |     6 |
     | user     | user2 |   1 |    1 |      |         |     2 |
     |}];
   ()

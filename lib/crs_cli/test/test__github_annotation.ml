@@ -39,19 +39,12 @@ let test file_contents ~config ~review_mode ~with_user_mentions =
         print_endline (Github_annotation.to_string github_annotation)))
 ;;
 
-let test_cases =
-  {|
-(* $CR user: Hello. *)
-(* $CR user for user2: Hello. *)
-(* $XCR user for user2: Hello. *)
-(* $CR-user: Invalid. *)
-(* $CR-soon user: Hello. *)
-(* $CR-someday user: Hello. *)
-|}
-;;
-
 let%expect_test "compute" =
-  test test_cases ~config:Config.empty ~review_mode:Commit ~with_user_mentions:true;
+  test
+    Tests_helpers.test_cases
+    ~config:Config.empty
+    ~review_mode:Commit
+    ~with_user_mentions:true;
   [%expect
     {|
     ========================
@@ -77,34 +70,79 @@ let%expect_test "compute" =
         (message "This CR is assigned to user2 (CR recipient)."))))
     ::notice file=my_file.ml,line=2,col=1,endLine=2,endColumn=32,title=CR::This CR is assigned to user2 (CR recipient).
     ========================
-    XCR user for user2: Hello.
+    XCR user: Hello.
     ((
       github_annotation (
         (loc (
           (start my_file.ml:3:0)
-          (stop  my_file.ml:3:32)))
+          (stop  my_file.ml:3:22)))
         (severity Notice)
         (title    XCR)
         (message "This XCR is assigned to user (CR reporter)."))))
-    ::notice file=my_file.ml,line=3,col=1,endLine=3,endColumn=33,title=XCR::This XCR is assigned to user (CR reporter).
+    ::notice file=my_file.ml,line=3,col=1,endLine=3,endColumn=23,title=XCR::This XCR is assigned to user (CR reporter).
+    ========================
+    XCR user for user2: Hello.
+    ((
+      github_annotation (
+        (loc (
+          (start my_file.ml:4:0)
+          (stop  my_file.ml:4:32)))
+        (severity Notice)
+        (title    XCR)
+        (message "This XCR is assigned to user (CR reporter)."))))
+    ::notice file=my_file.ml,line=4,col=1,endLine=4,endColumn=33,title=XCR::This XCR is assigned to user (CR reporter).
     ========================
     CR-user: Invalid.
     ((
       github_annotation (
         (loc (
-          (start my_file.ml:4:0)
-          (stop  my_file.ml:4:23)))
+          (start my_file.ml:5:0)
+          (stop  my_file.ml:5:23)))
         (severity Warning)
         (title    "Invalid CR")
         (message
          "This invalid CR is unassigned (no default repo owner configured)."))))
-    ::warning file=my_file.ml,line=4,col=1,endLine=4,endColumn=24,title=Invalid CR::This invalid CR is unassigned (no default repo owner configured).
+    ::warning file=my_file.ml,line=5,col=1,endLine=5,endColumn=24,title=Invalid CR::This invalid CR is unassigned (no default repo owner configured).
+    ========================
+    XCR-user: Invalid.
+    ((
+      github_annotation (
+        (loc (
+          (start my_file.ml:6:0)
+          (stop  my_file.ml:6:24)))
+        (severity Warning)
+        (title    "Invalid CR")
+        (message
+         "This invalid CR is unassigned (no default repo owner configured)."))))
+    ::warning file=my_file.ml,line=6,col=1,endLine=6,endColumn=25,title=Invalid CR::This invalid CR is unassigned (no default repo owner configured).
     ========================
     CR-soon user: Hello.
     No annotation generated.
     ========================
     CR-someday user: Hello.
     No annotation generated.
+    ========================
+    XCR-soon user: Hello.
+    ((
+      github_annotation (
+        (loc (
+          (start my_file.ml:9:0)
+          (stop  my_file.ml:9:27)))
+        (severity Notice)
+        (title    XCR)
+        (message "This XCR is assigned to user (CR reporter)."))))
+    ::notice file=my_file.ml,line=9,col=1,endLine=9,endColumn=28,title=XCR::This XCR is assigned to user (CR reporter).
+    ========================
+    XCR-someday user: Hello.
+    ((
+      github_annotation (
+        (loc (
+          (start my_file.ml:10:0)
+          (stop  my_file.ml:11:0)))
+        (severity Notice)
+        (title    XCR)
+        (message "This XCR is assigned to user (CR reporter)."))))
+    ::notice file=my_file.ml,line=10,col=1,endLine=11,endColumn=1,title=XCR::This XCR is assigned to user (CR reporter).
     |}];
   let config = Config.create ~invalid_crs_annotation_severity:Error () in
   test

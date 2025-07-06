@@ -29,3 +29,18 @@ let parse_file ~path ~file_contents =
   in
   Crs_parser.parse_file ~path ~file_contents |> Cr_comment.sort
 ;;
+
+let test_cases =
+  {|
+(* $CR user: Hello. *)
+(* $CR user for user2: Hello. *)
+(* $XCR user: Hello. *)
+(* $XCR user for user2: Hello. *)
+(* $CR-user: Invalid. *)
+(* $XCR-user: Invalid. *)
+(* $CR-soon user: Hello. *)
+(* $CR-someday user: Hello. *)
+(* $XCR-soon user: Hello. *)
+(* $XCR-someday user: Hello. *)
+|}
+;;
