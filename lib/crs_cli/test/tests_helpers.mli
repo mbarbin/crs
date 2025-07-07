@@ -34,3 +34,7 @@
     locations for the resulting CRs. The contents is solely read from
     [file_contents]. *)
 val parse_file : path:Vcs.Path_in_repo.t -> file_contents:string -> Cr_comment.t list
+
+(** A shared list of common cases for CRs. This is used by several tests as a
+    basis for making sure to handle various kinds of CRs. *)
+val test_cases : string

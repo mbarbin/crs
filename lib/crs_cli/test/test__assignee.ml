@@ -58,20 +58,9 @@ let test file_contents ~config ~review_mode =
     print_s [%sexp { assignee : Assignee.t }])
 ;;
 
-let test_cases =
-  {|
-(* $CR user: Hello. *)
-(* $CR user for user2: Hello. *)
-(* $XCR user for user2: Hello. *)
-(* $CR-user: Invalid. *)
-(* $CR-soon user: Hello. *)
-(* $CR-someday user: Hello. *)
-|}
-;;
-
 let%expect_test "compute" =
   let config = Config.create ~default_repo_owner:(Vcs.User_handle.v "owner") () in
-  test test_cases ~config ~review_mode:Commit;
+  test Tests_helpers.test_cases ~config ~review_mode:Commit;
   [%expect
     {|
     ========================
@@ -81,10 +70,16 @@ let%expect_test "compute" =
     CR user for user2: Hello.
     ((assignee ((user (user2)) (reason Recipient))))
     ========================
+    XCR user: Hello.
+    ((assignee ((user (user)) (reason Reporter))))
+    ========================
     XCR user for user2: Hello.
     ((assignee ((user (user)) (reason Reporter))))
     ========================
     CR-user: Invalid.
+    ((assignee ((user (owner)) (reason Default_repo_owner))))
+    ========================
+    XCR-user: Invalid.
     ((assignee ((user (owner)) (reason Default_repo_owner))))
     ========================
     CR-soon user: Hello.
@@ -92,10 +87,16 @@ let%expect_test "compute" =
     ========================
     CR-someday user: Hello.
     ((assignee ((user ()) (reason Not_due_now))))
+    ========================
+    XCR-soon user: Hello.
+    ((assignee ((user (user)) (reason Reporter))))
+    ========================
+    XCR-someday user: Hello.
+    ((assignee ((user (user)) (reason Reporter))))
     |}];
   let config = Config.create ~default_repo_owner:(Vcs.User_handle.v "owner") () in
   test
-    test_cases
+    Tests_helpers.test_cases
     ~config
     ~review_mode:(Pull_request { author = Vcs.User_handle.v "pr-author" });
   [%expect
@@ -107,10 +108,16 @@ let%expect_test "compute" =
     CR user for user2: Hello.
     ((assignee ((user (user2)) (reason Recipient))))
     ========================
+    XCR user: Hello.
+    ((assignee ((user (user)) (reason Reporter))))
+    ========================
     XCR user for user2: Hello.
     ((assignee ((user (user)) (reason Reporter))))
     ========================
     CR-user: Invalid.
+    ((assignee ((user (pr-author)) (reason Pull_request_author))))
+    ========================
+    XCR-user: Invalid.
     ((assignee ((user (pr-author)) (reason Pull_request_author))))
     ========================
     CR-soon user: Hello.
@@ -118,6 +125,12 @@ let%expect_test "compute" =
     ========================
     CR-someday user: Hello.
     ((assignee ((user ()) (reason Not_due_now))))
+    ========================
+    XCR-soon user: Hello.
+    ((assignee ((user (user)) (reason Reporter))))
+    ========================
+    XCR-someday user: Hello.
+    ((assignee ((user (user)) (reason Reporter))))
     |}];
   ()
 ;;

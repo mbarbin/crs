@@ -129,19 +129,12 @@ let test file_contents ~config ~review_mode ~with_user_mentions =
              (Annotation.message annotation))))
 ;;
 
-let test_cases =
-  {|
-(* $CR user: Hello. *)
-(* $CR user for user2: Hello. *)
-(* $XCR user for user2: Hello. *)
-(* $CR-user: Invalid. *)
-(* $CR-soon user: Hello. *)
-(* $CR-someday user: Hello. *)
-|}
-;;
-
 let%expect_test "compute" =
-  test test_cases ~config:Config.empty ~review_mode:Commit ~with_user_mentions:true;
+  test
+    Tests_helpers.test_cases
+    ~config:Config.empty
+    ~review_mode:Commit
+    ~with_user_mentions:true;
   [%expect
     {|
     ========================
@@ -151,10 +144,16 @@ let%expect_test "compute" =
     CR user for user2: Hello.
     Info: This CR is assigned to user2 (CR recipient).
     ========================
+    XCR user: Hello.
+    Info: This XCR is assigned to user (CR reporter).
+    ========================
     XCR user for user2: Hello.
     Info: This XCR is assigned to user (CR reporter).
     ========================
     CR-user: Invalid.
+    Warning: This invalid CR is unassigned (no default repo owner configured).
+    ========================
+    XCR-user: Invalid.
     Warning: This invalid CR is unassigned (no default repo owner configured).
     ========================
     CR-soon user: Hello.
@@ -162,13 +161,19 @@ let%expect_test "compute" =
     ========================
     CR-someday user: Hello.
     No annotation generated.
+    ========================
+    XCR-soon user: Hello.
+    Info: This XCR is assigned to user (CR reporter).
+    ========================
+    XCR-someday user: Hello.
+    Info: This XCR is assigned to user (CR reporter).
     |}];
   let config =
     let user = Vcs.User_handle.v "user" in
     let user2 = Vcs.User_handle.v "user2" in
     Config.create ~default_repo_owner:user ~user_mentions_whitelist:[ user; user2 ] ()
   in
-  test test_cases ~config ~review_mode:Commit ~with_user_mentions:true;
+  test Tests_helpers.test_cases ~config ~review_mode:Commit ~with_user_mentions:true;
   [%expect
     {|
     ========================
@@ -178,10 +183,16 @@ let%expect_test "compute" =
     CR user for user2: Hello.
     Info: This CR is assigned to @user2 (CR recipient).
     ========================
+    XCR user: Hello.
+    Info: This XCR is assigned to @user (CR reporter).
+    ========================
     XCR user for user2: Hello.
     Info: This XCR is assigned to @user (CR reporter).
     ========================
     CR-user: Invalid.
+    Warning: This invalid CR is assigned to @user (default repo owner).
+    ========================
+    XCR-user: Invalid.
     Warning: This invalid CR is assigned to @user (default repo owner).
     ========================
     CR-soon user: Hello.
@@ -189,6 +200,12 @@ let%expect_test "compute" =
     ========================
     CR-someday user: Hello.
     No annotation generated.
+    ========================
+    XCR-soon user: Hello.
+    Info: This XCR is assigned to @user (CR reporter).
+    ========================
+    XCR-someday user: Hello.
+    Info: This XCR is assigned to @user (CR reporter).
     |}];
   (* Here user3 should not be notified because they are not in the whitelist. *)
   test
@@ -211,7 +228,7 @@ let%expect_test "compute" =
       ()
   in
   test
-    test_cases
+    Tests_helpers.test_cases
     ~config
     ~review_mode:(Pull_request { author = Vcs.User_handle.v "user" })
     ~with_user_mentions:false;
@@ -224,10 +241,16 @@ let%expect_test "compute" =
     CR user for user2: Hello.
     Warning: This CR is assigned to user2 (CR recipient).
     ========================
+    XCR user: Hello.
+    Warning: This XCR is assigned to user (CR reporter).
+    ========================
     XCR user for user2: Hello.
     Warning: This XCR is assigned to user (CR reporter).
     ========================
     CR-user: Invalid.
+    Error: This invalid CR is assigned to user (PR author).
+    ========================
+    XCR-user: Invalid.
     Error: This invalid CR is assigned to user (PR author).
     ========================
     CR-soon user: Hello.
@@ -235,6 +258,12 @@ let%expect_test "compute" =
     ========================
     CR-someday user: Hello.
     No annotation generated.
+    ========================
+    XCR-soon user: Hello.
+    Warning: This XCR is assigned to user (CR reporter).
+    ========================
+    XCR-someday user: Hello.
+    Warning: This XCR is assigned to user (CR reporter).
     |}];
   ()
 ;;

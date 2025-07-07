@@ -42,19 +42,12 @@ let test file_contents ~config ~review_mode ~with_user_mentions =
   print_endline (Yojson.Safe.pretty_to_string ~std:true json)
 ;;
 
-let test_cases =
-  {|
-(* $CR user: Hello. *)
-(* $CR user for user2: Hello. *)
-(* $XCR user for user2: Hello. *)
-(* $CR-user: Invalid. *)
-(* $CR-soon user: Hello. *)
-(* $CR-someday user: Hello. *)
-|}
-;;
-
 let%expect_test "compute" =
-  test test_cases ~config:Config.empty ~review_mode:Commit ~with_user_mentions:true;
+  test
+    Tests_helpers.test_cases
+    ~config:Config.empty
+    ~review_mode:Commit
+    ~with_user_mentions:true;
   [%expect
     {|
     {
@@ -91,7 +84,19 @@ let%expect_test "compute" =
             "path": "my_file.ml",
             "range": {
               "start": { "line": 3, "column": 1 },
-              "end": { "line": 3, "column": 33 }
+              "end": { "line": 3, "column": 23 }
+            }
+          },
+          "severity": "INFO",
+          "originalOutput": "XCR user: Hello."
+        },
+        {
+          "message": "This XCR is assigned to user (CR reporter).",
+          "location": {
+            "path": "my_file.ml",
+            "range": {
+              "start": { "line": 4, "column": 1 },
+              "end": { "line": 4, "column": 33 }
             }
           },
           "severity": "INFO",
@@ -102,12 +107,48 @@ let%expect_test "compute" =
           "location": {
             "path": "my_file.ml",
             "range": {
-              "start": { "line": 4, "column": 1 },
-              "end": { "line": 4, "column": 24 }
+              "start": { "line": 5, "column": 1 },
+              "end": { "line": 5, "column": 24 }
             }
           },
           "severity": "WARNING",
           "originalOutput": "CR-user: Invalid."
+        },
+        {
+          "message": "This invalid CR is unassigned (no default repo owner configured).",
+          "location": {
+            "path": "my_file.ml",
+            "range": {
+              "start": { "line": 6, "column": 1 },
+              "end": { "line": 6, "column": 25 }
+            }
+          },
+          "severity": "WARNING",
+          "originalOutput": "XCR-user: Invalid."
+        },
+        {
+          "message": "This XCR is assigned to user (CR reporter).",
+          "location": {
+            "path": "my_file.ml",
+            "range": {
+              "start": { "line": 9, "column": 1 },
+              "end": { "line": 9, "column": 28 }
+            }
+          },
+          "severity": "INFO",
+          "originalOutput": "XCR-soon user: Hello."
+        },
+        {
+          "message": "This XCR is assigned to user (CR reporter).",
+          "location": {
+            "path": "my_file.ml",
+            "range": {
+              "start": { "line": 10, "column": 1 },
+              "end": { "line": 11, "column": 1 }
+            }
+          },
+          "severity": "INFO",
+          "originalOutput": "XCR-someday user: Hello."
         }
       ]
     }
