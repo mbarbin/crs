@@ -22,7 +22,9 @@
 module Style : sig
   type t =
     | Default
+    | Fg_green
     | Fg_red
+    | Fg_yellow
 end
 
 module Cell : sig

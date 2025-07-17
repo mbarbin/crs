@@ -28,13 +28,16 @@ module Style = struct
   include Text_table_ast.Style
 
   let default = Default
+  let fg_green = Fg_green
   let fg_red = Fg_red
+  let fg_yellow = Fg_yellow
 end
 
 module Cell = struct
   include Text_table_ast.Cell
 
   let empty = { style = Style.default; text = "" }
+  let is_empty t = String.is_empty t.text
   let text ?(style = Style.default) text = { style; text }
 end
 
