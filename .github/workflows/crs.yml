@@ -38,7 +38,7 @@ jobs:
       - name: Install reviewdog
         uses: reviewdog/action-setup@v1
 
-      # Here we can have a few CRs workflow that should permit to test the crs
+      # Here we can have a few CRs workflows that should permit to test the crs
       # built from that PR and its interaction with other tools like reviewdog,
       # GitHub annotations, step summaries, etc.
 
