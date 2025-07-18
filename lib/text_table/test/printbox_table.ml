@@ -57,7 +57,9 @@ let of_text_table t =
                             | false ->
                               (match style with
                                | Default -> line text
-                               | Fg_red -> line_with_style (Style.fg_color Red) text)
+                               | Fg_green -> line_with_style (Style.fg_color Green) text
+                               | Fg_red -> line_with_style (Style.fg_color Red) text
+                               | Fg_yellow -> line_with_style (Style.fg_color Yellow) text)
                           in
                           [ align ~h:align_h ~v:`Center (pad_cell box) ]))
                    ])))))

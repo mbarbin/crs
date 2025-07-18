@@ -59,7 +59,7 @@ let to_string_non_empty t =
       let { Text_table_ast.Cell.text; style } = List.nth_exn col.cells i in
       let () =
         match style with
-        | Default | Fg_red ->
+        | Default | Fg_green | Fg_red | Fg_yellow ->
           (* There is no support for controlling colors in the GitHub Markdown
              syntax. We simply do not render them. *)
           ()

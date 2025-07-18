@@ -60,14 +60,17 @@ let to_string_non_empty t =
       (* [nth_exn] thanks to invariant from Box: all cells have the same length. *)
       let { Text_table_ast.Cell.text; style } = List.nth_exn col.cells i in
       Buffer.add_char buffer ' ';
+      let add_colored_text color_code =
+        Buffer.add_string buffer color_code;
+        Buffer.add_string buffer (Box.pad text ~len:col.length ~align:col.align);
+        Buffer.add_string buffer "\027[0m"
+      in
       (match style with
        | Default ->
          Buffer.add_string buffer (Box.pad text ~len:col.length ~align:col.align)
-       | Fg_red ->
-         Buffer.add_string buffer "\027[31m";
-         (* ANSI red *)
-         Buffer.add_string buffer (Box.pad text ~len:col.length ~align:col.align);
-         Buffer.add_string buffer "\027[0m" (* reset *));
+       | Fg_red -> add_colored_text "\027[31m"
+       | Fg_green -> add_colored_text "\027[32m"
+       | Fg_yellow -> add_colored_text "\027[33m");
       Buffer.add_char buffer ' ';
       Buffer.add_string buffer "│");
     Buffer.add_char buffer '\n'

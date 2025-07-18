@@ -42,13 +42,16 @@ module Style : sig
   type t
 
   val default : t
+  val fg_green : t
   val fg_red : t
+  val fg_yellow : t
 end
 
 module Cell : sig
   type t
 
   val empty : t
+  val is_empty : t -> bool
   val text : ?style:Style.t -> string -> t
 end
 
