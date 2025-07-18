@@ -80,5 +80,7 @@ This command is meant to be used to generate contents to include to the history 
               "Users with assigned CRs/XCRs: %s"
               (String.concat ~sep:", " assignees))
      in
+     (* CR mbarbin: Remove after testing this. *)
+     print_endline "Hello crs built from this PR!";
      ())
 ;;
