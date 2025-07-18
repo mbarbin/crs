@@ -30,6 +30,11 @@ jobs:
         run: |
           dune pkg lock
 
+      - name: Build 'crs'
+        shell: bash
+        run: |
+          dune exec crs -- --version
+
       - name: Install reviewdog
         uses: reviewdog/action-setup@v1
 
