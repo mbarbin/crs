@@ -10,9 +10,9 @@
   -open
   Base
   -open
-  Cmdlang
-  -open
   Expect_test_helpers_base
+  -open
+  Cmdlang
   -open
   Volgo)
  (libraries
