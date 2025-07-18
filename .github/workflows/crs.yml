@@ -1,0 +1,57 @@
+name: CRs Workflows
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - "**" # This will match pull requests targeting any branch
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        runs-on: [ubuntu-latest]
+    runs-on: ${{ matrix.runs-on }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup dune
+        id: setup-dune
+        uses: ocaml-dune/setup-dune@v0.0.1
+        with:
+          automagic: false
+
+      - name: Resolve dependencies
+        shell: bash
+        run: |
+          dune pkg lock
+
+      - name: Build 'crs'
+        shell: bash
+        run: |
+          dune exec crs -- --version
+
+      - name: Install reviewdog
+        uses: reviewdog/action-setup@v1
+
+      # Here we can have a few CRs workflows that should permit to test the crs
+      # built from that PR and its interaction with other tools like reviewdog,
+      # GitHub annotations, step summaries, etc.
+
+      - name: Annotate CRs with reviewdog
+        if: github.event_name == 'pull_request'
+        run: |
+          dune exec crs -- tools reviewdog annotate-crs \
+            --config=.github/crs-config.json \
+            --review-mode=pull-request \
+            --pull-request-author="${{ github.event.pull_request.user.login }}" \
+          | reviewdog -f=rdjson -name="crs" -reporter=github-pr-review
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add CRs summary to workflow run summary
+        run: dune exec crs -- tools github summary-comment >> $GITHUB_STEP_SUMMARY
