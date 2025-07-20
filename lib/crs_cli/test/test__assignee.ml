@@ -60,7 +60,7 @@ let test file_contents ~config ~review_mode =
 
 let%expect_test "compute" =
   let config = Config.create ~default_repo_owner:(Vcs.User_handle.v "owner") () in
-  test Tests_helpers.test_cases ~config ~review_mode:Commit;
+  test Tests_helpers.test_cases ~config ~review_mode:Revision;
   [%expect
     {|
     ========================
@@ -98,7 +98,7 @@ let%expect_test "compute" =
   test
     Tests_helpers.test_cases
     ~config
-    ~review_mode:(Pull_request { author = Vcs.User_handle.v "pr-author" });
+    ~review_mode:(Pull_request { author = Vcs.User_handle.v "pr-author"; base = None });
   [%expect
     {|
     ========================

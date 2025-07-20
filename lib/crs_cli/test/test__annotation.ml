@@ -34,7 +34,7 @@ let%expect_test "sexp_of_t" =
       Annotation.of_cr
         ~cr
         ~config:Config.empty
-        ~review_mode:Commit
+        ~review_mode:Revision
         ~with_user_mentions:false
     in
     print_s [%sexp (annotation : Annotation.t option)];
@@ -90,7 +90,7 @@ let%expect_test "getters" =
         Annotation.of_cr
           ~cr
           ~config:Config.empty
-          ~review_mode:Commit
+          ~review_mode:Revision
           ~with_user_mentions:false)
     with
     | [ hd ] -> hd
@@ -133,7 +133,7 @@ let%expect_test "compute" =
   test
     Tests_helpers.test_cases
     ~config:Config.empty
-    ~review_mode:Commit
+    ~review_mode:Revision
     ~with_user_mentions:true;
   [%expect
     {|
@@ -173,7 +173,7 @@ let%expect_test "compute" =
     let user2 = Vcs.User_handle.v "user2" in
     Config.create ~default_repo_owner:user ~user_mentions_whitelist:[ user; user2 ] ()
   in
-  test Tests_helpers.test_cases ~config ~review_mode:Commit ~with_user_mentions:true;
+  test Tests_helpers.test_cases ~config ~review_mode:Revision ~with_user_mentions:true;
   [%expect
     {|
     ========================
@@ -211,7 +211,7 @@ let%expect_test "compute" =
   test
     "(* $CR user for user3: Hello. *)"
     ~config
-    ~review_mode:Commit
+    ~review_mode:Revision
     ~with_user_mentions:true;
   [%expect
     {|
@@ -230,7 +230,7 @@ let%expect_test "compute" =
   test
     Tests_helpers.test_cases
     ~config
-    ~review_mode:(Pull_request { author = Vcs.User_handle.v "user" })
+    ~review_mode:(Pull_request { author = Vcs.User_handle.v "user"; base = None })
     ~with_user_mentions:false;
   [%expect
     {|

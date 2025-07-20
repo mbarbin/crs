@@ -76,8 +76,9 @@ let of_raw
   =
   let default =
     match review_mode with
-    | Pull_request { author } -> { user = Some author; reason = Pull_request_author }
-    | Commit ->
+    | Pull_request { author; base = _ } ->
+      { user = Some author; reason = Pull_request_author }
+    | Revision ->
       (match config.default_repo_owner with
        | Some owner -> { user = Some owner; reason = Default_repo_owner }
        | None -> { user = None; reason = No_default_repo_owner })

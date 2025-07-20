@@ -84,6 +84,20 @@ Test it in the context of a pull review too.
   $ crs tools github annotate-crs --config=crs-config.json \
   >   --review-mode=pull-request \
   >   --pull-request-author="pr-author"
+  Warning: Review mode [pull-request] requires [--pull-request-base].
+  It will become mandatory in the future, please attend.
+  ::warning title=crs::Review mode [pull-request] requires [--pull-request-base].%0AIt will become mandatory in the future, please attend.
+  ::notice file=foo/a.txt,line=2,col=1,endLine=2,endColumn=39,title=XCR::This XCR is assigned to user1 (CR reporter).
+  ::notice file=foo/foo.c,line=1,col=1,endLine=1,endColumn=61,title=CR::This CR is assigned to user3 (CR recipient).
+  ::notice file=foo/pr.ml,line=1,col=1,endLine=1,endColumn=51,title=CR::This CR is assigned to pr-author (PR author).
+  ::notice file=hello,line=2,col=1,endLine=2,endColumn=61,title=CR::This CR is assigned to user2 (CR recipient).
+
+Let's add the required base revision.
+
+  $ crs tools github annotate-crs --config=crs-config.json \
+  >   --review-mode=pull-request \
+  >   --pull-request-author="pr-author" \
+  >   --pull-request-base="${rev0}"
   ::notice file=foo/a.txt,line=2,col=1,endLine=2,endColumn=39,title=XCR::This XCR is assigned to user1 (CR reporter).
   ::notice file=foo/foo.c,line=1,col=1,endLine=1,endColumn=61,title=CR::This CR is assigned to user3 (CR recipient).
   ::notice file=foo/pr.ml,line=1,col=1,endLine=1,endColumn=51,title=CR::This CR is assigned to pr-author (PR author).
@@ -159,6 +173,7 @@ Let's test the reviewdog annotations too.
   $ crs tools reviewdog annotate-crs --config=crs-config.json \
   >   --review-mode=pull-request \
   >   --pull-request-author="pr-author" \
+  >   --pull-request-base="${rev0}" \
   >   --with-user-mentions=true \
   >  > for-pull-request
 
@@ -196,6 +211,7 @@ We can also print a summary comment,
   $ crs tools github summary-comment --config=crs-config.json \
   >   --review-mode=pull-request \
   >   --pull-request-author="pr-author" \
+  >   --pull-request-base="${rev0}" \
   >   --with-user-mentions=true \
   >  > for-pull-request
 

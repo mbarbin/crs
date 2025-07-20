@@ -43,7 +43,7 @@ let%expect_test "compute" =
   test
     Tests_helpers.test_cases
     ~config:Config.empty
-    ~review_mode:Commit
+    ~review_mode:Revision
     ~with_user_mentions:true;
   [%expect
     {|
@@ -148,7 +148,7 @@ let%expect_test "compute" =
   test
     {|(* $CR-invalid : Invalid *)|}
     ~config
-    ~review_mode:Commit
+    ~review_mode:Revision
     ~with_user_mentions:false;
   [%expect
     {|
