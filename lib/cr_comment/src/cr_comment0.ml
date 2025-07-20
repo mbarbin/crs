@@ -239,6 +239,10 @@ let priority t : Priority.t =
   match t.header with
   | Error _ -> Now
   | Ok p ->
+    (* CR mbarbin: Given that we are computing this result solely from the
+       header, and that there is a [priority] function in header, I believe both
+       functions should be aligned. We should fix this and make it more
+       consistent. *)
     (match Header.status p with
      | XCR -> Now
      | CR -> Header.priority p)
