@@ -14,7 +14,9 @@
   -open
   Cmdlang
   -open
-  Volgo)
+  Volgo
+  -open
+  Fpath_base)
  (libraries
   base
   cmdlang
@@ -23,6 +25,8 @@
   crs_cli
   crs_parser
   expect_test_helpers_core.expect_test_helpers_base
+  fpath
+  fpath-base
   loc
   pplumbing.err
   reviewdog
