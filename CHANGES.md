@@ -2,7 +2,7 @@
 
 ### Fixed
 
-- Make `Header.priority` return `Now` on XCRs (#PR, @mbarbin).
+- Make `Header.priority` return `Now` on XCRs (#55, @mbarbin).
 
 ## 0.0.20250705 (2025-07-05)
 
