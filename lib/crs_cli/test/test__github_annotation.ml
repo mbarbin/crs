@@ -178,10 +178,7 @@ let%expect_test "multilines annotations" =
   in
   print_endline (Github_annotation.to_string github_annotation);
   [%expect
-    {|
-    ::warning file=my_file.ml,line=1,col=1,endLine=1,endColumn=1,title=Hello Multiline Message::This message has
-    multiple lines!
-    |}];
+    {| ::warning file=my_file.ml,line=1,col=1,endLine=1,endColumn=1,title=Hello Multiline Message::This message has%0Amultiple lines! |}];
   ()
 ;;
 

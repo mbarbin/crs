@@ -65,6 +65,6 @@ let to_string { loc; severity; title; message } =
     ; List.map fields ~f:(fun (field, value) -> Printf.sprintf "%s=%s" field value)
       |> String.concat ~sep:","
     ; "::"
-    ; message
+    ; String.substr_replace_all message ~pattern:"\n" ~with_:"%0A"
     ]
 ;;
