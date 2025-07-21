@@ -23,8 +23,11 @@ module T = struct
   [@@@coverage off]
 
   type t =
-    | Pull_request of { author : Vcs.User_handle.t }
-    | Commit
+    | Pull_request of
+        { author : Vcs.User_handle.t
+        ; base : Vcs.Rev.t option
+        }
+    | Revision
   [@@deriving equal, sexp_of]
 end
 
@@ -33,30 +36,81 @@ include T
 module Name = struct
   type t =
     | Pull_request
-    | Commit
-  [@@deriving enumerate]
+    | Revision
 
   let to_string = function
     | Pull_request -> "pull-request"
-    | Commit -> "commit"
+    | Revision -> "revision"
   ;;
 end
 
-let arg =
+module Name_compatibility = struct
+  (* For a few releases we accept "commit" as former name for "revision" as a
+     compatibility mode. We'll drop this support at some future point. *)
+
+  type t =
+    | Pull_request
+    | Commit
+    | Revision
+  [@@deriving enumerate]
+
+  let to_name : t -> Name.t = function
+    | Pull_request -> Pull_request
+    | Commit | Revision -> Revision
+  ;;
+
+  let to_string = function
+    | Commit -> "commit"
+    | (Pull_request | Revision) as t -> Name.to_string (to_name t)
+  ;;
+end
+
+let pp_to_string pp =
+  let buffer = Buffer.create 23 in
+  let formatter = Stdlib.Format.formatter_of_buffer buffer in
+  Stdlib.Format.fprintf formatter "%a%!" Pp.to_fmt pp;
+  let contents =
+    Buffer.contents buffer
+    |> String.split_lines
+    |> List.map ~f:(fun s -> String.rstrip s ^ "\n")
+    |> String.concat
+  in
+  contents
+;;
+
+let warning ~print_gh_annotation_warnings messages =
+  Err.warning messages;
+  if print_gh_annotation_warnings
+  then (
+    let github_annotation =
+      Github_annotation.create
+        ~loc:Loc.none
+        ~severity:Warning
+        ~title:"crs"
+        ~message:
+          (String.concat ~sep:"" (List.map messages ~f:pp_to_string) |> String.strip)
+    in
+    prerr_endline (Github_annotation.to_string github_annotation))
+;;
+
+let arg ~print_gh_annotation_warnings =
   let open Command.Std in
   let pull_request_author_switch = "pull-request-author" in
+  let pull_request_base_switch = "pull-request-base" in
   let review_mode_switch = "review-mode" in
   let+ name =
     Arg.named_with_default
       [ review_mode_switch ]
-      (Param.enumerated ~docv:"MODE" (module Name))
-      ~default:Commit
+      (Param.enumerated ~docv:"MODE" (module Name_compatibility))
+      ~default:Revision
       ~doc:
         "Specifies the review context in which this command is executed. Use \
          $(b,pull-request) when running in the context of a pull request (requires \
-         $(b,--pull-request-author)). Use $(b,commit) when running in the context of a \
-         direct commit or push to a branch (default). This setting affects how CRs are \
-         assigned and annotated."
+         $(b,--pull-request-{author,base})). Use $(b,revision) when running in the \
+         context of a push to a branch (default). This setting affects how CRs are \
+         assigned and annotated. As a compatibility transition, this command accepts the \
+         $(b,commit) parameter as an alias for $(b,revision), however this should not be \
+         used in new code."
   and+ pull_request_author =
     Arg.named_opt
       [ pull_request_author_switch ]
@@ -66,25 +120,62 @@ let arg =
            "When $(b,--%s) is a pull-request this argument must be supplied to set the \
             PR author."
            review_mode_switch)
+  and+ pull_request_base =
+    Arg.named_opt
+      [ pull_request_base_switch ]
+      (Param.validated_string ~docv:"REV" (module Vcs.Rev))
+      ~doc:
+        (Printf.sprintf
+           "When $(b,--%s) is a pull-request this argument must be supplied to set the \
+            PR base."
+           review_mode_switch)
+  in
+  let () =
+    match name with
+    | Pull_request | Revision -> ()
+    | Commit ->
+      let messages =
+        Pp.O.
+          [ Pp.verbatim "Parameter "
+            ++ Pp_tty.id (module Name_compatibility) Commit
+            ++ Pp.verbatim " for "
+            ++ Pp_tty.kwd (module String) ("--" ^ review_mode_switch)
+            ++ Pp.verbatim " was renamed "
+            ++ Pp_tty.id (module Name_compatibility) Revision
+            ++ Pp.text "."
+          ; Pp.verbatim "Please attend."
+          ]
+      in
+      warning ~print_gh_annotation_warnings messages
   in
   (* Both errors are covered but disabled due to an issue with bisect_ppx out
      edge creating false negative. *)
-  match name with
-  | Commit ->
+  match Name_compatibility.to_name name with
+  | Revision ->
     let () =
       if Option.is_some pull_request_author
       then
         Err.raise
           ~exit_code:Err.Exit_code.cli_error
           Pp.O.
-            [ Pp.text "Argument "
-              ++ Pp_tty.kwd (module String) ("--" ^ pull_request_author_switch)
+            [ Pp_tty.kwd (module String) ("--" ^ pull_request_author_switch)
               ++ Pp.text " should not be set when review mode is "
-              ++ Pp_tty.kwd (module String) "commit"
+              ++ Pp_tty.kwd (module Name) Revision
               ++ Pp.text "."
-            ] [@coverage off]
+            ] [@coverage off];
+      if Option.is_some pull_request_base
+      then
+        Err.raise
+          ~exit_code:Err.Exit_code.cli_error
+          Pp.O.
+            [ Pp_tty.kwd (module String) ("--" ^ pull_request_base_switch)
+              ++ Pp.text " should not be set when review mode is "
+              ++ Pp_tty.kwd (module Name) Revision
+              ++ Pp.text "."
+            ] [@coverage off];
+      ()
     in
-    Commit
+    Revision
   | Pull_request ->
     let author =
       match pull_request_author with
@@ -93,12 +184,29 @@ let arg =
         Err.raise
           ~exit_code:Err.Exit_code.cli_error
           Pp.O.
-            [ Pp.text "Argument "
-              ++ Pp_tty.kwd (module String) ("--" ^ pull_request_author_switch)
-              ++ Pp.text " should be set when review mode is "
+            [ Pp.text "Review mode "
               ++ Pp_tty.kwd (module String) "pull-request"
+              ++ Pp.text " requires "
+              ++ Pp_tty.kwd (module String) ("--" ^ pull_request_author_switch)
               ++ Pp.text "."
             ] [@coverage off]
     in
-    Pull_request { author }
+    let base =
+      (match pull_request_base with
+       | Some _ -> ()
+       | None ->
+         let messages =
+           Pp.O.
+             [ Pp.verbatim "Review mode "
+               ++ Pp_tty.kwd (module String) "pull-request"
+               ++ Pp.verbatim " requires "
+               ++ Pp_tty.kwd (module String) ("--" ^ pull_request_base_switch)
+               ++ Pp.verbatim "."
+             ; Pp.verbatim "It will become mandatory in the future, please attend."
+             ]
+         in
+         warning ~print_gh_annotation_warnings messages);
+      pull_request_base
+    in
+    Pull_request { author; base }
 ;;

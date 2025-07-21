@@ -29,7 +29,7 @@ This command searches for CRs in the tree and prints GitHub Workflow Annotations
     (let open Command.Std in
      let+ config =
        Arg.named_opt [ "config" ] Param.file ~doc:"Config file to customize crs."
-     and+ review_mode = Review_mode.arg in
+     and+ review_mode = Review_mode.arg ~print_gh_annotation_warnings:true in
      let cwd = Unix.getcwd () |> Absolute_path.v in
      let { Enclosing_repo.vcs_kind = _; repo_root; vcs } =
        Common_helpers.find_enclosing_repo ~from:cwd

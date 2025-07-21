@@ -23,7 +23,11 @@ module Review_mode = Crs_cli.Private.Review_mode
 
 let test args =
   match
-    let cmd = Command.make Review_mode.arg ~summary:"return the args" in
+    let cmd =
+      Command.make
+        (Review_mode.arg ~print_gh_annotation_warnings:true)
+        ~summary:"return the args"
+    in
     Cmdlang_stdlib_runner.eval cmd ~argv:(Array.of_list ("./main.exe" :: args))
   with
   | Ok a -> print_s [%sexp (a : Review_mode.t)]
@@ -32,25 +36,48 @@ let test args =
 
 let%expect_test "arg" =
   Err.For_test.protect (fun () -> test []);
-  [%expect {| Commit |}];
+  [%expect {| Revision |}];
   Err.For_test.protect (fun () -> test [ "--pull-request-author=jdoe" ]);
   [%expect
     {|
-    Error: Argument [--pull-request-author] should not be set when review mode is
-    [commit].
+    Error: [--pull-request-author] should not be set when review mode is
+    [revision].
     [124]
     |}];
   Err.For_test.protect (fun () -> test [ "--review-mode=commit" ]);
-  [%expect {| Commit |}];
+  [%expect
+    {|
+    Warning: Parameter [commit] for [--review-mode] was renamed [revision].
+    Please attend.
+    ::warning title=crs::Parameter [commit] for [--review-mode] was renamed [revision].%0APlease attend.
+    Revision
+    |}];
+  Err.For_test.protect (fun () -> test [ "--review-mode=revision" ]);
+  [%expect {| Revision |}];
   Err.For_test.protect (fun () -> test [ "--review-mode=pull-request" ]);
   [%expect
     {|
-    Error: Argument [--pull-request-author] should be set when review mode is
-    [pull-request].
+    Error: Review mode [pull-request] requires [--pull-request-author].
     [124]
     |}];
   Err.For_test.protect (fun () ->
     test [ "--review-mode=pull-request"; "--pull-request-author=jdoe" ]);
-  [%expect {| (Pull_request (author jdoe)) |}];
+  [%expect
+    {|
+    Warning: Review mode [pull-request] requires [--pull-request-base].
+    It will become mandatory in the future, please attend.
+    ::warning title=crs::Review mode [pull-request] requires [--pull-request-base].%0AIt will become mandatory in the future, please attend.
+    (Pull_request (author jdoe) (base ()))
+    |}];
+  let mock_rev_gen = Vcs.Mock_rev_gen.create ~name:"review" in
+  let base = Vcs.Mock_rev_gen.next mock_rev_gen in
+  Err.For_test.protect (fun () ->
+    test
+      [ "--review-mode=pull-request"
+      ; "--pull-request-author=jdoe"
+      ; "--pull-request-base=" ^ Vcs.Rev.to_string base
+      ]);
+  [%expect
+    {| (Pull_request (author jdoe) (base (6c3e826c6e1da1d8975aaca8fbfbbaac6c3e826c))) |}];
   ()
 ;;
