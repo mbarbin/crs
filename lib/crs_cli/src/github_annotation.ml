@@ -43,7 +43,7 @@ type t =
 
 let create ~loc ~severity ~title ~message = { loc; severity; title; message }
 
-let to_loc_fields ~loc =
+let to_loc_fields_internal ~loc =
   let column (pos : Lexing.position) = pos.pos_cnum - pos.pos_bol + 1 in
   let start_pos = Loc.start loc in
   let stop_pos = Loc.stop loc in
@@ -55,6 +55,8 @@ let to_loc_fields ~loc =
   ]
 ;;
 
+let to_loc_fields ~loc = if Loc.is_none loc then [] else to_loc_fields_internal ~loc
+
 let to_string { loc; severity; title; message } =
   let fields = to_loc_fields ~loc @ [ "title", title ] in
   String.concat
@@ -65,6 +67,6 @@ let to_string { loc; severity; title; message } =
     ; List.map fields ~f:(fun (field, value) -> Printf.sprintf "%s=%s" field value)
       |> String.concat ~sep:","
     ; "::"
-    ; message
+    ; String.substr_replace_all message ~pattern:"\n" ~with_:"%0A"
     ]
 ;;

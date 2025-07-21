@@ -167,3 +167,30 @@ let%expect_test "compute" =
     |}];
   ()
 ;;
+
+let%expect_test "multilines annotations" =
+  let github_annotation =
+    Github_annotation.create
+      ~loc:(Loc.of_file ~path:(Vcs.Path_in_repo.to_relative_path path :> Fpath.t))
+      ~severity:Warning
+      ~title:"Hello Multiline Message"
+      ~message:"This message has\nmultiple lines!"
+  in
+  print_endline (Github_annotation.to_string github_annotation);
+  [%expect
+    {| ::warning file=my_file.ml,line=1,col=1,endLine=1,endColumn=1,title=Hello Multiline Message::This message has%0Amultiple lines! |}];
+  ()
+;;
+
+let%expect_test "no loc" =
+  let github_annotation =
+    Github_annotation.create
+      ~loc:Loc.none
+      ~severity:Warning
+      ~title:"Hello Loc.none"
+      ~message:"This message has no location!"
+  in
+  print_endline (Github_annotation.to_string github_annotation);
+  [%expect {| ::warning title=Hello Loc.none::This message has no location! |}];
+  ()
+;;
