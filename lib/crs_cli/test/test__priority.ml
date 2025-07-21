@@ -64,19 +64,9 @@ let%expect_test "test-cases" =
     ========================
     CR-someday user: Hello.
     ((priority Someday))
-    (* CR require-failed: lib/crs_cli/test/test__priority.ml:33:18.
-       Do not 'X' this CR; instead make the required property true,
-       which will make the CR disappear.  For more information, see
-       [Expect_test_helpers_base.require]. *)
-    ("values are not equal" Now Soon)
     ========================
     XCR-soon user: Hello.
     ((priority Now))
-    (* CR require-failed: lib/crs_cli/test/test__priority.ml:33:18.
-       Do not 'X' this CR; instead make the required property true,
-       which will make the CR disappear.  For more information, see
-       [Expect_test_helpers_base.require]. *)
-    ("values are not equal" Now Someday)
     ========================
     XCR-someday user: Hello.
     ((priority Now))
