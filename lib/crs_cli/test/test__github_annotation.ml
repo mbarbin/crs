@@ -191,7 +191,6 @@ let%expect_test "no loc" =
       ~message:"This message has no location!"
   in
   print_endline (Github_annotation.to_string github_annotation);
-  [%expect
-    {| ::warning file=<none>,line=1,col=1,endLine=1,endColumn=1,title=Hello Loc.none::This message has no location! |}];
+  [%expect {| ::warning title=Hello Loc.none::This message has no location! |}];
   ()
 ;;
