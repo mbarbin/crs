@@ -1,3 +1,9 @@
+## 0.0.2025XXXX (unreleased)
+
+### Fixed
+
+- Make `Header.priority` return `Now` on XCRs (#PR, @mbarbin).
+
 ## 0.0.20250705 (2025-07-05)
 
 ### Added

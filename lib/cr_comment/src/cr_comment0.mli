@@ -97,7 +97,8 @@ module Header : sig
   val qualifier : t -> Qualifier.t
 
   (** [priority t] represents the expectation as to when work on the CR is meant
-      to happen. It is based on the header's qualifier. *)
+      to happen. It is based on the header's qualifier except that XCRs are
+      meant to be worked on [Now]. *)
   val priority : t -> Priority.t
 
   module With_loc : sig

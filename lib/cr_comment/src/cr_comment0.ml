@@ -116,7 +116,12 @@ module Header = struct
   let recipient t = Option.map t.recipient ~f:Loc.Txt.txt
   let status t = t.status.txt
   let qualifier t = t.qualifier.txt
-  let priority t = qualifier t |> Qualifier.priority
+
+  let priority t : Priority.t =
+    match status t with
+    | XCR -> Now
+    | CR -> qualifier t |> Qualifier.priority
+  ;;
 
   (* Deprecated. *)
   let reported_by = reporter
@@ -238,10 +243,7 @@ let status t : Status.t =
 let priority t : Priority.t =
   match t.header with
   | Error _ -> Now
-  | Ok p ->
-    (match Header.status p with
-     | XCR -> Now
-     | CR -> Header.priority p)
+  | Ok p -> Header.priority p
 ;;
 
 let to_string t =
