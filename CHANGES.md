@@ -1,5 +1,10 @@
 ## 0.0.2025XXXX (unreleased)
 
+### Changed
+
+- Prepare review mode for requiring the pull-request base (#57, @mbarbin).
+- Rename review-mode "commit" => "revision" (#57, @mbarbin).
+
 ### Fixed
 
 - Fix GitHub annotations for empty locs and multiple lines messages (#56, @mbarbin).
