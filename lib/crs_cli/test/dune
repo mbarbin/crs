@@ -10,13 +10,13 @@
   -open
   Base
   -open
-  Expect_test_helpers_base
+  Fpath_base
   -open
-  Cmdlang
+  Expect_test_helpers_base
   -open
   Volgo
   -open
-  Fpath_base)
+  Cmdlang)
  (libraries
   base
   cmdlang
