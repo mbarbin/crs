@@ -2,6 +2,7 @@
 
 ### Changed
 
+- Switch from `text-table` to upstream `print-table` lib (#PR, @mbarbin).
 - Prepare review mode for requiring the pull-request base (#57, @mbarbin).
 - Rename review-mode "commit" => "revision" (#57, @mbarbin).
 
@@ -9,6 +10,10 @@
 
 - Fix GitHub annotations for empty locs and multiple lines messages (#56, @mbarbin).
 - Make `Header.priority` return `Now` on XCRs (#55, @mbarbin).
+
+### Removed
+
+- Removed library `crs.text-table`. It was upstreamed (#PR, @mbarbin).
 
 ## 0.0.20250705 (2025-07-05)
 
