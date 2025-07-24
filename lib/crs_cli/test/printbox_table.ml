@@ -19,6 +19,13 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
+(*_ This file was copied from the print-table test suite. *)
+(****************************************************************************)
+(*  print-table - Simple Unicode/ANSI and Markdown text table rendering     *)
+(*  SPDX-FileCopyrightText: 2025 Mathieu Barbin <mathieu.barbin@gmail.com>  *)
+(*  SPDX-License-Identifier: ISC                                            *)
+(****************************************************************************)
+
 (* This was mostly an experiment. We ended up implementing a direct rendering
    from [Print_table] to markdown without [PrintBox] intermediary. Keeping for
    experimentations (test dependencies only). *)

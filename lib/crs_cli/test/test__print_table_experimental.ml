@@ -130,3 +130,65 @@ let%expect_test "to_string" =
     |}];
   ()
 ;;
+
+let%expect_test "empty columns" =
+  let crs = parse_file ~path ~file_contents:"(* $CR-soon user: Hello CR! *)" in
+  let table = Summary_table.make crs in
+  let print_table = Summary_table.to_print_table table |> Option.value_exn in
+  let printbox = Printbox_table.of_print_table print_table in
+  print_endline (PrintBox_text.to_string printbox ^ "\n");
+  [%expect
+    {|
+    ┌──────────┬──────┬───────┐
+    │ Reporter │ Soon │ Total │
+    ├──────────┼──────┼───────┤
+    │ user     │    1 │     1 │
+    └──────────┴──────┴───────┘
+    |}]
+;;
+
+(* This test was copied from the print-table test suite in order to fully cover
+   the use of styles in the experimental print-table -> printbox translation. *)
+(****************************************************************************)
+(*  print-table - Simple Unicode/ANSI and Markdown text table rendering     *)
+(*  SPDX-FileCopyrightText: 2025 Mathieu Barbin <mathieu.barbin@gmail.com>  *)
+(*  SPDX-License-Identifier: ISC                                            *)
+(****************************************************************************)
+let%expect_test "style" =
+  let columns =
+    Print_table.O.
+      [ Column.make ~header:"Name" (fun (name, _) -> Cell.text name)
+      ; Column.make ~header:"Style" ~align:Center (fun (_, style) -> Cell.text ~style "v")
+      ]
+  in
+  let print_table =
+    Print_table.make
+      ~columns
+      ~rows:
+        Print_table.O.
+          [ "default", Style.default
+          ; "fg_green", Style.fg_green
+          ; "fg_rd", Style.fg_red
+          ; "fg_yellow", Style.fg_yellow
+          ; "dim", Style.dim
+          ; "underscore", Style.underscore
+          ]
+  in
+  (* Ansi via Printbox. *)
+  let printbox = Printbox_table.of_print_table print_table in
+  print_endline (PrintBox_text.to_string printbox ^ "\n");
+  [%expect
+    {|
+    ┌────────────┬───────┐
+    │ Name       │ Style │
+    ├────────────┼───────┤
+    │ default    │   v   │
+    │ fg_green   │   [32mv[0m   │
+    │ fg_rd      │   [31mv[0m   │
+    │ fg_yellow  │   [33mv[0m   │
+    │ dim        │   v   │
+    │ underscore │   v   │
+    └────────────┴───────┘
+    |}];
+  ()
+;;

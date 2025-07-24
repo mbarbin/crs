@@ -19,6 +19,13 @@
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
 
+(*_ This file was copied from the print-table test suite. *)
+(*_***************************************************************************)
+(*_  print-table - Simple Unicode/ANSI and Markdown text table rendering     *)
+(*_  SPDX-FileCopyrightText: 2025 Mathieu Barbin <mathieu.barbin@gmail.com>  *)
+(*_  SPDX-License-Identifier: ISC                                            *)
+(*_***************************************************************************)
+
 (** Render a PrintBox in GitHub Flavored Markdown table syntax. *)
 
 type t = PrintBox.t
