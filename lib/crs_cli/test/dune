@@ -29,8 +29,11 @@
   fpath-base
   loc
   pplumbing.err
+  print-table
+  printbox
+  printbox-md
+  printbox-text
   reviewdog
-  text_table
   uutf
   volgo
   yojson)

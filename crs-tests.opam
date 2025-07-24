@@ -42,6 +42,7 @@ depends: [
   "ppx_yojson_conv" {>= "v0.17"}
   "ppx_yojson_conv_lib" {>= "v0.17"}
   "ppxlib" {>= "0.33"}
+  "print-table" {>= "0.1.0"}
   "printbox" {>= "0.12"}
   "printbox-md" {>= "0.12"}
   "printbox-text" {>= "0.12"}

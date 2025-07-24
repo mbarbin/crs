@@ -62,6 +62,8 @@
    (>= v0.17))
   (ppxlib
    (>= 0.33))
+  (print-table
+   (>= 0.1.0))
   (re
    (>= 1.12.0))
   (spawn
@@ -151,6 +153,8 @@
    (>= v0.17))
   (ppxlib
    (>= 0.33))
+  (print-table
+   (>= 0.1.0))
   (printbox
    (>= 0.12))
   (printbox-md
@@ -256,6 +260,8 @@
    (>= v0.17))
   (ppxlib
    (>= 0.33))
+  (print-table
+   (>= 0.1.0))
   (re
    (>= 1.12.0))
   (spawn

@@ -52,12 +52,12 @@ This command is meant to be used to generate contents to include to the history 
      in
      let crs, annotations = List.unzip annotated_crs in
      let by_type =
-       Summary_table.By_type.make crs |> Summary_table.By_type.to_text_table
+       Summary_table.By_type.make crs |> Summary_table.By_type.to_print_table
      in
-     let summary = Summary_table.make crs |> Summary_table.to_text_table in
+     let summary = Summary_table.make crs |> Summary_table.to_print_table in
      let tables =
        List.filter_opt [ by_type; summary ]
-       |> List.map ~f:Text_table.to_string_markdown
+       |> List.map ~f:Print_table.to_string_markdown
        |> String.concat ~sep:"\n"
      in
      let assignees =

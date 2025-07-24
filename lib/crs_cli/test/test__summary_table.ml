@@ -24,21 +24,22 @@ module Summary_table = Crs_cli.Private.Summary_table
 let path = Vcs.Path_in_repo.v "my_file.ml"
 
 let%expect_test "empty table" =
-  match Summary_table.make [] |> Summary_table.to_text_table with
+  match Summary_table.make [] |> Summary_table.to_print_table with
   | None -> ()
   | Some _ -> assert false
 ;;
 
 (* We already have a comprehensive test to monitor the various rendering
-   implementation of tables in [text_table/test]. Here we only monitor the one
-   that are used by the [crs] cli and actively in use by the project. *)
+   implementation of tables in [test__print_table_experimental.ml]. Here we only
+   monitor the one that are used by the [crs] cli and actively in use by the
+   project. *)
 
 let%expect_test "to_string" =
   let crs = Tests_helpers.parse_file ~path ~file_contents:Tests_helpers.test_cases in
   let table = Summary_table.make crs in
-  let text_table = Summary_table.to_text_table table |> Option.value_exn in
+  let print_table = Summary_table.to_print_table table |> Option.value_exn in
   (* Ansi *)
-  print_endline (Text_table.to_string_ansi text_table);
+  print_endline (Print_table.to_string_text print_table);
   [%expect
     {|
     ┌──────────┬───────┬─────┬──────┬──────┬─────────┬───────┐
@@ -49,7 +50,7 @@ let%expect_test "to_string" =
     └──────────┴───────┴─────┴──────┴──────┴─────────┴───────┘
     |}];
   (* GitHub Markdown *)
-  print_endline (Text_table.to_string_markdown text_table);
+  print_endline (Print_table.to_string_markdown print_table);
   [%expect
     {|
     | Reporter | For   | CRs | XCRs | Soon | Someday | Total |

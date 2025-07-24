@@ -23,10 +23,10 @@ module By_type : sig
   type t
 
   val make : Cr_comment.t list -> t
-  val to_text_table : t -> Text_table.t option
+  val to_print_table : t -> Print_table.t option
 end
 
 type t
 
 val make : Cr_comment.t list -> t
-val to_text_table : t -> Text_table.t option
+val to_print_table : t -> Print_table.t option
