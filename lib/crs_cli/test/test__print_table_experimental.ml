@@ -52,9 +52,9 @@ let parse_file ~path ~file_contents =
 let%expect_test "to_string" =
   let crs = parse_file ~path ~file_contents:test_cases in
   let table = Summary_table.make crs in
-  let text_table = Summary_table.to_text_table table |> Option.value_exn in
+  let print_table = Summary_table.to_print_table table |> Option.value_exn in
   (* Ansi *)
-  print_endline (Text_table.to_string_ansi text_table);
+  print_endline (Print_table.to_string_text print_table);
   [%expect
     {|
     ┌──────────┬───────┬─────┬──────┬──────┬─────────┬───────┐
@@ -65,7 +65,7 @@ let%expect_test "to_string" =
     └──────────┴───────┴─────┴──────┴──────┴─────────┴───────┘
     |}];
   (* GitHub Markdown *)
-  print_endline (Text_table.to_string_markdown text_table);
+  print_endline (Print_table.to_string_markdown print_table);
   [%expect
     {|
     | Reporter | For   | CRs | XCRs | Soon | Someday | Total |
@@ -74,7 +74,7 @@ let%expect_test "to_string" =
     | user     | user2 |   1 |    1 |      |         |     2 |
     |}];
   (* Ansi via Printbox. *)
-  let printbox = Printbox_table.of_text_table text_table in
+  let printbox = Printbox_table.of_print_table print_table in
   print_endline (PrintBox_text.to_string printbox ^ "\n");
   [%expect
     {|

@@ -70,7 +70,7 @@ module By_type = struct
   ;;
 
   let columns =
-    Text_table.O.
+    Print_table.O.
       [ Column.make ~header:"CR Type" (fun (row : Row.t) ->
           Cell.text (Type.to_string row.type_))
       ; Column.make ~header:"Count" ~align:Right (fun (row : Row.t) ->
@@ -83,8 +83,8 @@ module By_type = struct
       ]
   ;;
 
-  let to_text_table t =
-    if List.is_empty t.rows then None else Some (Text_table.make ~columns ~rows:t.rows)
+  let to_print_table t =
+    if List.is_empty t.rows then None else Some (Print_table.make ~columns ~rows:t.rows)
   ;;
 end
 
@@ -171,12 +171,12 @@ let make (crs : Cr_comment.t list) =
 
 let columns =
   let count ~header count =
-    Text_table.O.(
+    Print_table.O.(
       Column.make ~header ~align:Right (fun (row : Row.t) ->
         let count = count row in
         if count = 0 then Cell.empty else Cell.text (Int.to_string_hum count)))
   in
-  Text_table.O.
+  Print_table.O.
     [ Column.make ~header:"Reporter" (fun (row : Row.t) ->
         Cell.text (Vcs.User_handle.to_string row.reporter))
     ; Column.make ~header:"For" (fun (row : Row.t) ->
@@ -191,6 +191,6 @@ let columns =
     ]
 ;;
 
-let to_text_table t =
-  if List.is_empty t.rows then None else Some (Text_table.make ~columns ~rows:t.rows)
+let to_print_table t =
+  if List.is_empty t.rows then None else Some (Print_table.make ~columns ~rows:t.rows)
 ;;

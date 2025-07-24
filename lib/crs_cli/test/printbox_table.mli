@@ -19,9 +19,13 @@
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
 
-(** Implement the rendering of text tables using the GitHub Flavored Markdown
-    syntax. *)
+(** Render a PrintBox in GitHub Flavored Markdown table syntax. *)
 
-type t = Text_table_ast.t
+type t = PrintBox.t
 
-val to_string : t -> string
+val of_print_table : Print_table.t -> t
+
+(** This is implemented as post-process that expects the table to be in a
+    box-drawing style as produced by PrintBox when rendered into ansi. Not
+    suitable for all-purposes. *)
+val to_string_markdown : t -> string

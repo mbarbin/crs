@@ -20,13 +20,13 @@
 (********************************************************************************)
 
 (* This was mostly an experiment. We ended up implementing a direct rendering
-   from [Text_table] to markdown without [PrintBox] intermediary. Keeping for
+   from [Print_table] to markdown without [PrintBox] intermediary. Keeping for
    experimentations (test dependencies only). *)
 
 type t = PrintBox.t
 
-let of_text_table t =
-  let (Text_table.Private.Ast.T { columns; rows }) = Text_table.Private.to_ast t in
+let of_print_table t =
+  let (Print_table.Private.Ast.T { columns; rows }) = Print_table.Private.to_ast t in
   let pad_cell box = PrintBox.hpad 1 box in
   PrintBox.(
     frame
@@ -56,7 +56,7 @@ let of_text_table t =
                             | true -> line " "
                             | false ->
                               (match style with
-                               | Default -> line text
+                               | Default | Dim | Underscore -> line text
                                | Fg_green -> line_with_style (Style.fg_color Green) text
                                | Fg_red -> line_with_style (Style.fg_color Red) text
                                | Fg_yellow -> line_with_style (Style.fg_color Yellow) text)

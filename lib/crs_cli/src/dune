@@ -30,9 +30,9 @@
   pp
   pplumbing.err
   pplumbing.pp-tty
+  print-table
   reviewdog
   stdio
-  text_table
   unix
   volgo-base
   volgo-git-unix
