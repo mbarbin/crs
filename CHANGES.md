@@ -2,7 +2,7 @@
 
 ### Changed
 
-- Switch from `text-table` to upstream `print-table` lib (#PR, @mbarbin).
+- Switch from `text-table` to upstream `print-table` lib (#59, @mbarbin).
 - Prepare review mode for requiring the pull-request base (#57, @mbarbin).
 - Rename review-mode "commit" => "revision" (#57, @mbarbin).
 
@@ -13,7 +13,7 @@
 
 ### Removed
 
-- Removed library `crs.text-table`. It was upstreamed (#PR, @mbarbin).
+- Removed library `crs.text-table`. It was upstreamed (#59, @mbarbin).
 
 ## 0.0.20250705 (2025-07-05)
 
