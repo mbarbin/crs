@@ -23,11 +23,11 @@ let main =
   Command.make
     ~summary:"Print a comment with a summary of CRs in the repo."
     ~readme:(fun () ->
-      {|
-This command searches for CRs in the tree and prints a summary using the GitHub Flavored Markdown syntax.
-
-This command is meant to be used to generate contents to include to the history of a pull request on GitHub, for example in conversation comments or checks panels.
-|})
+      "This command searches for CRs in the tree and prints a summary using the GitHub \
+       Flavored Markdown syntax.\n\n\
+       This command is meant to be used to generate contents to include to the history \
+       of a pull request on GitHub, for example in conversation comments or checks \
+       panels.")
     (let open Command.Std in
      let+ with_user_mentions = Common_helpers.with_user_mentions_arg
      and+ config =

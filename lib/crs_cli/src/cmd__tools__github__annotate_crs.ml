@@ -23,9 +23,8 @@ let main =
   Command.make
     ~summary:"Output GitHub Workflow Annotations for CRs in the repo."
     ~readme:(fun () ->
-      {|
-This command searches for CRs in the tree and prints GitHub Workflow Annotations for them to $(b,stdout) for use in CIs.
-|})
+      "This command searches for CRs in the tree and prints GitHub Workflow Annotations \
+       for them to $(b,stdout) for use in CIs.")
     (let open Command.Std in
      let+ config =
        Arg.named_opt [ "config" ] Param.file ~doc:"Config file to customize crs."

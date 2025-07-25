@@ -78,15 +78,13 @@ let main =
   Command.make
     ~summary:"A util for emacs crs-grep-mode to search CRs."
     ~readme:(fun () ->
-      {|
-This command is a building block to the emacs $(b,crs-grep-mode).
-
-It first locates the repository in which the command is launched and then grep-finds all CRs located in listed-files located in the subtree whose root is the current working directory of the command.
-
-It then prints these CRs to $(b,stdout), displaying paths using a syntax that facilitate the integration with emacs grep-mode.
-
-By default the file paths are displayed relative to the command's $(b,cwd).
-|})
+      "This command is a building block to the emacs $(b,crs-grep-mode).\n\n\
+       It first locates the repository in which the command is launched and then \
+       grep-finds all CRs located in listed-files located in the subtree whose root is \
+       the current working directory of the command.\n\n\
+       It then prints these CRs to $(b,stdout), displaying paths using a syntax that \
+       facilitate the integration with emacs grep-mode.\n\n\
+       By default the file paths are displayed relative to the command's $(b,cwd).")
     (let open Command.Std in
      let+ path_display_mode =
        Arg.named_with_default

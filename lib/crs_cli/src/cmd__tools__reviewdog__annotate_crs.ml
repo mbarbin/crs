@@ -23,9 +23,8 @@ let main =
   Command.make
     ~summary:"Output Reviewdog Annotations for CRs in the repo."
     ~readme:(fun () ->
-      {|
-This command searches for CRs in the tree and prints Reviewdog Annotations for them to $(b,stdout) in $(b,rdjson) format for use in CIs.
-|})
+      "This command searches for CRs in the tree and prints Reviewdog Annotations for \
+       them to $(b,stdout) in $(b,rdjson) format for use in CIs.")
     (let open Command.Std in
      let+ with_user_mentions = Common_helpers.with_user_mentions_arg
      and+ config =

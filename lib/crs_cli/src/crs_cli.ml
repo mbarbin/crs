@@ -23,19 +23,17 @@ let main =
   Command.group
     ~summary:"A tool for managing code review comments embedded in source code."
     ~readme:(fun () ->
-      {|
-The primary goal of $(b,crs) is to make it easy to locate, parse, and manipulate special code review comments called 'CRs' (pronounced "C"-"R"-z), embedded directly in source code.
-
-This CLI aims to offer ergonomic helpers for tasks such as systematically updating comments across multiple files, changing their priority, marking them as resolved, modifying reporter or assignee information, and more.
-
-Main commands include:
-
-- $(b,grep): grep-search and print CRs found in the current repository.
-
-- $(b,tools): a collection of more specific commands, for example to facilitate the integration with other tools (editors, etc).
-
-For more information, use the $(b,--help) flag on a subcommand.
-|})
+      "The primary goal of $(b,crs) is to make it easy to locate, parse, and manipulate \
+       special code review comments called 'CRs' (pronounced \"C\"-\"R\"-z), embedded \
+       directly in source code.\n\n\
+       This CLI aims to offer ergonomic helpers for tasks such as systematically \
+       updating comments across multiple files, changing their priority, marking them as \
+       resolved, modifying reporter or assignee information, and more.\n\n\
+       Main commands include:\n\n\
+       - $(b,grep): grep-search and print CRs found in the current repository.\n\n\
+       - $(b,tools): a collection of more specific commands, for example to facilitate \
+       the integration with other tools (editors, etc).\n\n\
+       For more information, use the $(b,--help) flag on a subcommand.")
     [ "grep", Cmd__grep.main
     ; ( "tools"
       , Command.group
