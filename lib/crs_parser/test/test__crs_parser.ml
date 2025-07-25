@@ -103,7 +103,7 @@ let%expect_test "invalid syntax CR" =
 
 let%expect_test "zero spaces CR" =
   (* Although this should be eventually rejected by a crs linter, having
-     multiple spaces leading the the CR is allowed. *)
+     zero spaces leading to the CR is allowed. *)
   test
     {|
 (*$CR user: Hey. *)
@@ -191,7 +191,7 @@ let%expect_test "zero spaces CR" =
 
 let%expect_test "multiple spaces CR" =
   (* Although this should be eventually rejected by a crs linter, having
-     multiple spaces leading the the CR is allowed. *)
+     multiple spaces leading to the CR is allowed. *)
   test
     {|
 (*  $CR user: Blah. *)
