@@ -54,11 +54,14 @@ let%expect_test "remove CR entirely" =
   let file_contents =
     {|
 let () =
-  (* $CR *)
+  (* $CR jdoe: This will be removed. *)
   ()
 ;;
 
 (* $XCR jdoe: This too *)
+let () = ()
+
+(* $CR-jdoe: Invalid CRs are removed too. *)
 let () = ()
 |}
   in
@@ -67,15 +70,19 @@ let () = ()
       File_rewriter.remove file_rewriter ~range:(Loc.range (Cr_comment.whole_loc cr))));
   [%expect
     {|
-    -1,8 +1,8
+    -1,11 +1,11
 
       let () =
-    -|  (* $CR *)
+    -|  (* $CR jdoe: This will be removed. *)
         ()
       ;;
 
     -|(* $XCR jdoe: This too *)
-      let () = () |}];
+      let () = ()
+
+    -|(* $CR-jdoe: Invalid CRs are removed too. *)
+      let () = ()
+    |}];
   ()
 ;;
 
