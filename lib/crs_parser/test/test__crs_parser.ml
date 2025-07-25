@@ -74,6 +74,11 @@ $CR user1: message.
 ;;
 
 let%expect_test "invalid syntax CR" =
+  (* Here we monitor fragments that may look like CRs but are not. We make use
+     of some heurisitic, and opinionated choices, to decide whether to flag
+     these constructs as invalid CRs, or simply ignore them. This test is used
+     to characterize the behavior around this question. *)
+  (* No text. *)
   test
     {|
 (* $CR *)
@@ -94,6 +99,201 @@ let%expect_test "invalid syntax CR" =
      (getters (
        (path    my_file.ml)
        (content CR)
+       (status  CR)
+       (qualifier ())
+       (priority Now))))
+    |}];
+  test
+    {|
+(* $CR : *)
+|};
+  [%expect
+    {|
+    ========================
+    CR :
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:1:0)
+         (stop  my_file.ml:2:0)))
+       (header (Error ("Invalid CR comment" "CR :")))
+       (comment_prefix "(*")
+       (digest_of_condensed_content 4ecc072f951465fb458ef1c75ffc6e24)
+       (content "CR :")))
+     (getters (
+       (path    my_file.ml)
+       (content "CR :")
+       (status  CR)
+       (qualifier ())
+       (priority Now))))
+    |}];
+  test
+    {|
+(* $CR-user *)
+|};
+  [%expect
+    {|
+    ========================
+    CR-user
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:1:0)
+         (stop  my_file.ml:2:0)))
+       (header (Error ("Invalid CR comment" CR-user)))
+       (comment_prefix "(*")
+       (digest_of_condensed_content b1e92145e4e45e8538a73aece031a01d)
+       (content CR-user)))
+     (getters (
+       (path    my_file.ml)
+       (content CR-user)
+       (status  CR)
+       (qualifier ())
+       (priority Now))))
+    |}];
+  test
+    {|
+(* $CR-user: *)
+|};
+  [%expect
+    {|
+    ========================
+    CR-user:
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:1:0)
+         (stop  my_file.ml:2:0)))
+       (header (Error ("Invalid CR comment" CR-user:)))
+       (comment_prefix "(*")
+       (digest_of_condensed_content 17497801764b8cc56107b683d2c30d55)
+       (content CR-user:)))
+     (getters (
+       (path    my_file.ml)
+       (content CR-user:)
+       (status  CR)
+       (qualifier ())
+       (priority Now))))
+    |}];
+  test
+    {|
+(* $CR user *)
+|};
+  [%expect
+    {|
+    ========================
+    CR user
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:1:0)
+         (stop  my_file.ml:2:0)))
+       (header (Error ("Invalid CR comment" "CR user")))
+       (comment_prefix "(*")
+       (digest_of_condensed_content d0469bb593e8d5de0103ff72946e8013)
+       (content "CR user")))
+     (getters (
+       (path    my_file.ml)
+       (content "CR user")
+       (status  CR)
+       (qualifier ())
+       (priority Now))))
+    |}];
+  (* With text. *)
+  test
+    {|
+(* $CR : Hello contents. *)
+|};
+  [%expect
+    {|
+    ========================
+    CR : Hello contents.
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:1:0)
+         (stop  my_file.ml:2:0)))
+       (header (Error ("Invalid CR comment" "CR : Hello contents.")))
+       (comment_prefix "(*")
+       (digest_of_condensed_content b4298566357d8b49acb9dde0b4584cfa)
+       (content "CR : Hello contents.")))
+     (getters (
+       (path    my_file.ml)
+       (content "CR : Hello contents.")
+       (status  CR)
+       (qualifier ())
+       (priority Now))))
+    |}];
+  test
+    {|
+(* $CR-user Hello contents. *)
+|};
+  [%expect
+    {|
+    ========================
+    CR-user Hello contents.
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:1:0)
+         (stop  my_file.ml:2:0)))
+       (header (Error ("Invalid CR comment" "CR-user Hello contents.")))
+       (comment_prefix "(*")
+       (digest_of_condensed_content 65065bf53ad3746b61ee3d1b78e75e4e)
+       (content "CR-user Hello contents.")))
+     (getters (
+       (path    my_file.ml)
+       (content "CR-user Hello contents.")
+       (status  CR)
+       (qualifier ())
+       (priority Now))))
+    |}];
+  test
+    {|
+(* $CR-user: Hello contents. *)
+|};
+  [%expect
+    {|
+    ========================
+    CR-user: Hello contents.
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:1:0)
+         (stop  my_file.ml:2:0)))
+       (header (Error ("Invalid CR comment" "CR-user: Hello contents.")))
+       (comment_prefix "(*")
+       (digest_of_condensed_content 27f8a76f8a2985b7b0a6275de779cb94)
+       (content "CR-user: Hello contents.")))
+     (getters (
+       (path    my_file.ml)
+       (content "CR-user: Hello contents.")
+       (status  CR)
+       (qualifier ())
+       (priority Now))))
+    |}];
+  test
+    {|
+(* $CR user
+   Hello contents. *)
+|};
+  [%expect
+    {|
+    ========================
+    CR user
+    Hello contents.
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:1:0)
+         (stop  my_file.ml:3:0)))
+       (header (Error ("Invalid CR comment" "CR user\n   Hello contents.")))
+       (comment_prefix "(*")
+       (digest_of_condensed_content 5dea3b4b25c1a1d2076715fd5b668168)
+       (content "CR user\n   Hello contents.")))
+     (getters (
+       (path    my_file.ml)
+       (content "CR user\n   Hello contents.")
        (status  CR)
        (qualifier ())
        (priority Now))))
