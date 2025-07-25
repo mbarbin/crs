@@ -23,15 +23,15 @@ let main =
   Command.make
     ~summary:"Grep for CRs in the repository tree."
     ~readme:(fun () ->
-      {|
-This command searches for code review comments ($(b,CRs)) among all files under version control in the enclosing repository, and prints them to $(b,stdout).
-
-Supports both $(b,git) and $(b,hg) repositories.
-
-By default, all CRs from the root of the enclosing repository are selected, even if the command is run from a subdirectory. Use $(b,--below) to restrict the search to a specific path.
-
-All types of CRs are printed by default. You can restrict the selection using filtering flags such as $(b,--xcrs) or $(b,--soon). Supplying multiple filtering flags selects the union of all matching CRs (i.e., flags are combined with OR).
-|})
+      "This command searches for code review comments ($(b,CRs)) among all files under \
+       version control in the enclosing repository, and prints them to $(b,stdout).\n\n\
+       Supports both $(b,git) and $(b,hg) repositories.\n\n\
+       By default, all CRs from the root of the enclosing repository are selected, even \
+       if the command is run from a subdirectory. Use $(b,--below) to restrict the \
+       search to a specific path.\n\n\
+       All types of CRs are printed by default. You can restrict the selection using \
+       filtering flags such as $(b,--xcrs) or $(b,--soon). Supplying multiple filtering \
+       flags selects the union of all matching CRs (i.e., flags are combined with OR).")
     (let open Command.Std in
      let+ below =
        Arg.named_opt

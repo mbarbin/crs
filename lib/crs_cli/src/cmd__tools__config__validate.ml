@@ -23,9 +23,8 @@ let main =
   Command.make
     ~summary:"Validate the supplied config file."
     ~readme:(fun () ->
-      {|
-You can use this command to validate that the supplied file is a valid config file for $(b,crs).
-|})
+      "You can use this command to validate that the supplied file is a valid config \
+       file for $(b,crs).")
     (let open Command.Std in
      let+ path = Arg.pos ~pos:0 Param.file ~doc:"Config file to customize crs."
      and+ print =

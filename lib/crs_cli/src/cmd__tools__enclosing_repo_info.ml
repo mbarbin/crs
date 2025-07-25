@@ -23,17 +23,15 @@ let main =
   Command.make
     ~summary:"A util to get info about the enclosing repo."
     ~readme:(fun () ->
-      {|
-This command locates the root of the repository containing the current working directory.
-
-It then displays a S-expression containing several fields related to that repository and the current path.
-
-- $(b,repo_root) : The root of the enclosing repo (absolute path).
-
-- $(b,path_in_repo) : The path of the current directory related to the repo root (relative path).
-
-- $(b,vcs_kind) : The kind of version control for the enclosing repository (git|hg).
-|})
+      "This command locates the root of the repository containing the current working \
+       directory.\n\n\
+       It then displays a S-expression containing several fields related to that \
+       repository and the current path.\n\n\
+       - $(b,repo_root) : The root of the enclosing repo (absolute path).\n\n\
+       - $(b,path_in_repo) : The path of the current directory related to the repo root \
+       (relative path).\n\n\
+       - $(b,vcs_kind) : The kind of version control for the enclosing repository \
+       (git|hg).")
     (let open Command.Std in
      let+ () = Arg.return () in
      let cwd = Unix.getcwd () |> Absolute_path.v in

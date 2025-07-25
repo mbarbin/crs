@@ -2,6 +2,7 @@
 
 ### Changed
 
+- Wrap CLI readme text using code margin (#60, @mbarbin).
 - Switch from `text-table` to upstream `print-table` lib (#59, @mbarbin).
 - Prepare review mode for requiring the pull-request base (#57, @mbarbin).
 - Rename review-mode "commit" => "revision" (#57, @mbarbin).
