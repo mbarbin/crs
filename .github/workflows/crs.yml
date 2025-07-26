@@ -29,11 +29,17 @@ jobs:
         with:
           automagic: false
 
+      - name: Resolve dependencies
+        shell: bash
+        run: |
+          dune pkg lock
+
       - name: Build & Install crs binary
         shell: bash
         run: |
           mkdir -p "${{ runner.temp }}/crs-bin"
           dune subst
+          dune build -p crs @install
           dune install crs --bindir="${{ runner.temp }}/crs-bin"
           echo "${{ runner.temp }}/crs-bin" >> $GITHUB_PATH
           crs --version
