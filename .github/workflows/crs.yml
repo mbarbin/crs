@@ -37,6 +37,7 @@ jobs:
       - name: Build & Install crs binary
         shell: bash
         run: |
+          dune exec crs -- --version
           mkdir -p "${{ runner.temp }}/crs-bin"
           dune subst
           dune build -p crs @install
