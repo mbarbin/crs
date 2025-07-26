@@ -32,9 +32,9 @@ jobs:
       - name: Build & Install crs binary
         shell: bash
         run: |
+          dune exec crs -- --version
           mkdir -p "${{ runner.temp }}/crs-bin"
-          dune build -p crs @install
-          dune install crs --bindir="${{ runner.temp }}/crs-bin"
+          cp _build/default/bin/main.exe "${{ runner.temp }}/crs-bin/crs"
           echo "${{ runner.temp }}/crs-bin" >> $GITHUB_PATH
           crs --version
 
