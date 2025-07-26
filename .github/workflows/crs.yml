@@ -41,7 +41,9 @@ jobs:
           mkdir -p "${{ runner.temp }}/crs-bin"
           cp _build/default/bin/main.exe "${{ runner.temp }}/crs-bin/crs"
           echo "${{ runner.temp }}/crs-bin" >> $GITHUB_PATH
-          crs --version
+
+      - name: Check crs installation
+        run: crs --version
 
       - name: Install reviewdog
         uses: reviewdog/action-setup@v1
