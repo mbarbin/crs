@@ -29,6 +29,11 @@ jobs:
         with:
           automagic: false
 
+      - name: Resolve dependencies
+        shell: bash
+        run: |
+          dune pkg lock
+
       - name: Build & Install crs binary
         shell: bash
         run: |
