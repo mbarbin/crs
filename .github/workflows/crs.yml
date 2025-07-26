@@ -8,6 +8,10 @@ on:
     branches:
       - "**" # This will match pull requests targeting any branch
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   build:
     strategy:
@@ -30,10 +34,16 @@ jobs:
         run: |
           dune pkg lock
 
-      - name: Build 'crs'
+      - name: Build & Install crs binary
         shell: bash
         run: |
           dune exec crs -- --version
+          mkdir -p "${{ runner.temp }}/crs-bin"
+          cp _build/default/bin/main.exe "${{ runner.temp }}/crs-bin/crs"
+          echo "${{ runner.temp }}/crs-bin" >> $GITHUB_PATH
+
+      - name: Check crs installation
+        run: crs --version
 
       - name: Install reviewdog
         uses: reviewdog/action-setup@v1
@@ -42,16 +52,12 @@ jobs:
       # built from that PR and its interaction with other tools like reviewdog,
       # GitHub annotations, step summaries, etc.
 
-      - name: Annotate CRs with reviewdog
-        if: github.event_name == 'pull_request'
-        run: |
-          dune exec crs -- tools reviewdog annotate-crs \
-            --config=.github/crs-config.json \
-            --review-mode=pull-request \
-            --pull-request-author="${{ github.event.pull_request.user.login }}" \
-          | reviewdog -f=rdjson -name="crs" -reporter=github-pr-review
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Comment on CRs in PR
+        uses: mbarbin/crs-actions/comment-crs-in-pr@v1.0.0-alpha.5
+        with:
+          crs-config: .github/crs-config.json
 
-      - name: Add CRs summary to workflow run summary
-        run: dune exec crs -- tools github summary-comment >> $GITHUB_STEP_SUMMARY
+      - name: Summarize CRs in PR
+        uses: mbarbin/crs-actions/summarize-crs-in-pr@v1.0.0-alpha.5
+        with:
+          crs-config: .github/crs-config.json
