@@ -1,5 +1,9 @@
 ## 0.0.2025XXXX (unreleased)
 
+### Added
+
+- Add getters for cr comment content start offset and prefix (#61, @mbarbin).
+
 ### Changed
 
 - Wrap CLI readme text using code margin (#60, @mbarbin).

@@ -21,6 +21,22 @@
 
 let path = Vcs.Path_in_repo.v "my_file.ml"
 
+let invariant ~(file_contents : Vcs.File_contents.t) cr =
+  let content_start_offset = Cr_comment.content_start_offset cr in
+  let comment_prefix = Cr_comment.comment_prefix cr in
+  let whole_loc = Cr_comment.whole_loc cr in
+  let recompute_prefix =
+    let start_pos = Loc.start_offset whole_loc in
+    String.sub
+      (file_contents :> string)
+      ~pos:start_pos
+      ~len:(content_start_offset - start_pos)
+    |> String.strip
+  in
+  require_equal [%here] (module String) comment_prefix recompute_prefix;
+  ()
+;;
+
 module Getters = struct
   type t =
     { path : Vcs.Path_in_repo.t
@@ -58,6 +74,7 @@ let test file_contents =
   Ref.set_temporarily Loc.include_sexp_of_locs true ~f:(fun () ->
     List.iter crs ~f:(fun t ->
       print_endline "========================";
+      invariant ~file_contents t;
       print_endline (Cr_comment.reindented_content t);
       let getters = Getters.of_cr t in
       print_s [%sexp { raw = (t : Cr_comment.t); getters : Getters.t }];
@@ -92,6 +109,7 @@ let%expect_test "invalid syntax CR" =
        (whole_loc (
          (start my_file.ml:1:0)
          (stop  my_file.ml:2:0)))
+       (content_start_offset 3)
        (header (Error ("Invalid CR comment" CR)))
        (comment_prefix "(*")
        (digest_of_condensed_content 1d7b33fc26ca22c2011aaa97fecc43d8)
@@ -116,6 +134,7 @@ let%expect_test "invalid syntax CR" =
        (whole_loc (
          (start my_file.ml:1:0)
          (stop  my_file.ml:2:0)))
+       (content_start_offset 3)
        (header (Error ("Invalid CR comment" "CR :")))
        (comment_prefix "(*")
        (digest_of_condensed_content 4ecc072f951465fb458ef1c75ffc6e24)
@@ -140,6 +159,7 @@ let%expect_test "invalid syntax CR" =
        (whole_loc (
          (start my_file.ml:1:0)
          (stop  my_file.ml:2:0)))
+       (content_start_offset 3)
        (header (Error ("Invalid CR comment" CR-user)))
        (comment_prefix "(*")
        (digest_of_condensed_content b1e92145e4e45e8538a73aece031a01d)
@@ -164,6 +184,7 @@ let%expect_test "invalid syntax CR" =
        (whole_loc (
          (start my_file.ml:1:0)
          (stop  my_file.ml:2:0)))
+       (content_start_offset 3)
        (header (Error ("Invalid CR comment" CR-user:)))
        (comment_prefix "(*")
        (digest_of_condensed_content 17497801764b8cc56107b683d2c30d55)
@@ -188,6 +209,7 @@ let%expect_test "invalid syntax CR" =
        (whole_loc (
          (start my_file.ml:1:0)
          (stop  my_file.ml:2:0)))
+       (content_start_offset 3)
        (header (Error ("Invalid CR comment" "CR user")))
        (comment_prefix "(*")
        (digest_of_condensed_content d0469bb593e8d5de0103ff72946e8013)
@@ -213,6 +235,7 @@ let%expect_test "invalid syntax CR" =
        (whole_loc (
          (start my_file.ml:1:0)
          (stop  my_file.ml:2:0)))
+       (content_start_offset 3)
        (header (Error ("Invalid CR comment" "CR : Hello contents.")))
        (comment_prefix "(*")
        (digest_of_condensed_content b4298566357d8b49acb9dde0b4584cfa)
@@ -237,6 +260,7 @@ let%expect_test "invalid syntax CR" =
        (whole_loc (
          (start my_file.ml:1:0)
          (stop  my_file.ml:2:0)))
+       (content_start_offset 3)
        (header (Error ("Invalid CR comment" "CR-user Hello contents.")))
        (comment_prefix "(*")
        (digest_of_condensed_content 65065bf53ad3746b61ee3d1b78e75e4e)
@@ -261,6 +285,7 @@ let%expect_test "invalid syntax CR" =
        (whole_loc (
          (start my_file.ml:1:0)
          (stop  my_file.ml:2:0)))
+       (content_start_offset 3)
        (header (Error ("Invalid CR comment" "CR-user: Hello contents.")))
        (comment_prefix "(*")
        (digest_of_condensed_content 27f8a76f8a2985b7b0a6275de779cb94)
@@ -287,6 +312,7 @@ let%expect_test "invalid syntax CR" =
        (whole_loc (
          (start my_file.ml:1:0)
          (stop  my_file.ml:3:0)))
+       (content_start_offset 3)
        (header (Error ("Invalid CR comment" "CR user\n   Hello contents.")))
        (comment_prefix "(*")
        (digest_of_condensed_content 5dea3b4b25c1a1d2076715fd5b668168)
@@ -317,6 +343,7 @@ let%expect_test "zero spaces CR" =
        (whole_loc (
          (start my_file.ml:1:0)
          (stop  my_file.ml:2:0)))
+       (content_start_offset 2)
        (header (
          Ok (
            (status (
@@ -358,6 +385,7 @@ let%expect_test "zero spaces CR" =
        (whole_loc (
          (start my_file.ml:1:0)
          (stop  my_file.ml:2:0)))
+       (content_start_offset 1)
        (header (
          Ok (
            (status (
@@ -405,6 +433,7 @@ let%expect_test "multiple spaces CR" =
        (whole_loc (
          (start my_file.ml:1:0)
          (stop  my_file.ml:2:0)))
+       (content_start_offset 4)
        (header (
          Ok (
            (status (
@@ -450,6 +479,7 @@ let%expect_test "empty CR" =
        (whole_loc (
          (start my_file.ml:1:0)
          (stop  my_file.ml:2:0)))
+       (content_start_offset 3)
        (header (
          Ok (
            (status (
@@ -506,6 +536,7 @@ let () = ()
        (whole_loc (
          (start my_file.ml:1:0)
          (stop  my_file.ml:1:29)))
+       (content_start_offset 3)
        (header (
          Ok (
            (status (
@@ -540,6 +571,7 @@ let () = ()
        (whole_loc (
          (start my_file.ml:3:0)
          (stop  my_file.ml:3:32)))
+       (content_start_offset 45)
        (header (
          Ok (
            (status (
@@ -574,6 +606,7 @@ let () = ()
        (whole_loc (
          (start my_file.ml:5:0)
          (stop  my_file.ml:5:40)))
+       (content_start_offset 90)
        (header (
          Ok (
            (status (
@@ -612,6 +645,7 @@ let () = ()
        (whole_loc (
          (start my_file.ml:7:0)
          (stop  my_file.ml:7:43)))
+       (content_start_offset 143)
        (header (
          Ok (
            (status (
@@ -650,6 +684,7 @@ let () = ()
        (whole_loc (
          (start my_file.ml:9:0)
          (stop  my_file.ml:9:30)))
+       (content_start_offset 199)
        (header (
          Ok (
            (status (
@@ -684,6 +719,7 @@ let () = ()
        (whole_loc (
          (start my_file.ml:11:0)
          (stop  my_file.ml:11:33)))
+       (content_start_offset 242)
        (header (
          Ok (
            (status (
@@ -740,6 +776,7 @@ let () = ()
        (whole_loc (
          (start my_file.ml:1:0)
          (stop  my_file.ml:1:77)))
+       (content_start_offset 3)
        (header (
          Error (
            "Invalid CR comment"
@@ -762,6 +799,7 @@ let () = ()
        (whole_loc (
          (start my_file.ml:4:0)
          (stop  my_file.ml:4:47)))
+       (content_start_offset 94)
        (header (
          Error ("Invalid CR comment" "CR-20260131 user: This is not it either..")))
        (comment_prefix "(*")
@@ -780,6 +818,7 @@ let () = ()
        (whole_loc (
          (start my_file.ml:7:0)
          (stop  my_file.ml:7:75)))
+       (content_start_offset 155)
        (header (
          Ok (
            (status (
@@ -829,6 +868,7 @@ let () = ()
        (whole_loc (
          (start my_file.ml:1:0)
          (stop  my_file.ml:1:25)))
+       (content_start_offset 3)
        (header (
          Ok (
            (status (
@@ -863,6 +903,7 @@ let () = ()
        (whole_loc (
          (start my_file.ml:1:38)
          (stop  my_file.ml:1:73)))
+       (content_start_offset 41)
        (header (
          Ok (
            (status (
@@ -940,9 +981,11 @@ end
     [%sexp (cr2 : Cr_comment.t)];
   [%expect
     {|
-    -1,12 +1,12
-      ((path      my_file.ml)
-       (whole_loc _)
+    -1,13 +1,13
+      ((path                 my_file.ml)
+       (whole_loc            _)
+    -| (content_start_offset 16)
+    +| (content_start_offset 38)
        (header (
          Ok (
            (status    CR)
@@ -1232,6 +1275,7 @@ span multiple lines too.
        (whole_loc (
          (start my_file.ml:1:0)
          (stop  my_file.ml:1:33)))
+       (content_start_offset 3)
        (header (
          Ok (
            (status (
@@ -1267,6 +1311,7 @@ span multiple lines too.
        (whole_loc (
          (start my_file.ml:3:0)
          (stop  my_file.ml:6:0)))
+       (content_start_offset 38)
        (header (
          Ok (
            (status (
@@ -1311,6 +1356,7 @@ span multiple lines too.
        (whole_loc (
          (start my_file.ml:1:0)
          (stop  my_file.ml:1:42)))
+       (content_start_offset 3)
        (header (
          Ok (
            (status (
@@ -1346,6 +1392,7 @@ span multiple lines too.
        (whole_loc (
          (start my_file.ml:3:0)
          (stop  my_file.ml:5:0)))
+       (content_start_offset 47)
        (header (
          Ok (
            (status (
@@ -1408,6 +1455,7 @@ Hello text # $CR user: Comment may be left next to a non-empty line.
        (whole_loc (
          (start my_file.ml:1:0)
          (stop  my_file.ml:1:29)))
+       (content_start_offset 2)
        (header (
          Ok (
            (status (
@@ -1443,6 +1491,7 @@ Hello text # $CR user: Comment may be left next to a non-empty line.
        (whole_loc (
          (start my_file.ml:3:0)
          (stop  my_file.ml:4:26)))
+       (content_start_offset 33)
        (header (
          Ok (
            (status (
@@ -1477,6 +1526,7 @@ Hello text # $CR user: Comment may be left next to a non-empty line.
        (whole_loc (
          (start my_file.ml:6:11)
          (stop  my_file.ml:6:67)))
+       (content_start_offset 95)
        (header (
          Ok (
            (status (
@@ -1514,6 +1564,7 @@ Hello text # $CR user: Comment may be left next to a non-empty line.
        (whole_loc (
          (start my_file.ml:8:2)
          (stop  my_file.ml:12:0)))
+       (content_start_offset 155)
        (header (
          Ok (
            (status (
@@ -1571,6 +1622,7 @@ Hello text ## $CR user: Comment may be left next to a non-empty line.
        (whole_loc (
          (start my_file.ml:1:0)
          (stop  my_file.ml:1:30)))
+       (content_start_offset 3)
        (header (
          Ok (
            (status (
@@ -1606,6 +1658,7 @@ Hello text ## $CR user: Comment may be left next to a non-empty line.
        (whole_loc (
          (start my_file.ml:3:0)
          (stop  my_file.ml:4:27)))
+       (content_start_offset 35)
        (header (
          Ok (
            (status (
@@ -1640,6 +1693,7 @@ Hello text ## $CR user: Comment may be left next to a non-empty line.
        (whole_loc (
          (start my_file.ml:6:11)
          (stop  my_file.ml:6:68)))
+       (content_start_offset 99)
        (header (
          Ok (
            (status (
@@ -1677,6 +1731,7 @@ Hello text ## $CR user: Comment may be left next to a non-empty line.
        (whole_loc (
          (start my_file.ml:8:2)
          (stop  my_file.ml:12:0)))
+       (content_start_offset 160)
        (header (
          Ok (
            (status (
@@ -1722,6 +1777,7 @@ Hello ## $CR user: By the way, multiple hash is supported. The location for the 
        (whole_loc (
          (start my_file.ml:1:6)
          (stop  my_file.ml:3:0)))
+       (content_start_offset 9)
        (header (
          Ok (
            (status (
@@ -1789,6 +1845,7 @@ Hello text -- $CR user: Comment may be left next to a non-empty line.
        (whole_loc (
          (start my_file.ml:1:0)
          (stop  my_file.ml:1:30)))
+       (content_start_offset 3)
        (header (
          Ok (
            (status (
@@ -1824,6 +1881,7 @@ Hello text -- $CR user: Comment may be left next to a non-empty line.
        (whole_loc (
          (start my_file.ml:3:0)
          (stop  my_file.ml:4:27)))
+       (content_start_offset 35)
        (header (
          Ok (
            (status (
@@ -1858,6 +1916,7 @@ Hello text -- $CR user: Comment may be left next to a non-empty line.
        (whole_loc (
          (start my_file.ml:6:11)
          (stop  my_file.ml:7:0)))
+       (content_start_offset 99)
        (header (
          Ok (
            (status (
@@ -1916,6 +1975,7 @@ let%expect_test "single-semi-style" =
        (whole_loc (
          (start my_file.ml:1:0)
          (stop  my_file.ml:1:29)))
+       (content_start_offset 2)
        (header (
          Ok (
            (status (
@@ -1951,6 +2011,7 @@ let%expect_test "single-semi-style" =
        (whole_loc (
          (start my_file.ml:3:0)
          (stop  my_file.ml:4:26)))
+       (content_start_offset 33)
        (header (
          Ok (
            (status (
@@ -1985,6 +2046,7 @@ let%expect_test "single-semi-style" =
        (whole_loc (
          (start my_file.ml:6:20)
          (stop  my_file.ml:6:76)))
+       (content_start_offset 104)
        (header (
          Ok (
            (status (
@@ -2020,6 +2082,7 @@ let%expect_test "single-semi-style" =
        (whole_loc (
          (start my_file.ml:8:9)
          (stop  my_file.ml:9:21)))
+       (content_start_offset 190)
        (header (
          Ok (
            (status (
@@ -2057,6 +2120,7 @@ let%expect_test "single-semi-style" =
        (whole_loc (
          (start my_file.ml:11:2)
          (stop  my_file.ml:15:0)))
+       (content_start_offset 252)
        (header (
          Ok (
            (status (
@@ -2117,6 +2181,7 @@ let%expect_test "double-semi-style" =
        (whole_loc (
          (start my_file.ml:1:0)
          (stop  my_file.ml:1:30)))
+       (content_start_offset 3)
        (header (
          Ok (
            (status (
@@ -2152,6 +2217,7 @@ let%expect_test "double-semi-style" =
        (whole_loc (
          (start my_file.ml:3:0)
          (stop  my_file.ml:4:27)))
+       (content_start_offset 35)
        (header (
          Ok (
            (status (
@@ -2186,6 +2252,7 @@ let%expect_test "double-semi-style" =
        (whole_loc (
          (start my_file.ml:6:20)
          (stop  my_file.ml:6:77)))
+       (content_start_offset 108)
        (header (
          Ok (
            (status (
@@ -2221,6 +2288,7 @@ let%expect_test "double-semi-style" =
        (whole_loc (
          (start my_file.ml:8:9)
          (stop  my_file.ml:9:22)))
+       (content_start_offset 195)
        (header (
          Ok (
            (status (
@@ -2258,6 +2326,7 @@ let%expect_test "double-semi-style" =
        (whole_loc (
          (start my_file.ml:11:2)
          (stop  my_file.ml:15:0)))
+       (content_start_offset 259)
        (header (
          Ok (
            (status (
@@ -2312,6 +2381,7 @@ let%expect_test "xml-style" =
        (whole_loc (
          (start my_file.ml:1:0)
          (stop  my_file.ml:1:36)))
+       (content_start_offset 5)
        (header (
          Ok (
            (status (
@@ -2347,6 +2417,7 @@ let%expect_test "xml-style" =
        (whole_loc (
          (start my_file.ml:3:0)
          (stop  my_file.ml:4:33)))
+       (content_start_offset 43)
        (header (
          Ok (
            (status (
@@ -2381,6 +2452,7 @@ let%expect_test "xml-style" =
        (whole_loc (
          (start my_file.ml:7:2)
          (stop  my_file.ml:7:50)))
+       (content_start_offset 126)
        (header (
          Ok (
            (status (
@@ -2440,6 +2512,7 @@ let%expect_test "nested-ml-style" =
        (whole_loc (
          (start my_file.ml:3:3)
          (stop  my_file.ml:3:74)))
+       (content_start_offset 25)
        (header (
          Ok (
            (status (
@@ -2491,6 +2564,7 @@ let%expect_test "nested-ml-style" =
        (whole_loc (
          (start my_file.ml:1:0)
          (stop  my_file.ml:6:0)))
+       (content_start_offset 3)
        (header (
          Ok (
            (status (
@@ -2600,6 +2674,7 @@ let%expect_test "not standard" =
        (whole_loc (
          (start my_file.ml:1:3)
          (stop  my_file.ml:1:76)))
+       (content_start_offset 5)
        (header (
          Ok (
            (status (
@@ -2643,6 +2718,7 @@ let%expect_test "not standard" =
        (whole_loc (
          (start my_file.ml:1:0)
          (stop  my_file.ml:2:0)))
+       (content_start_offset 4)
        (header (
          Ok (
            (status (
@@ -2681,6 +2757,7 @@ let%expect_test "not standard" =
        (whole_loc (
          (start my_file.ml:1:0)
          (stop  my_file.ml:2:0)))
+       (content_start_offset 3)
        (header (
          Ok (
            (status (
@@ -2723,6 +2800,7 @@ let%expect_test "not standard" =
        (whole_loc (
          (start my_file.ml:1:0)
          (stop  my_file.ml:3:0)))
+       (content_start_offset 8)
        (header (
          Ok (
            (status (

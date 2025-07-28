@@ -135,6 +135,7 @@ module T = struct
   type t =
     { path : Vcs.Path_in_repo.t
     ; whole_loc : Loc.t
+    ; content_start_offset : int
     ; header : Header.t Or_error.t
     ; comment_prefix : string
     ; digest_of_condensed_content : Digest_hex.t
@@ -147,11 +148,28 @@ include T
 
 let path t = t.path
 let content t = t.content
+let content_start_offset t = t.content_start_offset
+let comment_prefix t = t.comment_prefix
 let whole_loc t = t.whole_loc
 let header t = t.header
 
-let create ~path ~whole_loc ~header ~comment_prefix ~digest_of_condensed_content ~content =
-  { path; whole_loc; header; comment_prefix; digest_of_condensed_content; content }
+let create
+      ~path
+      ~whole_loc
+      ~content_start_offset
+      ~header
+      ~comment_prefix
+      ~digest_of_condensed_content
+      ~content
+  =
+  { path
+  ; whole_loc
+  ; content_start_offset
+  ; header
+  ; comment_prefix
+  ; digest_of_condensed_content
+  ; content
+  }
 ;;
 
 let digest_ignoring_minor_text_changes t = t.digest_of_condensed_content

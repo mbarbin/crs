@@ -91,6 +91,7 @@ A basic [sexp] output is available.
 
   $ crs grep --sexp
   ((path foo/a.txt) (whole_loc ((start foo/a.txt:2:0) (stop foo/a.txt:2:38)))
+   (content_start_offset 31)
    (header
     (Ok
      ((status ((txt XCR) (loc ((start foo/a.txt:2:3) (stop foo/a.txt:2:6)))))
@@ -103,6 +104,7 @@ A basic [sexp] output is available.
    (digest_of_condensed_content 9dce8eceb787a95abf3fccb037d164ea)
    (content "XCR user1: Fix this. Edit: Done."))
   ((path foo/b.txt) (whole_loc ((start foo/b.txt:1:0) (stop foo/b.txt:1:71)))
+   (content_start_offset 3)
    (header
     (Ok
      ((status ((txt CR) (loc ((start foo/b.txt:1:3) (stop foo/b.txt:1:5)))))
@@ -117,6 +119,7 @@ A basic [sexp] output is available.
     "CR-someday user1: Reconsider if/when updating to the new version."))
   ((path foo/bar/b.txt)
    (whole_loc ((start foo/bar/b.txt:2:0) (stop foo/bar/b.txt:2:55)))
+   (content_start_offset 35)
    (header
     (Ok
      ((status
@@ -132,6 +135,7 @@ A basic [sexp] output is available.
    (content "CR-soon user1: Hey, this is a code review comment"))
   ((path foo/bar/c.txt)
    (whole_loc ((start foo/bar/c.txt:1:0) (stop foo/bar/c.txt:1:52)))
+   (content_start_offset 3)
    (header
     (Error
      ("Invalid CR comment" "CR-user: Hey, I'm trying to use CR, it's cool!")))
@@ -140,6 +144,7 @@ A basic [sexp] output is available.
    (content "CR-user: Hey, I'm trying to use CR, it's cool!"))
   ((path foo/bar/d.txt)
    (whole_loc ((start foo/bar/d.txt:1:0) (stop foo/bar/d.txt:1:67)))
+   (content_start_offset 3)
    (header
     (Error
      ("Invalid CR comment"
@@ -148,6 +153,7 @@ A basic [sexp] output is available.
    (digest_of_condensed_content d8a25b0acac6d3a23ff4f4c1e4c990a3)
    (content "CR : Hey, this comment look like a CR but it's not quite one."))
   ((path foo/foo.c) (whole_loc ((start foo/foo.c:1:0) (stop foo/foo.c:1:60)))
+   (content_start_offset 3)
    (header
     (Ok
      ((status ((txt CR) (loc ((start foo/foo.c:1:3) (stop foo/foo.c:1:5)))))
@@ -161,6 +167,7 @@ A basic [sexp] output is available.
    (digest_of_condensed_content 4721a5c5f8a37bdcb9e065268bbd0153)
    (content "CR user1 for user3: Hey, this is a code review comment"))
   ((path hello) (whole_loc ((start hello:2:0) (stop hello:2:60)))
+   (content_start_offset 15)
    (header
     (Ok
      ((status ((txt CR) (loc ((start hello:2:3) (stop hello:2:5)))))

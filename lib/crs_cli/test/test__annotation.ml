@@ -43,8 +43,9 @@ let%expect_test "sexp_of_t" =
     {|
     ((
       (cr (
-        (path      my_file.ml)
-        (whole_loc _)
+        (path                 my_file.ml)
+        (whole_loc            _)
+        (content_start_offset 3)
         (header (
           Ok (
             (status    CR)
