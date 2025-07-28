@@ -3,7 +3,7 @@
 ### Added
 
 - Add getters for cr comment content start offset and prefix (#63, @mbarbin).
-- Add more tests for invalid CRs (#61, @mbarbin).
+- Add more tests for invalid CRs (#61, #64, @mbarbin).
 
 ### Changed
 
