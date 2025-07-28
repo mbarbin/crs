@@ -230,26 +230,27 @@ let parse_file ~path ~(file_contents : Vcs.File_contents.t) =
   let ms = Re.all cr_regex file_contents in
   let ( let+ ) a f = Option.map a ~f in
   List.filter_map ms ~f:(fun m ->
-    let cr_start = Re.Group.start m 0 in
-    let+ start_index, end_index, content = find_comment_bounds file_contents cr_start in
+    let content_start_offset = Re.Group.start m 0 in
+    let+ start_offset, end_offset, content =
+      find_comment_bounds file_contents content_start_offset
+    in
     let comment_prefix =
-      String.sub file_contents ~pos:start_index ~len:(cr_start - start_index)
+      String.sub file_contents ~pos:start_offset ~len:(content_start_offset - start_offset)
       |> String.strip
     in
     let content = String.rstrip content in
     let file_cache = Lazy.force file_cache in
-    let start_position = Loc.Offset.to_position start_index ~file_cache in
-    let stop_position = Loc.Offset.to_position (end_index + 1) ~file_cache in
+    let start_position = Loc.Offset.to_position start_offset ~file_cache in
+    let stop_position = Loc.Offset.to_position (end_offset + 1) ~file_cache in
     let whole_loc = Loc.create (start_position, stop_position) in
-    let header =
-      Header_parser.parse ~file_cache ~content_start_offset:cr_start ~content
-    in
+    let header = Header_parser.parse ~file_cache ~content_start_offset ~content in
     let digest_of_condensed_content =
       Cr_comment.Digest_hex.create (condense_whitespace content)
     in
     Cr_comment.Private.create
       ~path
       ~whole_loc
+      ~content_start_offset
       ~header
       ~comment_prefix
       ~digest_of_condensed_content

@@ -180,6 +180,16 @@ val path : t -> Vcs.Path_in_repo.t
     beginning and end (if applicable). See also {!reindented_content}. *)
 val content : t -> string
 
+(** This is the offset in the original file at which the [content] field
+    started. This is useful if you need to reparse the content of CRs
+    dynamically while being able to build locations. *)
+val content_start_offset : t -> int
+
+(** This is the leading string that contains the comment markers on the left of
+    the [content] field, stripped. This may be useful when linting comments and
+    working on CR formatting. *)
+val comment_prefix : t -> string
+
 (** [whole_loc] is suitable for removal of the entire CR comment. It includes
     the comments boundaries from [path] as well. *)
 val whole_loc : t -> Loc.t
@@ -251,6 +261,7 @@ module Private : sig
   val create
     :  path:Vcs.Path_in_repo.t
     -> whole_loc:Loc.t
+    -> content_start_offset:int
     -> header:header Or_error.t
     -> comment_prefix:string
     -> digest_of_condensed_content:Digest_hex.t

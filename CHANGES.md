@@ -1,7 +1,13 @@
 ## 0.0.2025XXXX (unreleased)
 
+### Added
+
+- Add getters for cr comment content start offset and prefix (#63, @mbarbin).
+- Add more tests for invalid CRs (#61, @mbarbin).
+
 ### Changed
 
+- Install crs in the CI actions PATH and use shared crs actions (#62, @mbarbin).
 - Wrap CLI readme text using code margin (#60, @mbarbin).
 - Switch from `text-table` to upstream `print-table` lib (#59, @mbarbin).
 - Prepare review mode for requiring the pull-request base (#57, @mbarbin).
