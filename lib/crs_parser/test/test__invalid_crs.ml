@@ -74,7 +74,7 @@ let test file_contents =
              ~content_start_offset:(Cr_comment.content_start_offset cr)
              ~content:(Cr_comment.content cr)
          with
-         | Not_a_cr -> None
+         | Not_a_cr -> assert false
          | Invalid_cr cr -> Some cr))
   in
   Ref.set_temporarily Loc.include_sexp_of_locs false ~f:(fun () ->

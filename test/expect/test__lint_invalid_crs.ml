@@ -47,7 +47,7 @@ let test file_contents ~f =
              ~content_start_offset:(Cr_comment.content_start_offset cr)
              ~content:(Cr_comment.content cr)
          with
-         | Not_a_cr -> ()
+         | Not_a_cr -> assert false
          | Invalid_cr cr -> f cr ~file_rewriter)))
 ;;
 
