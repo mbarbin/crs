@@ -71,3 +71,7 @@ val grep
   -> repo_root:Vcs.Repo_root.t
   -> below:Vcs.Path_in_repo.t
   -> Cr_comment.t list
+
+module Private : sig
+  module Invalid_cr_parser = Invalid_cr_parser
+end
