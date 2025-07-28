@@ -159,6 +159,7 @@ let parse ~file_cache ~content_start_offset ~content =
       (Cr_comment.Private.Header.create ~status ~qualifier ~reporter ~recipient)
   with
   | exn ->
+    (* This catches e.g. other invalid inputs such as invalid user names. *)
     Or_error.error
       "could not process CR"
       (content, exn)

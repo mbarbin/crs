@@ -327,6 +327,39 @@ let%expect_test "invalid syntax CR" =
   ()
 ;;
 
+let%expect_test "invalid CRs due to parsing errors" =
+  (* Here we monitor the behavior on CRs that would be valid except that the
+     parsing encountered some exceptions. For example, a user name contains
+     invalid characters. *)
+  test {| (* $CR user$name : Hello contents. *) |};
+  [%expect
+    {|
+    ========================
+    CR user$name : Hello contents.
+    ((raw (
+       (path my_file.ml)
+       (whole_loc (
+         (start my_file.ml:1:0)
+         (stop  my_file.ml:2:0)))
+       (content_start_offset 3)
+       (header (
+         Error (
+           "could not process CR" (
+             "CR user$name : Hello contents." (
+               Invalid_argument "\"user$name\": invalid user_handle")))))
+       (comment_prefix "(*")
+       (digest_of_condensed_content fd1ac2615463428fdb1f94e66c2f84fe)
+       (content "CR user$name : Hello contents.")))
+     (getters (
+       (path    my_file.ml)
+       (content "CR user$name : Hello contents.")
+       (status  CR)
+       (qualifier ())
+       (priority Now))))
+    |}];
+  ()
+;;
+
 let%expect_test "zero spaces CR" =
   (* Although this should be eventually rejected by a crs linter, having
      zero spaces leading to the CR is allowed. *)
