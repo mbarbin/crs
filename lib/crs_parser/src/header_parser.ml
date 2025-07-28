@@ -63,56 +63,71 @@ let word_t =
 
 let whitespace = Re.alt [ Re.char ' '; Re.char '\n'; Re.char '\t' ]
 
-let comment_regex =
-  lazy
-    (Re.(
-       whole_string
-         (seq
-            [ rep whitespace
-            ; group ~name:"status" (seq [ opt (char 'X'); str "CR" ])
-            ; opt
-                (seq
-                   [ char '-'
-                   ; group
-                       ~name:"qualifier"
-                       (alt [ repn digit 6 (Some 6); str "soon"; str "someday" ])
-                   ])
-            ; rep1 whitespace
-            ; group ~name:"reporter" (rep1 word_t)
-            ; opt
-                (seq
-                   [ rep1 whitespace
-                   ; str "for"
-                   ; rep1 whitespace
-                   ; group ~name:"recipient" (rep1 word_t)
-                   ])
-            ; rep whitespace
-            ; char ':'
-            ; rep any
-            ]))
-     |> Re.compile)
+module Re_helper = struct
+  type t =
+    { re : Re.re
+    ; status : int
+    ; qualifier : int
+    ; reporter : int
+    ; recipient : int
+    }
+end
+
+let make_re_helper () =
+  let status_g = "status" in
+  let qualifier_g = "qualifier" in
+  let reporter_g = "reporter" in
+  let recipient_g = "recipient" in
+  let re =
+    Re.(
+      whole_string
+        (seq
+           [ rep whitespace
+           ; group ~name:status_g (seq [ opt (char 'X'); str "CR" ])
+           ; opt
+               (seq
+                  [ char '-'
+                  ; group
+                      ~name:qualifier_g
+                      (alt [ repn digit 6 (Some 6); str "soon"; str "someday" ])
+                  ])
+           ; rep1 whitespace
+           ; group ~name:reporter_g (rep1 word_t)
+           ; opt
+               (seq
+                  [ rep1 whitespace
+                  ; str "for"
+                  ; rep1 whitespace
+                  ; group ~name:recipient_g (rep1 word_t)
+                  ])
+           ; rep whitespace
+           ; char ':'
+           ; rep any
+           ]))
+    |> Re.compile
+  in
+  let groups = Re.group_names re |> Map.of_alist_exn (module String) in
+  let find_group ~name = Map.find_exn groups name in
+  { Re_helper.re
+  ; status = find_group ~name:status_g
+  ; qualifier = find_group ~name:qualifier_g
+  ; reporter = find_group ~name:reporter_g
+  ; recipient = find_group ~name:recipient_g
+  }
 ;;
+
+let re_helper = lazy (make_re_helper ())
 
 let parse ~file_cache ~content_start_offset ~content =
   let ( let* ) a f = Or_error.bind a ~f in
   try
-    let comment_regex = Lazy.force comment_regex in
-    let group_names = Re.group_names comment_regex in
+    let re_helper = Lazy.force re_helper in
     let* m =
-      match Re.exec_opt comment_regex content with
+      match Re.exec_opt re_helper.re content with
       | None -> Or_error.error "Invalid CR comment" content String.sexp_of_t
       | Some m -> Or_error.return m
     in
-    let get field_name =
-      let index =
-        match
-          List.find group_names ~f:(fun (name, _) -> String.equal field_name name)
-        with
-        | Some (_, index) -> index
-        | None ->
-          failwith
-            (Printf.sprintf "Invalid regexp group name %S" field_name) [@coverage off]
-      in
+    let get index =
       match Re.Group.get_opt m index with
       | None -> None
       | Some v ->
@@ -126,28 +141,28 @@ let parse ~file_cache ~content_start_offset ~content =
         Some (v, loc)
     in
     let reporter =
-      match get "reporter" with
-      | None -> assert false (* Mandatory in the [comment_regexp]. *)
+      match get re_helper.reporter with
+      | None -> assert false (* Mandatory in the [regexp]. *)
       | Some (reporter, loc) -> { Loc.Txt.txt = Vcs.User_handle.v reporter; loc }
     in
     let status =
-      match get "status" with
-      | None -> assert false (* Mandatory in the [comment_regexp]. *)
+      match get re_helper.status with
+      | None -> assert false (* Mandatory in the [regexp]. *)
       | Some (status, loc) ->
         let txt : Cr_comment.Status.t =
           match status with
           | "CR" -> CR
           | "XCR" -> XCR
-          | _ -> assert false (* Cannot be parsed according to the regexp. *)
+          | _ -> assert false (* Cannot be parsed according to the [regexp]. *)
         in
         { Loc.Txt.txt; loc }
     in
     let recipient =
-      Option.map (get "recipient") ~f:(fun (user, loc) ->
+      Option.map (get re_helper.recipient) ~f:(fun (user, loc) ->
         { Loc.Txt.txt = Vcs.User_handle.v user; loc })
     in
     let qualifier =
-      match get "qualifier" with
+      match get re_helper.qualifier with
       | None -> { Loc.Txt.txt = Cr_comment.Qualifier.None; loc = status.loc }
       | Some ("soon", loc) -> { Loc.Txt.txt = Cr_comment.Qualifier.Soon; loc }
       | Some ("someday", loc) -> { Loc.Txt.txt = Cr_comment.Qualifier.Someday; loc }
