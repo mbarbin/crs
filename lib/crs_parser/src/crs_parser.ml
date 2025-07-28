@@ -203,3 +203,7 @@ let grep ~vcs ~repo_root ~below =
     in
     parse_file ~path:path_in_repo ~file_contents)
 ;;
+
+module Private = struct
+  module Invalid_cr_parser = Invalid_cr_parser
+end

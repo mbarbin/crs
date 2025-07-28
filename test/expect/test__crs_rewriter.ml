@@ -25,30 +25,7 @@
    that manipulate large quantities of CRs automatically. *)
 
 let path = Vcs.Path_in_repo.v "my_file.ml"
-
-let test original_contents ~f =
-  let file_contents =
-    (* In this test we want to avoid test CRs to be mistaken for actual CRs,
-       thus we perform some dynamic string substitutions. *)
-    original_contents
-    |> String.substr_replace_all ~pattern:"$CR" ~with_:"CR"
-    |> String.substr_replace_all ~pattern:"$XCR" ~with_:"XCR"
-    |> Vcs.File_contents.create
-  in
-  let crs = Crs_parser.parse_file ~path ~file_contents in
-  let file_rewriter =
-    File_rewriter.create
-      ~path:(Vcs.Path_in_repo.to_fpath path)
-      ~original_contents:(file_contents :> string)
-  in
-  f ~crs ~file_rewriter;
-  let output =
-    File_rewriter.contents file_rewriter
-    |> String.substr_replace_all ~pattern:" CR" ~with_:" $CR"
-    |> String.substr_replace_all ~pattern:" XCR" ~with_:" $XCR"
-  in
-  Expect_test_patdiff.print_patdiff original_contents output
-;;
+let test file_contents ~f = Tests_helpers.test ~path ~file_contents ~f
 
 let%expect_test "remove CR entirely" =
   let file_contents =

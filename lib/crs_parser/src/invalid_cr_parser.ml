@@ -19,44 +19,6 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-(* This module is derived from Iron (v0.9.114.44+47), file
-   * [./hg/cr_comment.ml], which is released under Apache 2.0:
-   *
-   * Copyright (c) 2016-2017 Jane Street Group, LLC <opensource-contacts@janestreet.com>
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License"); you may not
-   * use this file except in compliance with the License. You may obtain a copy
-   * of the License at:
-   *
-   *     http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-   * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-   * License for the specific language governing permissions and limitations
-   * under the License.
-   *
-   * See the file `NOTICE.md` at the root of this repository for more details.
-   *
-   * Changes:
-   *
-   * - Migrate to this file only the part that relates to the parsing of the 1st line.
-   * - Remove dependency to [Core] - make small adjustments to use [Base] instead.
-   * - Replace [Unresolved_name] by [Vcs.User_handle].
-   * - Remove alternate names and aliases resolution.
-   * - Remove support for in-file `Properties.
-   * - Remove support for extra headers.
-   * - Remove support for attributes.
-   * - Remove assignee computation (left as external work).
-   * - Replace [is_xcr] by a variant type [Status.t].
-   * - Make [reporter] mandatory.
-   * - Rename [Processed] to [Header].
-   * - Remove support for 'v' separator in CR comment
-   * - Include the leading '-' char in due's [Loc.t].
-   * - Migrate from [Re2] to [ocaml-re].
-*)
-
-(* : and @ have other meanings in CR comments *)
 let word_t =
   Re.compl [ Re.char ' '; Re.char '\t'; Re.char '\n'; Re.char ':'; Re.char '@' ]
 ;;
@@ -69,7 +31,9 @@ module Re_helper = struct
     ; status : int
     ; qualifier : int
     ; reporter : int
+    ; for_or_to : int
     ; recipient : int
+    ; contents : int
     }
 end
 
@@ -77,32 +41,28 @@ let make_re_helper () =
   let status_g = "status" in
   let qualifier_g = "qualifier" in
   let reporter_g = "reporter" in
+  let for_or_to_g = "for_or_to" in
   let recipient_g = "recipient" in
+  let contents_g = "contents" in
   let re =
     Re.(
       whole_string
         (seq
            [ rep whitespace
            ; group ~name:status_g (seq [ opt (char 'X'); str "CR" ])
+           ; opt (seq [ char '-'; group ~name:qualifier_g (rep1 word_t) ])
+           ; rep whitespace
+           ; opt (group ~name:reporter_g (rep1 word_t))
            ; opt
                (seq
-                  [ char '-'
-                  ; group
-                      ~name:qualifier_g
-                      (alt [ repn digit 6 (Some 6); str "soon"; str "someday" ])
-                  ])
-           ; rep1 whitespace
-           ; group ~name:reporter_g (rep1 word_t)
-           ; opt
-               (seq
-                  [ rep1 whitespace
-                  ; str "for"
+                  [ rep whitespace
+                  ; group ~name:for_or_to_g (alt [ str "for"; str "to" ])
                   ; rep1 whitespace
                   ; group ~name:recipient_g (rep1 word_t)
                   ])
            ; rep whitespace
-           ; char ':'
-           ; rep any
+           ; opt (char ':')
+           ; group ~name:contents_g (rep any)
            ]))
     |> Re.compile
   in
@@ -112,21 +72,43 @@ let make_re_helper () =
   ; status = find_group ~name:status_g
   ; qualifier = find_group ~name:qualifier_g
   ; reporter = find_group ~name:reporter_g
+  ; for_or_to = find_group ~name:for_or_to_g
   ; recipient = find_group ~name:recipient_g
+  ; contents = find_group ~name:contents_g
   }
 ;;
 
 let re_helper = lazy (make_re_helper ())
 
+module Invalid_cr = struct
+  type t =
+    { status : Cr_comment.Status.t Loc.Txt.t
+    ; qualifier : string Loc.Txt.t option
+    ; reporter : string Loc.Txt.t option
+    ; for_or_to : string Loc.Txt.t option
+    ; recipient : string Loc.Txt.t option
+    ; contents : string Loc.Txt.t
+    }
+
+  let status t = t.status
+  let qualifier t = t.qualifier
+  let reporter t = t.reporter
+  let for_or_to t = t.for_or_to
+  let recipient t = t.recipient
+  let contents t = t.contents
+end
+
+module Maybe_invalid_cr = struct
+  type t =
+    | Invalid_cr of Invalid_cr.t
+    | Not_a_cr
+end
+
 let parse ~file_cache ~content_start_offset ~content =
-  let ( let* ) a f = Or_error.bind a ~f in
-  try
-    let re_helper = Lazy.force re_helper in
-    let* m =
-      match Re.exec_opt re_helper.re content with
-      | None -> Or_error.error "Invalid CR comment" content String.sexp_of_t
-      | Some m -> Or_error.return m
-    in
+  let re_helper = Lazy.force re_helper in
+  match Re.exec_opt re_helper.re content with
+  | None -> Maybe_invalid_cr.Not_a_cr
+  | Some m ->
     let get index =
       match Re.Group.get_opt m index with
       | None -> None
@@ -142,8 +124,8 @@ let parse ~file_cache ~content_start_offset ~content =
     in
     let reporter =
       match get re_helper.reporter with
-      | None -> assert false (* Mandatory in the [regexp]. *)
-      | Some (reporter, loc) -> { Loc.Txt.txt = Vcs.User_handle.v reporter; loc }
+      | None -> None
+      | Some (reporter, loc) -> Some { Loc.Txt.txt = reporter; loc }
     in
     let status =
       match get re_helper.status with
@@ -157,26 +139,27 @@ let parse ~file_cache ~content_start_offset ~content =
         in
         { Loc.Txt.txt; loc }
     in
+    let for_or_to =
+      Option.map (get re_helper.for_or_to) ~f:(fun (user, loc) ->
+        { Loc.Txt.txt = user; loc })
+    in
     let recipient =
       Option.map (get re_helper.recipient) ~f:(fun (user, loc) ->
-        { Loc.Txt.txt = Vcs.User_handle.v user; loc })
+        { Loc.Txt.txt = user; loc })
     in
     let qualifier =
       match get re_helper.qualifier with
-      | None -> { Loc.Txt.txt = Cr_comment.Qualifier.None; loc = status.loc }
-      | Some ("soon", loc) -> { Loc.Txt.txt = Cr_comment.Qualifier.Soon; loc }
-      | Some ("someday", loc) -> { Loc.Txt.txt = Cr_comment.Qualifier.Someday; loc }
-      | Some (_, loc) ->
-        (* dated CR -> CR-someday *)
-        { Loc.Txt.txt = Cr_comment.Qualifier.Someday; loc }
+      | None -> None
+      | Some (txt, loc) -> Some { Loc.Txt.txt; loc }
     in
-    Or_error.return
-      (Cr_comment.Private.Header.create ~status ~qualifier ~reporter ~recipient)
-  with
-  | exn ->
-    (* This catches e.g. other invalid inputs such as invalid user names. *)
-    Or_error.error
-      "could not process CR"
-      (content, exn)
-      [%sexp_of: string * exn] [@coverage off]
+    let contents =
+      match get re_helper.contents with
+      | None -> assert false (* Mandatory in the [regexp]. *)
+      | Some (contents, loc) -> { Loc.Txt.txt = String.strip contents; loc }
+    in
+    if String.is_empty contents.txt
+    then Maybe_invalid_cr.Not_a_cr
+    else
+      Maybe_invalid_cr.Invalid_cr
+        { status; qualifier; reporter; for_or_to; recipient; contents }
 ;;
