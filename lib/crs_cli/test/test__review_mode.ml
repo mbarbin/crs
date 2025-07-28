@@ -26,7 +26,7 @@ let test args =
     let cmd =
       Command.make
         (Review_mode.arg ~print_gh_annotation_warnings:true)
-        ~summary:"return the args"
+        ~summary:"Return the args."
     in
     Cmdlang_stdlib_runner.eval cmd ~argv:(Array.of_list ("./main.exe" :: args))
   with
