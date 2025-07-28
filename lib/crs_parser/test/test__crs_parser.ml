@@ -100,127 +100,27 @@ let%expect_test "invalid syntax CR" =
     {|
 (* $CR *)
 |};
-  [%expect
-    {|
-    ========================
-    CR
-    ((raw (
-       (path my_file.ml)
-       (whole_loc (
-         (start my_file.ml:1:0)
-         (stop  my_file.ml:2:0)))
-       (content_start_offset 3)
-       (header (Error ("Invalid CR comment" CR)))
-       (comment_prefix "(*")
-       (digest_of_condensed_content 1d7b33fc26ca22c2011aaa97fecc43d8)
-       (content CR)))
-     (getters (
-       (path    my_file.ml)
-       (content CR)
-       (status  CR)
-       (qualifier ())
-       (priority Now))))
-    |}];
+  [%expect {||}];
   test
     {|
 (* $CR : *)
 |};
-  [%expect
-    {|
-    ========================
-    CR :
-    ((raw (
-       (path my_file.ml)
-       (whole_loc (
-         (start my_file.ml:1:0)
-         (stop  my_file.ml:2:0)))
-       (content_start_offset 3)
-       (header (Error ("Invalid CR comment" "CR :")))
-       (comment_prefix "(*")
-       (digest_of_condensed_content 4ecc072f951465fb458ef1c75ffc6e24)
-       (content "CR :")))
-     (getters (
-       (path    my_file.ml)
-       (content "CR :")
-       (status  CR)
-       (qualifier ())
-       (priority Now))))
-    |}];
+  [%expect {||}];
   test
     {|
 (* $CR-user *)
 |};
-  [%expect
-    {|
-    ========================
-    CR-user
-    ((raw (
-       (path my_file.ml)
-       (whole_loc (
-         (start my_file.ml:1:0)
-         (stop  my_file.ml:2:0)))
-       (content_start_offset 3)
-       (header (Error ("Invalid CR comment" CR-user)))
-       (comment_prefix "(*")
-       (digest_of_condensed_content b1e92145e4e45e8538a73aece031a01d)
-       (content CR-user)))
-     (getters (
-       (path    my_file.ml)
-       (content CR-user)
-       (status  CR)
-       (qualifier ())
-       (priority Now))))
-    |}];
+  [%expect {||}];
   test
     {|
 (* $CR-user: *)
 |};
-  [%expect
-    {|
-    ========================
-    CR-user:
-    ((raw (
-       (path my_file.ml)
-       (whole_loc (
-         (start my_file.ml:1:0)
-         (stop  my_file.ml:2:0)))
-       (content_start_offset 3)
-       (header (Error ("Invalid CR comment" CR-user:)))
-       (comment_prefix "(*")
-       (digest_of_condensed_content 17497801764b8cc56107b683d2c30d55)
-       (content CR-user:)))
-     (getters (
-       (path    my_file.ml)
-       (content CR-user:)
-       (status  CR)
-       (qualifier ())
-       (priority Now))))
-    |}];
+  [%expect {||}];
   test
     {|
 (* $CR user *)
 |};
-  [%expect
-    {|
-    ========================
-    CR user
-    ((raw (
-       (path my_file.ml)
-       (whole_loc (
-         (start my_file.ml:1:0)
-         (stop  my_file.ml:2:0)))
-       (content_start_offset 3)
-       (header (Error ("Invalid CR comment" "CR user")))
-       (comment_prefix "(*")
-       (digest_of_condensed_content d0469bb593e8d5de0103ff72946e8013)
-       (content "CR user")))
-     (getters (
-       (path    my_file.ml)
-       (content "CR user")
-       (status  CR)
-       (qualifier ())
-       (priority Now))))
-    |}];
+  [%expect {||}];
   (* With text. *)
   test
     {|

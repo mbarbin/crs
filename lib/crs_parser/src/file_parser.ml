@@ -228,31 +228,48 @@ let parse_file ~path ~(file_contents : Vcs.File_contents.t) =
     lazy (Loc.File_cache.create ~path:(Vcs.Path_in_repo.to_fpath path) ~file_contents)
   in
   let ms = Re.all cr_regex file_contents in
-  let ( let+ ) a f = Option.map a ~f in
+  let ( let* ) a f = Option.bind a ~f in
   List.filter_map ms ~f:(fun m ->
     let content_start_offset = Re.Group.start m 0 in
-    let+ start_offset, end_offset, content =
+    let* start_offset, end_offset, content =
       find_comment_bounds file_contents content_start_offset
-    in
-    let comment_prefix =
-      String.sub file_contents ~pos:start_offset ~len:(content_start_offset - start_offset)
-      |> String.strip
     in
     let content = String.rstrip content in
     let file_cache = Lazy.force file_cache in
-    let start_position = Loc.Offset.to_position start_offset ~file_cache in
-    let stop_position = Loc.Offset.to_position (end_offset + 1) ~file_cache in
-    let whole_loc = Loc.create (start_position, stop_position) in
     let header = Header_parser.parse ~file_cache ~content_start_offset ~content in
-    let digest_of_condensed_content =
-      Cr_comment.Digest_hex.create (condense_whitespace content)
+    let is_considered_a_CR =
+      match header with
+      | Ok _ -> true
+      | Error _ ->
+        (match Invalid_cr_parser.parse ~file_cache ~content_start_offset ~content with
+         | Invalid_cr _ -> true
+         | Not_a_cr -> false)
     in
-    Cr_comment.Private.create
-      ~path
-      ~whole_loc
-      ~content_start_offset
-      ~header
-      ~comment_prefix
-      ~digest_of_condensed_content
-      ~content)
+    match is_considered_a_CR with
+    | false -> None
+    | true ->
+      let comment_prefix =
+        String.sub
+          file_contents
+          ~pos:start_offset
+          ~len:(content_start_offset - start_offset)
+        |> String.strip
+      in
+      let start_position = Loc.Offset.to_position start_offset ~file_cache in
+      let stop_position = Loc.Offset.to_position (end_offset + 1) ~file_cache in
+      let whole_loc = Loc.create (start_position, stop_position) in
+      let digest_of_condensed_content =
+        Cr_comment.Digest_hex.create (condense_whitespace content)
+      in
+      let cr_comment =
+        Cr_comment.Private.create
+          ~path
+          ~whole_loc
+          ~content_start_offset
+          ~header
+          ~comment_prefix
+          ~digest_of_condensed_content
+          ~content
+      in
+      Some cr_comment)
 ;;
