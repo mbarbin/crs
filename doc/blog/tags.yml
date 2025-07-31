@@ -7,3 +7,8 @@ ci:
   label: CI
   permalink: /ci
   description: Integration to CI pipelines
+
+github:
+  label: GitHub
+  permalink: /github
+  description: Integration with GitHub
