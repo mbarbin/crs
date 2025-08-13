@@ -65,34 +65,6 @@ module Name_compatibility = struct
   ;;
 end
 
-let pp_to_string pp =
-  let buffer = Buffer.create 23 in
-  let formatter = Stdlib.Format.formatter_of_buffer buffer in
-  Stdlib.Format.fprintf formatter "%a%!" Pp.to_fmt pp;
-  let contents =
-    Buffer.contents buffer
-    |> String.split_lines
-    |> List.map ~f:(fun s -> String.rstrip s ^ "\n")
-    |> String.concat
-  in
-  contents
-;;
-
-let warning ~print_gh_annotation_warnings messages =
-  Err.warning messages;
-  if print_gh_annotation_warnings
-  then (
-    let github_annotation =
-      Github_annotation.create
-        ~loc:Loc.none
-        ~severity:Warning
-        ~title:"crs"
-        ~message:
-          (String.concat ~sep:"" (List.map messages ~f:pp_to_string) |> String.strip)
-    in
-    prerr_endline (Github_annotation.to_string github_annotation))
-;;
-
 let arg ~print_gh_annotation_warnings =
   let open Command.Std in
   let pull_request_author_switch = "pull-request-author" in
@@ -146,7 +118,7 @@ let arg ~print_gh_annotation_warnings =
           ; Pp.verbatim "Please attend."
           ]
       in
-      warning ~print_gh_annotation_warnings messages
+      User_warning.emit ~print_gh_annotation_warnings messages
   in
   (* Both errors are covered but disabled due to an issue with bisect_ppx out
      edge creating false negative. *)
@@ -205,7 +177,7 @@ let arg ~print_gh_annotation_warnings =
              ; Pp.verbatim "It will become mandatory in the future, please attend."
              ]
          in
-         warning ~print_gh_annotation_warnings messages);
+         User_warning.emit ~print_gh_annotation_warnings messages);
       pull_request_base
     in
     Pull_request { author; base }
