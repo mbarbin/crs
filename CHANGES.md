@@ -1,13 +1,16 @@
-## 0.0.2025XXXX (unreleased)
+## 0.0.20250813 (2025-08-13)
 
 ### Added
 
+- Add CRs Actions config reference including recent changes (#74, @mbarbin).
+- Add new documentation pages (#70, #71, #72, @mbarbin).
 - Add invalid CRs parser (#65, @mbarbin).
 - Add getters for cr comment content start offset and prefix (#63, @mbarbin).
 - Add more tests for invalid CRs (#61, #64, @mbarbin).
 
 ### Changed
 
+- Some format changes to CRs Actions config (#73, @mbarbin).
 - Ignore CRs that are considered not-a-cr by the invalid CRs parser (#66, @mbarbin).
 - Install crs in the CI actions PATH and use shared crs actions (#62, @mbarbin).
 - Wrap CLI readme text using code margin (#60, @mbarbin).
