@@ -2,12 +2,19 @@
 
 You can choose to install crs from either:
 
+- Pre-compiled binaries from GitHub releases (see [Pre-compiled Binaries](./pre-compiled-binaries.md))
 - The public opam-repository (most stable releases)
 - A custom opam-repository (more frequent releases)
 - From source (most recent version, PRs, etc.)
 - GitHub Actions (see [Setup crs for GitHub Actions](./setup-crs-for-github-actions.md))
 
 Releases are currently versioned using the scheme `0.0.YYYMMDD` while we are in the early stages of development.
+
+## Pre-compiled Binaries
+
+Pre-compiled binaries are available for select architectures from GitHub releases. This is the fastest installation method if your architecture is supported. See [Pre-compiled Binaries](./pre-compiled-binaries.md) for download and verification instructions.
+
+For an explanation of why we distribute binaries this way, see [Binary Distribution](../../explanation/binary-distribution.md).
 
 ## Release Process
 
