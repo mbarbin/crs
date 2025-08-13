@@ -5,6 +5,7 @@ You can choose to install crs from either:
 - The public opam-repository (most stable releases)
 - A custom opam-repository (more frequent releases)
 - From source (most recent version, PRs, etc.)
+- GitHub Actions (see [Setup crs for GitHub Actions](./setup-crs-for-github-actions.md))
 
 Releases are currently versioned using the scheme `0.0.YYYMMDD` while we are in the early stages of development.
 
@@ -81,3 +82,7 @@ Once this is setup, you can build with dune:
 ```sh
 dune build
 ```
+
+## GitHub Actions
+
+If you're looking to install crs within a GitHub Actions workflow, please see [Setup crs for GitHub Actions](./setup-crs-for-github-actions.md) for the recommended approach using the `setup-crs` action.
