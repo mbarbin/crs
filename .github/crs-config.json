@@ -1,8 +1,8 @@
 {
   "default_repo_owner": "mbarbin",
-  "user_mentions_whitelist": [
+  "user_mentions_allowlist": [
     "mbarbin"
   ],
-  "invalid_crs_annotation_severity": [ "Warning" ],
-  "crs_due_now_annotation_severity": [ "Info" ]
+  "invalid_crs_annotation_severity": "Warning",
+  "crs_due_now_annotation_severity": "Info"
 }
