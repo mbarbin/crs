@@ -71,8 +71,9 @@ let of_cr ~cr ~(config : Config.t) ~review_mode ~with_user_mentions =
     let header = Cr_comment.header cr in
     let severity : Severity.t =
       match header with
-      | Error _ -> Option.value config.invalid_crs_annotation_severity ~default:Warning
-      | Ok _ -> Option.value config.crs_due_now_annotation_severity ~default:Info
+      | Error _ ->
+        Option.value (Config.invalid_crs_annotation_severity config) ~default:Warning
+      | Ok _ -> Option.value (Config.crs_due_now_annotation_severity config) ~default:Info
     in
     let title =
       match header with
@@ -87,7 +88,7 @@ let of_cr ~cr ~(config : Config.t) ~review_mode ~with_user_mentions =
         (match assignee.user with
          | None -> false
          | Some user ->
-           (match config.user_mentions_whitelist with
+           (match Config.user_mentions_allowlist config with
             | None -> false
             | Some list -> List.mem list user ~equal:Vcs.User_handle.equal))
     in

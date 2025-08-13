@@ -36,8 +36,12 @@ module Annotation_severity : sig
     | Error
     | Warning
     | Info
-  [@@deriving of_yojson, sexp_of]
+  [@@deriving sexp_of]
 end
+
+type t [@@deriving sexp_of]
+
+(** {1 Getters} *)
 
 (** [default_repo_owner] When not in a PR, the default_repo_owner may be used to
     assigned certain kinds of otherwise not easy to assign to a particular user.
@@ -47,23 +51,23 @@ end
     If the repository is owned by an individual, this would typically be that
     user. If the repository is owned by an organization, this may be set to a
     user in particular who would be assigned otherwise unassignable CRs. If it
-    isn't set, such CRs will simply not be assigned to any one in particular.
+    isn't set, such CRs will simply not be assigned to any one in particular. *)
+val default_repo_owner : t -> Vcs.User_handle.t option
 
-    [user_mentions_whitelist] enables a specific list of users to be notified in
+(** [user_mentions_allowlist] enables a specific list of users to be notified in
     annotations comments, when notifications is requested. This is a protection
     measure to avoid spamming users that do not have ties to a repo in
     particular, or simply do not wish to be notified via CRs. *)
-type t =
-  { default_repo_owner : Vcs.User_handle.t option
-  ; user_mentions_whitelist : Vcs.User_handle.t list option
-  ; invalid_crs_annotation_severity : Annotation_severity.t option
-  ; crs_due_now_annotation_severity : Annotation_severity.t option
-  }
-[@@deriving of_yojson, sexp_of]
+val user_mentions_allowlist : t -> Vcs.User_handle.t list option
+
+val invalid_crs_annotation_severity : t -> Annotation_severity.t option
+val crs_due_now_annotation_severity : t -> Annotation_severity.t option
+
+(** {1 Create configs} *)
 
 val create
   :  ?default_repo_owner:Vcs.User_handle.t
-  -> ?user_mentions_whitelist:Vcs.User_handle.t list
+  -> ?user_mentions_allowlist:Vcs.User_handle.t list
   -> ?invalid_crs_annotation_severity:Annotation_severity.t
   -> ?crs_due_now_annotation_severity:Annotation_severity.t
   -> unit

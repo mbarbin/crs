@@ -45,9 +45,14 @@ type t =
   }
 [@@deriving of_yojson, sexp_of]
 
+let default_repo_owner t = t.default_repo_owner
+let user_mentions_allowlist t = t.user_mentions_whitelist
+let invalid_crs_annotation_severity t = t.invalid_crs_annotation_severity
+let crs_due_now_annotation_severity t = t.crs_due_now_annotation_severity
+
 let create
       ?default_repo_owner
-      ?user_mentions_whitelist
+      ?user_mentions_allowlist:user_mentions_whitelist
       ?invalid_crs_annotation_severity
       ?crs_due_now_annotation_severity
       ()
