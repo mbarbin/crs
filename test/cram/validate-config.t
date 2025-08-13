@@ -35,8 +35,36 @@ Let's try with valid configs.
   > EOF
 
   $ crs tools config validate crs-config.json
+  File "crs-config.json", line 1, characters 0-0:
+  Warning: The config field name [user_mentions_whitelist] is deprecated and
+  was renamed [user_mentions_allowlist].
+  Hint: Upgrade the config to use the new name.
+  
+  File "crs-config.json", line 1, characters 0-0:
+  Warning: The config field name [invalid_crs_annotation_severity] is now
+  expected to be a json string rather than a list.
+  Hint: Change it to simply: "Warning"
+  
+  File "crs-config.json", line 1, characters 0-0:
+  Warning: The config field name [crs_due_now_annotation_severity] is now
+  expected to be a json string rather than a list.
+  Hint: Change it to simply: "Info"
   $ crs tools config validate crs-config.json --print
-  ((default_repo_owner user1) (user_mentions_whitelist (user1 user2 pr-author))
+  File "crs-config.json", line 1, characters 0-0:
+  Warning: The config field name [user_mentions_whitelist] is deprecated and
+  was renamed [user_mentions_allowlist].
+  Hint: Upgrade the config to use the new name.
+  
+  File "crs-config.json", line 1, characters 0-0:
+  Warning: The config field name [invalid_crs_annotation_severity] is now
+  expected to be a json string rather than a list.
+  Hint: Change it to simply: "Warning"
+  
+  File "crs-config.json", line 1, characters 0-0:
+  Warning: The config field name [crs_due_now_annotation_severity] is now
+  expected to be a json string rather than a list.
+  Hint: Change it to simply: "Info"
+  ((default_repo_owner user1) (user_mentions_allowlist (user1 user2 pr-author))
    (invalid_crs_annotation_severity Warning)
    (crs_due_now_annotation_severity Info))
 
@@ -47,6 +75,10 @@ Fields are usually optional.
   > EOF
 
   $ crs tools config validate crs-config.json --print
+  File "crs-config.json", line 1, characters 0-0:
+  Warning: The config field name [invalid_crs_annotation_severity] is now
+  expected to be a json string rather than a list.
+  Hint: Change it to simply: "Error"
   ((invalid_crs_annotation_severity Error))
 
 Unknown field.
@@ -56,13 +88,10 @@ Unknown field.
   > EOF
 
   $ crs tools config validate crs-config.json >out 2>&1
-  [123]
   $ cat out | sed 's/[a-zA-Z0-9._\/-]*config\.ml/<PATH>\/config.ml/g'
   File "crs-config.json", line 1, characters 0-0:
-  Error: Invalid config.
-  In: {"unknown_field":"Hello"}
-  (Failure
-   "<PATH>/config.ml.t_of_yojson: extra fields: unknown_field")
+  Warning: Unknown config field: [unknown_field]
+  Hint: Check the documentation for valid field names.
 
 Invalid value.
 
@@ -74,7 +103,5 @@ Invalid value.
   [123]
   $ cat out | sed 's/[a-zA-Z0-9._\/-]*config\.ml/<PATH>\/config.ml/g'
   File "crs-config.json", line 1, characters 0-0:
-  Error: Invalid config.
-  In: ["Unknown"]
-  (Failure
-   "<PATH>/config.ml.Annotation_severity.t_of_yojson: unexpected variant constructor")
+  Error: Field [invalid_crs_annotation_severity]:
+  Unsupported annotation severity "Unknown".
