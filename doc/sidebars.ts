@@ -35,6 +35,7 @@ const sidebars: SidebarsConfig = {
             id: 'guides/installation/README',
           },
           items: [
+            { type: 'doc', id: 'guides/installation/pre-compiled-binaries', label: 'Pre-compiled Binaries' },
             { type: 'doc', id: 'guides/installation/setup-crs-for-github-actions', label: 'Setup crs for GitHub Actions' },
           ],
         },
@@ -58,6 +59,7 @@ const sidebars: SidebarsConfig = {
       label: 'Explanation',
       items: [
         { type: 'doc', id: 'explanation/README', label: 'Introduction' },
+        { type: 'doc', id: 'explanation/binary-distribution', label: 'Binary Distribution' },
       ],
     },
   ],
