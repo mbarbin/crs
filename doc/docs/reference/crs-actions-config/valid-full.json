@@ -1,0 +1,10 @@
+{
+  "default_repo_owner": "alice",
+  "user_mentions_allowlist": [
+    "alice",
+    "bob",
+    "charlie"
+  ],
+  "invalid_crs_annotation_severity": "Warning",
+  "crs_due_now_annotation_severity": "Info"
+}

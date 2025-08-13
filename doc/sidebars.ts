@@ -48,6 +48,8 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Reference',
       items: [
+        { type: 'doc', id: 'reference/glossary', label: 'Glossary' },
+        { type: 'doc', id: 'reference/crs-actions-config/README', label: 'CRs Actions Config' },
         { type: 'doc', id: 'reference/odoc', label: 'OCaml Packages' },
       ],
     },

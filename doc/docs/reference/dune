@@ -1,0 +1,7 @@
+(mdx
+ (package crs-dev)
+ (deps
+  (package crs)
+  (package crs-tests)
+  (glob_files *.md))
+ (preludes prelude.txt))

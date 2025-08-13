@@ -125,7 +125,7 @@ const config: Config = {
             },
             {
               label: 'Reference',
-              to: '/docs/reference/odoc/',
+              to: '/docs/reference/glossary/',
             },
             {
               label: 'Explanation',
