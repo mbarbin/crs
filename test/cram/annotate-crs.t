@@ -67,30 +67,34 @@ Let's add a config.
 
   $ cat > crs-config.json <<EOF
   > { default_repo_owner: "user1"
-  > , user_mentions_whitelist: [ "user1", "user2", "pr-author" ]
-  > , invalid_crs_annotation_severity: [ "Warning" ]
-  > , crs_due_now_annotation_severity: [ "Info" ]
+  > , user_mentions_allowlist: [ "user1", "user2", "pr-author" ]
+  > , invalid_crs_annotation_severity: "Warning"
+  > , crs_due_now_annotation_severity: "Info"
   > }
   > EOF
 
-  $ crs tools github annotate-crs --config=crs-config.json
-  File "crs-config.json", line 1, characters 0-0:
+Test that deprecated field generates a warning with GitHub annotations.
+
+  $ cat > crs-config-deprecated.json <<EOF
+  > { default_repo_owner: "user1"
+  > , user_mentions_whitelist: [ "user1", "user2", "pr-author" ]
+  > , invalid_crs_annotation_severity: "Warning"
+  > , crs_due_now_annotation_severity: "Info"
+  > }
+  > EOF
+
+  $ crs tools github annotate-crs --config=crs-config-deprecated.json
+  File "crs-config-deprecated.json", line 1, characters 0-0:
   Warning: The config field name [user_mentions_whitelist] is deprecated and
   was renamed [user_mentions_allowlist].
   Hint: Upgrade the config to use the new name.
-  ::warning file=crs-config.json,line=1,col=1,endLine=1,endColumn=1,title=crs::The config field name [user_mentions_whitelist] is deprecated and was renamed%0A[user_mentions_allowlist].%0AHints: Upgrade the config to use the new%0Aname.
-  
-  File "crs-config.json", line 1, characters 0-0:
-  Warning: The config field name [invalid_crs_annotation_severity] is now
-  expected to be a json string rather than a list.
-  Hint: Change it to simply: "Warning"
-  ::warning file=crs-config.json,line=1,col=1,endLine=1,endColumn=1,title=crs::The config field name [invalid_crs_annotation_severity] is now expected to be%0Aa json string rather than a%0Alist.%0AHints: Change it to simply:%0A"Warning"
-  
-  File "crs-config.json", line 1, characters 0-0:
-  Warning: The config field name [crs_due_now_annotation_severity] is now
-  expected to be a json string rather than a list.
-  Hint: Change it to simply: "Info"
-  ::warning file=crs-config.json,line=1,col=1,endLine=1,endColumn=1,title=crs::The config field name [crs_due_now_annotation_severity] is now expected to be%0Aa json string rather than a%0Alist.%0AHints: Change it to simply:%0A"Info"
+  ::warning file=crs-config-deprecated.json,line=1,col=1,endLine=1,endColumn=1,title=crs::The config field name [user_mentions_whitelist] is deprecated and was renamed%0A[user_mentions_allowlist].%0AHints: Upgrade the config to use the new%0Aname.
+  ::notice file=foo/a.txt,line=2,col=1,endLine=2,endColumn=39,title=XCR::This XCR is assigned to user1 (CR reporter).
+  ::notice file=foo/foo.c,line=1,col=1,endLine=1,endColumn=61,title=CR::This CR is assigned to user3 (CR recipient).
+  ::notice file=foo/pr.ml,line=1,col=1,endLine=1,endColumn=51,title=CR::This CR is assigned to user1 (default repo owner).
+  ::notice file=hello,line=2,col=1,endLine=2,endColumn=61,title=CR::This CR is assigned to user2 (CR recipient).
+
+  $ crs tools github annotate-crs --config=crs-config.json
   ::notice file=foo/a.txt,line=2,col=1,endLine=2,endColumn=39,title=XCR::This XCR is assigned to user1 (CR reporter).
   ::notice file=foo/foo.c,line=1,col=1,endLine=1,endColumn=61,title=CR::This CR is assigned to user3 (CR recipient).
   ::notice file=foo/pr.ml,line=1,col=1,endLine=1,endColumn=51,title=CR::This CR is assigned to user1 (default repo owner).
@@ -104,24 +108,6 @@ Test it in the context of a pull review too.
   Warning: Review mode [pull-request] requires [--pull-request-base].
   It will become mandatory in the future, please attend.
   ::warning title=crs::Review mode [pull-request] requires [--pull-request-base].%0AIt will become mandatory in the future, please attend.
-  
-  File "crs-config.json", line 1, characters 0-0:
-  Warning: The config field name [user_mentions_whitelist] is deprecated and
-  was renamed [user_mentions_allowlist].
-  Hint: Upgrade the config to use the new name.
-  ::warning file=crs-config.json,line=1,col=1,endLine=1,endColumn=1,title=crs::The config field name [user_mentions_whitelist] is deprecated and was renamed%0A[user_mentions_allowlist].%0AHints: Upgrade the config to use the new%0Aname.
-  
-  File "crs-config.json", line 1, characters 0-0:
-  Warning: The config field name [invalid_crs_annotation_severity] is now
-  expected to be a json string rather than a list.
-  Hint: Change it to simply: "Warning"
-  ::warning file=crs-config.json,line=1,col=1,endLine=1,endColumn=1,title=crs::The config field name [invalid_crs_annotation_severity] is now expected to be%0Aa json string rather than a%0Alist.%0AHints: Change it to simply:%0A"Warning"
-  
-  File "crs-config.json", line 1, characters 0-0:
-  Warning: The config field name [crs_due_now_annotation_severity] is now
-  expected to be a json string rather than a list.
-  Hint: Change it to simply: "Info"
-  ::warning file=crs-config.json,line=1,col=1,endLine=1,endColumn=1,title=crs::The config field name [crs_due_now_annotation_severity] is now expected to be%0Aa json string rather than a%0Alist.%0AHints: Change it to simply:%0A"Info"
   ::notice file=foo/a.txt,line=2,col=1,endLine=2,endColumn=39,title=XCR::This XCR is assigned to user1 (CR reporter).
   ::notice file=foo/foo.c,line=1,col=1,endLine=1,endColumn=61,title=CR::This CR is assigned to user3 (CR recipient).
   ::notice file=foo/pr.ml,line=1,col=1,endLine=1,endColumn=51,title=CR::This CR is assigned to pr-author (PR author).
@@ -133,23 +119,6 @@ Let's add the required base revision.
   >   --review-mode=pull-request \
   >   --pull-request-author="pr-author" \
   >   --pull-request-base="${rev0}"
-  File "crs-config.json", line 1, characters 0-0:
-  Warning: The config field name [user_mentions_whitelist] is deprecated and
-  was renamed [user_mentions_allowlist].
-  Hint: Upgrade the config to use the new name.
-  ::warning file=crs-config.json,line=1,col=1,endLine=1,endColumn=1,title=crs::The config field name [user_mentions_whitelist] is deprecated and was renamed%0A[user_mentions_allowlist].%0AHints: Upgrade the config to use the new%0Aname.
-  
-  File "crs-config.json", line 1, characters 0-0:
-  Warning: The config field name [invalid_crs_annotation_severity] is now
-  expected to be a json string rather than a list.
-  Hint: Change it to simply: "Warning"
-  ::warning file=crs-config.json,line=1,col=1,endLine=1,endColumn=1,title=crs::The config field name [invalid_crs_annotation_severity] is now expected to be%0Aa json string rather than a%0Alist.%0AHints: Change it to simply:%0A"Warning"
-  
-  File "crs-config.json", line 1, characters 0-0:
-  Warning: The config field name [crs_due_now_annotation_severity] is now
-  expected to be a json string rather than a list.
-  Hint: Change it to simply: "Info"
-  ::warning file=crs-config.json,line=1,col=1,endLine=1,endColumn=1,title=crs::The config field name [crs_due_now_annotation_severity] is now expected to be%0Aa json string rather than a%0Alist.%0AHints: Change it to simply:%0A"Info"
   ::notice file=foo/a.txt,line=2,col=1,endLine=2,endColumn=39,title=XCR::This XCR is assigned to user1 (CR reporter).
   ::notice file=foo/foo.c,line=1,col=1,endLine=1,endColumn=61,title=CR::This CR is assigned to user3 (CR recipient).
   ::notice file=foo/pr.ml,line=1,col=1,endLine=1,endColumn=51,title=CR::This CR is assigned to pr-author (PR author).
@@ -214,23 +183,6 @@ Let's test the reviewdog annotations too.
   }
 
   $ crs tools reviewdog annotate-crs --config=crs-config.json > with-config
-  File "crs-config.json", line 1, characters 0-0:
-  Warning: The config field name [user_mentions_whitelist] is deprecated and
-  was renamed [user_mentions_allowlist].
-  Hint: Upgrade the config to use the new name.
-  ::warning file=crs-config.json,line=1,col=1,endLine=1,endColumn=1,title=crs::The config field name [user_mentions_whitelist] is deprecated and was renamed%0A[user_mentions_allowlist].%0AHints: Upgrade the config to use the new%0Aname.
-  
-  File "crs-config.json", line 1, characters 0-0:
-  Warning: The config field name [invalid_crs_annotation_severity] is now
-  expected to be a json string rather than a list.
-  Hint: Change it to simply: "Warning"
-  ::warning file=crs-config.json,line=1,col=1,endLine=1,endColumn=1,title=crs::The config field name [invalid_crs_annotation_severity] is now expected to be%0Aa json string rather than a%0Alist.%0AHints: Change it to simply:%0A"Warning"
-  
-  File "crs-config.json", line 1, characters 0-0:
-  Warning: The config field name [crs_due_now_annotation_severity] is now
-  expected to be a json string rather than a list.
-  Hint: Change it to simply: "Info"
-  ::warning file=crs-config.json,line=1,col=1,endLine=1,endColumn=1,title=crs::The config field name [crs_due_now_annotation_severity] is now expected to be%0Aa json string rather than a%0Alist.%0AHints: Change it to simply:%0A"Info"
 
   $ diff without-config with-config
   30c30
@@ -245,23 +197,6 @@ Let's test the reviewdog annotations too.
   >   --pull-request-base="${rev0}" \
   >   --with-user-mentions=true \
   >  > for-pull-request
-  File "crs-config.json", line 1, characters 0-0:
-  Warning: The config field name [user_mentions_whitelist] is deprecated and
-  was renamed [user_mentions_allowlist].
-  Hint: Upgrade the config to use the new name.
-  ::warning file=crs-config.json,line=1,col=1,endLine=1,endColumn=1,title=crs::The config field name [user_mentions_whitelist] is deprecated and was renamed%0A[user_mentions_allowlist].%0AHints: Upgrade the config to use the new%0Aname.
-  
-  File "crs-config.json", line 1, characters 0-0:
-  Warning: The config field name [invalid_crs_annotation_severity] is now
-  expected to be a json string rather than a list.
-  Hint: Change it to simply: "Warning"
-  ::warning file=crs-config.json,line=1,col=1,endLine=1,endColumn=1,title=crs::The config field name [invalid_crs_annotation_severity] is now expected to be%0Aa json string rather than a%0Alist.%0AHints: Change it to simply:%0A"Warning"
-  
-  File "crs-config.json", line 1, characters 0-0:
-  Warning: The config field name [crs_due_now_annotation_severity] is now
-  expected to be a json string rather than a list.
-  Hint: Change it to simply: "Info"
-  ::warning file=crs-config.json,line=1,col=1,endLine=1,endColumn=1,title=crs::The config field name [crs_due_now_annotation_severity] is now expected to be%0Aa json string rather than a%0Alist.%0AHints: Change it to simply:%0A"Info"
 
   $ diff with-config for-pull-request
   6c6
@@ -300,23 +235,6 @@ We can also print a summary comment,
   >   --pull-request-base="${rev0}" \
   >   --with-user-mentions=true \
   >  > for-pull-request
-  File "crs-config.json", line 1, characters 0-0:
-  Warning: The config field name [user_mentions_whitelist] is deprecated and
-  was renamed [user_mentions_allowlist].
-  Hint: Upgrade the config to use the new name.
-  ::warning file=crs-config.json,line=1,col=1,endLine=1,endColumn=1,title=crs::The config field name [user_mentions_whitelist] is deprecated and was renamed%0A[user_mentions_allowlist].%0AHints: Upgrade the config to use the new%0Aname.
-  
-  File "crs-config.json", line 1, characters 0-0:
-  Warning: The config field name [invalid_crs_annotation_severity] is now
-  expected to be a json string rather than a list.
-  Hint: Change it to simply: "Warning"
-  ::warning file=crs-config.json,line=1,col=1,endLine=1,endColumn=1,title=crs::The config field name [invalid_crs_annotation_severity] is now expected to be%0Aa json string rather than a%0Alist.%0AHints: Change it to simply:%0A"Warning"
-  
-  File "crs-config.json", line 1, characters 0-0:
-  Warning: The config field name [crs_due_now_annotation_severity] is now
-  expected to be a json string rather than a list.
-  Hint: Change it to simply: "Info"
-  ::warning file=crs-config.json,line=1,col=1,endLine=1,endColumn=1,title=crs::The config field name [crs_due_now_annotation_severity] is now expected to be%0Aa json string rather than a%0Alist.%0AHints: Change it to simply:%0A"Info"
 
   $ diff without-config for-pull-request
   12c12
