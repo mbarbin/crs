@@ -19,24 +19,35 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-let main =
-  Command.make
-    ~summary:"Validate the supplied config file."
-    ~readme:(fun () ->
-      "You can use this command to validate that the supplied file is a valid config \
-       file for $(b,crs).")
-    (let open Command.Std in
-     let+ path = Arg.pos ~pos:0 Param.file ~doc:"Config file to customize crs."
-     and+ print = Arg.flag [ "print" ] ~doc:"Print the parsed config as a S-expression."
-     and+ print_gh_annotation_warnings =
-       Arg.named_with_default
-         [ "with-github-annotations-warnings" ]
-         Param.bool
-         ~default:false
-         ~doc:
-           "Optionally print GitHub Annotations Warnings to highlight deprecated \
-            constructs, in addition to regular warning printed to stderr."
-     in
-     let config = Config.load_exn ~path:(Fpath.v path) ~print_gh_annotation_warnings in
-     if print then print_s [%sexp (config : Config.t)])
+let pp_to_string pp =
+  let buffer = Buffer.create 23 in
+  let formatter = Stdlib.Format.formatter_of_buffer buffer in
+  Stdlib.Format.fprintf formatter "%a%!" Pp.to_fmt pp;
+  let contents =
+    Buffer.contents buffer
+    |> String.split_lines
+    |> List.map ~f:(fun s -> String.rstrip s ^ "\n")
+    |> String.concat
+  in
+  contents
+;;
+
+let emit ?loc ~print_gh_annotation_warnings ?hints messages =
+  Err.warning ?loc ?hints messages;
+  if print_gh_annotation_warnings
+  then (
+    let message_text = String.concat ~sep:"" (List.map messages ~f:pp_to_string) in
+    let hints_text =
+      match hints with
+      | None -> ""
+      | Some hints -> "Hints: " ^ String.concat ~sep:" " (List.map hints ~f:pp_to_string)
+    in
+    let github_annotation =
+      Github_annotation.create
+        ~loc:(Option.value loc ~default:Loc.none)
+        ~severity:Warning
+        ~title:"crs"
+        ~message:(String.strip (message_text ^ hints_text))
+    in
+    prerr_endline (Github_annotation.to_string github_annotation))
 ;;

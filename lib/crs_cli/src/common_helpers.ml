@@ -98,7 +98,7 @@ let with_user_mentions_arg =
        $(i,@assignee-login)), which may trigger a notification in some environments \
        (such as GitHub PR reviews). If false, the assignee's login is shown without the \
        '@', so no notification is triggered. Note: For a notification to be triggered, \
-       the user must also be included in the configured user-mentions whitelist. This \
+       the user must also be included in the configured user-mentions allowlist. This \
        flag only affects notification behavior, as the assignee's name is always \
        displayed."
 ;;

@@ -37,7 +37,8 @@ let main =
      let config =
        match config with
        | None -> Config.empty
-       | Some path -> Config.load_exn ~path:(Fpath.v path)
+       | Some path ->
+         Config.load_exn ~path:(Fpath.v path) ~print_gh_annotation_warnings:true
      in
      let crs =
        Crs_parser.grep ~vcs ~repo_root ~below:Vcs.Path_in_repo.root |> Cr_comment.sort

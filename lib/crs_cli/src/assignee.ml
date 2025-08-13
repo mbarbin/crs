@@ -79,7 +79,7 @@ let of_raw
     | Pull_request { author; base = _ } ->
       { user = Some author; reason = Pull_request_author }
     | Revision ->
-      (match config.default_repo_owner with
+      (match Config.default_repo_owner config with
        | Some owner -> { user = Some owner; reason = Default_repo_owner }
        | None -> { user = None; reason = No_default_repo_owner })
   in

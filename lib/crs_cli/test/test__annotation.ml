@@ -172,7 +172,7 @@ let%expect_test "compute" =
   let config =
     let user = Vcs.User_handle.v "user" in
     let user2 = Vcs.User_handle.v "user2" in
-    Config.create ~default_repo_owner:user ~user_mentions_whitelist:[ user; user2 ] ()
+    Config.create ~default_repo_owner:user ~user_mentions_allowlist:[ user; user2 ] ()
   in
   test Tests_helpers.test_cases ~config ~review_mode:Revision ~with_user_mentions:true;
   [%expect
@@ -208,7 +208,7 @@ let%expect_test "compute" =
     XCR-someday user: Hello.
     Info: This XCR is assigned to @user (CR reporter).
     |}];
-  (* Here user3 should not be notified because they are not in the whitelist. *)
+  (* Here user3 should not be notified because they are not in the allowlist. *)
   test
     "(* $CR user for user3: Hello. *)"
     ~config
