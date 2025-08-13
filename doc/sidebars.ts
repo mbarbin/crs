@@ -27,7 +27,17 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Guides',
       items: [
-        { type: 'doc', id: 'guides/installation/README', label: 'Installation' },
+        {
+          type: 'category',
+          label: 'Installation',
+          link: {
+            type: 'doc',
+            id: 'guides/installation/README',
+          },
+          items: [
+            { type: 'doc', id: 'guides/installation/setup-crs-for-github-actions', label: 'Setup crs for GitHub Actions' },
+          ],
+        },
       ],
     },
   ],
