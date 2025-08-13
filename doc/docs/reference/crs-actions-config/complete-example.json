@@ -1,0 +1,16 @@
+{
+  // Alice takes over CRs that are otherwise hard to assign.
+  default_repo_owner: "alice",
+
+  // The list of users who have elected to being notified via GitHub
+  // through the use of `@ + username` mentions in comments.
+  user_mentions_allowlist: [
+    "alice",
+    "bob",
+    "charlie",
+  ],
+
+  // Configuration for the severity used in GitHub Annotations.
+  invalid_crs_annotation_severity: "Warning",
+  crs_due_now_annotation_severity: "Info",
+}
