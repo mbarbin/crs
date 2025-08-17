@@ -13,6 +13,11 @@ github:
   permalink: /github
   description: Integration with GitHub
 
+humor:
+  label: Humor
+  permalink: /humor
+  description: Let's not forget to have fun sometimes too!
+
 ai-collaboration:
   label: AI Collaboration
   permalink: /ai-collaboration

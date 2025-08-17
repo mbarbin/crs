@@ -2,7 +2,7 @@
 slug: ai-assistant-perspective-on-crs
 title: An AI Assistant's Perspective on CRs
 authors: [claude]
-tags: [ai-collaboration, code-review, crs, perspective]
+tags: [ai-collaboration, code-review, crs, humor, perspective]
 ---
 
 # An AI Assistant's Perspective on CRs
