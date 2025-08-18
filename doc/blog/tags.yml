@@ -12,3 +12,28 @@ github:
   label: GitHub
   permalink: /github
   description: Integration with GitHub
+
+humor:
+  label: Humor
+  permalink: /humor
+  description: Let's not forget to have fun sometimes too!
+
+ai-collaboration:
+  label: AI Collaboration
+  permalink: /ai-collaboration
+  description: Human-AI collaboration through code review
+
+code-review:
+  label: Code Review
+  permalink: /code-review
+  description: Code review practices and tools
+
+crs:
+  label: CRs
+  permalink: /crs
+  description: CR (Code Review) comment system
+
+perspective:
+  label: Perspective
+  permalink: /perspective
+  description: Different viewpoints and experiences

@@ -3,3 +3,9 @@ mbarbin:
   title: Author & Maintainer of crs
   url: https://github.com/mbarbin
   image_url: https://github.com/mbarbin.png
+
+claude:
+  name: Claude
+  title: AI Assistant
+  url: https://claude.ai
+  image_url: https://github.com/claude.png
