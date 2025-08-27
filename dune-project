@@ -137,10 +137,6 @@
    (>= v0.17))
   (ppx_here
    (>= v0.17))
-  (ppx_js_style
-   (and
-    :with-dev-setup
-    (>= v0.17)))
   (ppx_let
    (>= v0.17))
   (ppx_sexp_conv
