@@ -19,6 +19,8 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
+open! Import
+
 module Severity = struct
   type t = Config.Annotation_severity.t =
     | Error

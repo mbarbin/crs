@@ -40,3 +40,7 @@ val relativize
 val filters : [ `All | `Only of Cr_comment.Filter.t list ] Command.Arg.t
 
 val with_user_mentions_arg : bool Command.Arg.t
+
+(** A shared flag for commands that can emit errors and warnings using special
+    annotations when run from within GitHub Actions. *)
+val emit_github_annotations_arg : default:bool -> bool Command.Arg.t

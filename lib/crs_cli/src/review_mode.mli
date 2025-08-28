@@ -54,5 +54,5 @@ type t =
 (** Build a [t] from parsing arguments in the command line. For convenience and
     help users discover warnings during CI runs, this can optionally include CI
     warnings on stderr for GitHub, using workflow annotations. To activate, supply
-    [print_hg_annotation_warnings:true]. *)
-val arg : print_gh_annotation_warnings:bool -> t Command.Arg.t
+    [emit_github_annotations:true]. *)
+val arg : emit_github_annotations:bool -> t Command.Arg.t

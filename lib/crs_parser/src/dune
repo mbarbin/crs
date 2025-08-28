@@ -23,6 +23,7 @@
   loc
   pp
   pplumbing.err
+  pplumbing.pp-tty
   re
   spawn
   stdio

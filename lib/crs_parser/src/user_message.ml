@@ -19,45 +19,44 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-open! Import
+let pp_to_string pp =
+  let buffer = Buffer.create 23 in
+  let formatter = Stdlib.Format.formatter_of_buffer buffer in
+  Stdlib.Format.fprintf formatter "%a%!" Pp.to_fmt pp;
+  let contents =
+    Buffer.contents buffer
+    |> String.split_lines
+    |> List.map ~f:(fun s -> String.rstrip s ^ "\n")
+    |> String.concat
+  in
+  contents
+;;
 
-let main =
-  Command.make
-    ~summary:"Output GitHub Workflow Annotations for CRs in the repo."
-    ~readme:(fun () ->
-      "This command searches for CRs in the tree and prints GitHub Workflow Annotations \
-       for them to $(b,stdout) for use in CIs.")
-    (let open Command.Std in
-     let+ config =
-       Arg.named_opt [ "config" ] Param.file ~doc:"Config file to customize crs."
-     and+ review_mode = Review_mode.arg ~emit_github_annotations:true in
-     let cwd = Unix.getcwd () |> Absolute_path.v in
-     let { Enclosing_repo.vcs_kind = _; repo_root; vcs } =
-       Common_helpers.find_enclosing_repo ~from:cwd
-     in
-     let config =
-       match config with
-       | None -> Config.empty
-       | Some path -> Config.load_exn ~path:(Fpath.v path) ~emit_github_annotations:true
-     in
-     let crs =
-       Crs_parser.grep ~vcs ~repo_root ~below:Vcs.Path_in_repo.root |> Cr_comment.sort
-     in
-     List.iter crs ~f:(fun cr ->
-       match
-         Annotation.of_cr
-           ~cr
-           ~config
-           ~review_mode
-           ~with_user_mentions:
-             (* User notifications are not supported in the context of GitHub
-                Annotations. We prefer to never generate them given that they
-                are going to be ignored. *)
-             false
-       with
-       | None -> ()
-       | Some annotation ->
-         print_endline
-           (annotation |> Annotation.to_github_annotation |> Github_annotation.to_string));
-     ())
+let emit_github_annotation ~severity ~loc ~messages ~hints =
+  let message_text = String.concat ~sep:"" (List.map messages ~f:pp_to_string) in
+  let hints_text =
+    match hints with
+    | None -> ""
+    | Some hints -> "Hints: " ^ String.concat ~sep:" " (List.map hints ~f:pp_to_string)
+  in
+  let github_annotation =
+    Github_annotation.create
+      ~loc:(Option.value loc ~default:Loc.none)
+      ~severity
+      ~title:"crs"
+      ~message:(String.strip (message_text ^ hints_text))
+  in
+  prerr_endline (Github_annotation.to_string github_annotation)
+;;
+
+let warning ?loc ~emit_github_annotations ?hints messages =
+  Err.warning ?loc ?hints messages;
+  if emit_github_annotations
+  then emit_github_annotation ~severity:Warning ~loc ~messages ~hints
+;;
+
+let error ?loc ~emit_github_annotations ?hints messages =
+  Err.error ?loc ?hints messages;
+  if emit_github_annotations
+  then emit_github_annotation ~severity:Error ~loc ~messages ~hints
 ;;

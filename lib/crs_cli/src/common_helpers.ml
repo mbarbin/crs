@@ -102,3 +102,18 @@ let with_user_mentions_arg =
        flag only affects notification behavior, as the assignee's name is always \
        displayed."
 ;;
+
+let emit_github_annotations_arg ~default =
+  let open Command.Std in
+  Arg.named_with_default
+    [ "emit-github-annotations"; "with-github-annotations-warnings" ]
+    Param.bool
+    ~default
+    ~doc:
+      "Optionally emit GitHub Annotations on $(b,stderr) to highlight issues (such as \
+       deprecated constructs, errors, etc.) in addition to regular errors and warnings.\n\n\
+       This may be convenient when running jobs from within GitHub Actions to increase \
+       the chance of detecting these issues when inspecting the jobs summary pages.\n\n\
+       The $(i,--with-github-annotations-warnings) alias is deprecated and will be \
+       removed in a future release. Please update."
+;;

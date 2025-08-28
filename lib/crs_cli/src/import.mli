@@ -19,21 +19,6 @@
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
 
-val main : unit Command.t
-
-(** {1 Private}
-
-    This module is exported to be used by tests and libraries with strong ties
-    to [crs]. Its signature may change in breaking ways at any time without
-    prior notice, and outside of the guidelines set by semver. *)
-
-module Private : sig
-  val grep_cmd : unit Command.t
-
-  module Annotation = Annotation
-  module Assignee = Assignee
-  module Config = Config
-  module Review_mode = Review_mode
-  module Reviewdog_utils = Reviewdog_utils
-  module Summary_table = Summary_table
-end
+module Crs_ignore = Crs_parser.Private.Crs_ignore
+module Github_annotation = Crs_parser.Private.Github_annotation
+module User_message = Crs_parser.Private.User_message

@@ -10,6 +10,8 @@
   -open
   Base
   -open
+  Fpath_base
+  -open
   Expect_test_helpers_base
   -open
   Volgo)
@@ -19,6 +21,7 @@
   crs_parser
   expect_test_helpers_core.expect_test_helpers_base
   fpath
+  fpath-base
   loc
   patdiff.expect_test_patdiff
   re
