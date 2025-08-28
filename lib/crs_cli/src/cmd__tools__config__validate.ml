@@ -28,15 +28,9 @@ let main =
     (let open Command.Std in
      let+ path = Arg.pos ~pos:0 Param.file ~doc:"Config file to customize crs."
      and+ print = Arg.flag [ "print" ] ~doc:"Print the parsed config as a S-expression."
-     and+ print_gh_annotation_warnings =
-       Arg.named_with_default
-         [ "with-github-annotations-warnings" ]
-         Param.bool
-         ~default:false
-         ~doc:
-           "Optionally print GitHub Annotations Warnings to highlight deprecated \
-            constructs, in addition to regular warning printed to stderr."
+     and+ emit_github_annotations =
+       Common_helpers.emit_github_annotations_arg ~default:false
      in
-     let config = Config.load_exn ~path:(Fpath.v path) ~print_gh_annotation_warnings in
+     let config = Config.load_exn ~path:(Fpath.v path) ~emit_github_annotations in
      if print then print_s [%sexp (config : Config.t)])
 ;;

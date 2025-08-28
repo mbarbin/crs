@@ -93,7 +93,7 @@ let get_json_enum_constructor json ~loc ~field_name =
         ]
 ;;
 
-let parse_json json ~loc ~print_gh_annotation_warnings =
+let parse_json json ~loc ~emit_github_annotations =
   match json with
   | `Assoc fields ->
     (* Track which fields have been accessed *)
@@ -120,7 +120,7 @@ let parse_json json ~loc ~print_gh_annotation_warnings =
          | Some json ->
            User_message.warning
              ~loc
-             ~print_gh_annotation_warnings
+             ~emit_github_annotations
              Pp.O.
                [ Pp.text "The config field name "
                  ++ Pp_tty.kwd (module String) deprecated_field_name
@@ -152,7 +152,7 @@ let parse_json json ~loc ~print_gh_annotation_warnings =
            let severity = parse_string str in
            User_message.warning
              ~loc
-             ~print_gh_annotation_warnings
+             ~emit_github_annotations
              Pp.O.
                [ Pp.text "The config field name "
                  ++ Pp_tty.kwd (module String) field_name
@@ -173,7 +173,7 @@ let parse_json json ~loc ~print_gh_annotation_warnings =
       then
         User_message.warning
           ~loc
-          ~print_gh_annotation_warnings
+          ~emit_github_annotations
           Pp.O.[ Pp.text "Unknown config field: " ++ Pp_tty.kwd (module String) name ]
           ~hints:[ Pp.text "Check the documentation for valid field names." ]);
     { default_repo_owner
@@ -211,13 +211,13 @@ let empty =
   }
 ;;
 
-let load_exn ~path ~print_gh_annotation_warnings =
+let load_exn ~path ~emit_github_annotations =
   match Yojson_five.Safe.from_file (Fpath.to_string path) with
   | Error msg ->
     Err.raise ~loc:(Loc.of_file ~path) [ Pp.text "Not a valid json file."; Pp.text msg ]
   | Ok json ->
     (match
-       match parse_json json ~loc:(Loc.of_file ~path) ~print_gh_annotation_warnings with
+       match parse_json json ~loc:(Loc.of_file ~path) ~emit_github_annotations with
        | t -> Ok t
        | exception Ppx_yojson_conv_lib.Yojson_conv.Of_yojson_error (exn, json) ->
          Error (exn, json)

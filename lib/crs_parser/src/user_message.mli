@@ -19,7 +19,7 @@
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
 
-(** A helper module to create warnings that may be highlighted by GitHub
+(** A helper module to create user messages that may be highlighted by GitHub
     Annotations for accrued discoverability.
 
     For use in GitHub workflows. *)
@@ -27,7 +27,7 @@
 (** Emit a warning with [Err.warning] with the supplied messages. For
     convenience and help users discover warnings during CI runs, this can
     optionally include CI warnings on stderr for GitHub, using workflow
-    annotations. To activate, supply [print_gh_annotation_warnings:true].
+    annotations. To activate, supply [emit_github_annotations:true].
 
     {b Motivation:} When running in CI/CD environments, warnings printed to stderr
     can easily be missed among other output. GitHub workflow annotations provide
@@ -41,7 +41,7 @@
     included in the annotation message with a "Hints: " prefix. *)
 val warning
   :  ?loc:Loc.t
-  -> print_gh_annotation_warnings:bool
+  -> emit_github_annotations:bool
   -> ?hints:Pp_tty.t list
   -> Pp_tty.t list
   -> unit

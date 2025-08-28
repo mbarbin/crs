@@ -32,22 +32,25 @@ let pp_to_string pp =
   contents
 ;;
 
-let warning ?loc ~print_gh_annotation_warnings ?hints messages =
+let emit_github_annotation ~severity ~loc ~messages ~hints =
+  let message_text = String.concat ~sep:"" (List.map messages ~f:pp_to_string) in
+  let hints_text =
+    match hints with
+    | None -> ""
+    | Some hints -> "Hints: " ^ String.concat ~sep:" " (List.map hints ~f:pp_to_string)
+  in
+  let github_annotation =
+    Github_annotation.create
+      ~loc:(Option.value loc ~default:Loc.none)
+      ~severity
+      ~title:"crs"
+      ~message:(String.strip (message_text ^ hints_text))
+  in
+  prerr_endline (Github_annotation.to_string github_annotation)
+;;
+
+let warning ?loc ~emit_github_annotations ?hints messages =
   Err.warning ?loc ?hints messages;
-  if print_gh_annotation_warnings
-  then (
-    let message_text = String.concat ~sep:"" (List.map messages ~f:pp_to_string) in
-    let hints_text =
-      match hints with
-      | None -> ""
-      | Some hints -> "Hints: " ^ String.concat ~sep:" " (List.map hints ~f:pp_to_string)
-    in
-    let github_annotation =
-      Github_annotation.create
-        ~loc:(Option.value loc ~default:Loc.none)
-        ~severity:Warning
-        ~title:"crs"
-        ~message:(String.strip (message_text ^ hints_text))
-    in
-    prerr_endline (Github_annotation.to_string github_annotation))
+  if emit_github_annotations
+  then emit_github_annotation ~severity:Warning ~loc ~messages ~hints
 ;;

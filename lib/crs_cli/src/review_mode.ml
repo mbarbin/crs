@@ -67,7 +67,7 @@ module Name_compatibility = struct
   ;;
 end
 
-let arg ~print_gh_annotation_warnings =
+let arg ~emit_github_annotations =
   let open Command.Std in
   let pull_request_author_switch = "pull-request-author" in
   let pull_request_base_switch = "pull-request-base" in
@@ -120,7 +120,7 @@ let arg ~print_gh_annotation_warnings =
           ; Pp.verbatim "Please attend."
           ]
       in
-      User_message.warning ~print_gh_annotation_warnings messages
+      User_message.warning messages ~emit_github_annotations
   in
   (* Both errors are covered but disabled due to an issue with bisect_ppx out
      edge creating false negative. *)
@@ -179,7 +179,7 @@ let arg ~print_gh_annotation_warnings =
              ; Pp.verbatim "It will become mandatory in the future, please attend."
              ]
          in
-         User_message.warning ~print_gh_annotation_warnings messages);
+         User_message.warning messages ~emit_github_annotations);
       pull_request_base
     in
     Pull_request { author; base }

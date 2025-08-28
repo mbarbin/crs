@@ -80,5 +80,5 @@ val empty : t
     detected, warnings are emitted. For convenience and help users discover
     warnings during CI runs, the loading can optionally include CI warnings on
     stderr for GitHub, using workflow annotations. To activate, supply
-    [print_hg_annotation_warnings:true]. *)
-val load_exn : path:Fpath.t -> print_gh_annotation_warnings:bool -> t
+    [emit_github_annotations:true]. *)
+val load_exn : path:Fpath.t -> emit_github_annotations:bool -> t

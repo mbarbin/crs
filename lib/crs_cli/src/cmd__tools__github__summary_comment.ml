@@ -32,7 +32,7 @@ let main =
      let+ with_user_mentions = Common_helpers.with_user_mentions_arg
      and+ config =
        Arg.named_opt [ "config" ] Param.file ~doc:"Config file to customize crs."
-     and+ review_mode = Review_mode.arg ~print_gh_annotation_warnings:true in
+     and+ review_mode = Review_mode.arg ~emit_github_annotations:true in
      let cwd = Unix.getcwd () |> Absolute_path.v in
      let { Enclosing_repo.vcs_kind = _; repo_root; vcs } =
        Common_helpers.find_enclosing_repo ~from:cwd
@@ -40,8 +40,7 @@ let main =
      let config =
        match config with
        | None -> Config.empty
-       | Some path ->
-         Config.load_exn ~path:(Fpath.v path) ~print_gh_annotation_warnings:true
+       | Some path -> Config.load_exn ~path:(Fpath.v path) ~emit_github_annotations:true
      in
      let annotated_crs =
        Crs_parser.grep ~vcs ~repo_root ~below:Vcs.Path_in_repo.root
