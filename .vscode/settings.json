@@ -50,6 +50,7 @@
         "sherlodoc",
         "shexp",
         "sigpipe",
+        "Streeters",
         "stringp",
         "textutils",
         "vlist",
@@ -58,6 +59,7 @@
         "WEXITED",
         "WSIGNALED",
         "WSTOPPED",
-        "xcrs"
+        "xcrs",
+        "yojson"
     ]
 }
