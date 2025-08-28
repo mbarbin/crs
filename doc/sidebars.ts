@@ -50,6 +50,7 @@ const sidebars: SidebarsConfig = {
       items: [
         { type: 'doc', id: 'reference/glossary', label: 'Glossary' },
         { type: 'doc', id: 'reference/crs-actions-config/README', label: 'CRs Actions Config' },
+        { type: 'doc', id: 'reference/crs-ignore-files/README', label: 'CRs Ignore Files' },
         { type: 'doc', id: 'reference/odoc', label: 'OCaml Packages' },
       ],
     },
@@ -62,6 +63,7 @@ const sidebars: SidebarsConfig = {
       items: [
         { type: 'doc', id: 'explanation/README', label: 'Introduction' },
         { type: 'doc', id: 'explanation/binary-distribution', label: 'Binary Distribution' },
+        { type: 'doc', id: 'explanation/when-to-use-crs-ignore-files', label: 'When to Use .crs-ignore Files' },
       ],
     },
   ],
