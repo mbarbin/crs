@@ -1,0 +1,8 @@
+# The README.md file contains illustrative CRs which we ignore in code review.
+# At one point, we had prefixed them with a '$' character ($CR) so that they
+# would not be grepped as actual CRs. However doing this adds a level of
+# complexity for new readers and people discovering the project. Ignoring CRs
+# from the README prevents us from using the CRs workflow in this file. We've
+# accepted this tradeof.
+
+README.md

@@ -38,10 +38,8 @@ This simple syntax makes it easy to track, assign, and resolve code review comme
 CRs are embedded into the source code using the comment syntax of the language in which they appear. For example, in OCaml, a complete CR would look like this:
 
 ```ocaml
-(* $CR alice: Add a quick example of a CR comment in the project's home page! *)
+(* CR alice: Add a quick example of a CR comment in the project's home page! *)
 ```
-
-> **Note:** In this example, we’ve added a dollar sign (`$`) before `CR` to prevent this file from triggering an actual CR match in the review system we use to maintain this project. This ensures the example remains purely illustrative!
 
 ## Project Goals
 
