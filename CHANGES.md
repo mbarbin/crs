@@ -1,3 +1,14 @@
+## 0.0.2025XXXX (unreleased)
+
+### Added
+
+- Add support for `.crs-ignore` files (#77, #78, @mbarbin).
+- Add documentation about use with assistant agent (#76, @mbarbin).
+
+### Changed
+
+- Upgrade `crs-config` to latest format (#75, @mbarbin).
+
 ## 0.0.20250813 (2025-08-13)
 
 ### Added
