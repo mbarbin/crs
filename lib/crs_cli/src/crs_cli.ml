@@ -64,7 +64,6 @@ module Private = struct
   module Annotation = Annotation
   module Assignee = Assignee
   module Config = Config
-  module Github_annotation = Github_annotation
   module Review_mode = Review_mode
   module Reviewdog_utils = Reviewdog_utils
   module Summary_table = Summary_table

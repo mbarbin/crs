@@ -32,7 +32,7 @@ let pp_to_string pp =
   contents
 ;;
 
-let emit ?loc ~print_gh_annotation_warnings ?hints messages =
+let warning ?loc ~print_gh_annotation_warnings ?hints messages =
   Err.warning ?loc ?hints messages;
   if print_gh_annotation_warnings
   then (

@@ -19,6 +19,8 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
+open! Import
+
 module Annotation_severity = struct
   type t =
     | Error
@@ -116,7 +118,7 @@ let parse_json json ~loc ~print_gh_annotation_warnings =
         (match field deprecated_field_name with
          | None -> None
          | Some json ->
-           User_warning.emit
+           User_message.warning
              ~loc
              ~print_gh_annotation_warnings
              Pp.O.
@@ -148,7 +150,7 @@ let parse_json json ~loc ~print_gh_annotation_warnings =
          | `Unwrapped str -> Some (parse_string str)
          | `Wrapped str ->
            let severity = parse_string str in
-           User_warning.emit
+           User_message.warning
              ~loc
              ~print_gh_annotation_warnings
              Pp.O.
@@ -169,7 +171,7 @@ let parse_json json ~loc ~print_gh_annotation_warnings =
     List.iter fields ~f:(fun (name, _) ->
       if not (Hash_set.mem used_fields name)
       then
-        User_warning.emit
+        User_message.warning
           ~loc
           ~print_gh_annotation_warnings
           Pp.O.[ Pp.text "Unknown config field: " ++ Pp_tty.kwd (module String) name ]

@@ -22,7 +22,7 @@
 module Annotation = Crs_cli.Private.Annotation
 module Assignee = Crs_cli.Private.Assignee
 module Config = Crs_cli.Private.Config
-module Github_annotation = Crs_cli.Private.Github_annotation
+module Github_annotation = Crs_parser.Private.Github_annotation
 
 let path = Vcs.Path_in_repo.v "my_file.ml"
 

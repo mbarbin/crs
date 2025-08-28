@@ -19,6 +19,8 @@
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
 
+open! Import
+
 (** A type to hold information about a CR that is assigned in the ci event (pull
     request or push to ongoing branch).
 

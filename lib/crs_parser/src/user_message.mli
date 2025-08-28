@@ -19,21 +19,29 @@
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
 
-val main : unit Command.t
+(** A helper module to create warnings that may be highlighted by GitHub
+    Annotations for accrued discoverability.
 
-(** {1 Private}
+    For use in GitHub workflows. *)
 
-    This module is exported to be used by tests and libraries with strong ties
-    to [crs]. Its signature may change in breaking ways at any time without
-    prior notice, and outside of the guidelines set by semver. *)
+(** Emit a warning with [Err.warning] with the supplied messages. For
+    convenience and help users discover warnings during CI runs, this can
+    optionally include CI warnings on stderr for GitHub, using workflow
+    annotations. To activate, supply [print_gh_annotation_warnings:true].
 
-module Private : sig
-  val grep_cmd : unit Command.t
+    {b Motivation:} When running in CI/CD environments, warnings printed to stderr
+    can easily be missed among other output. GitHub workflow annotations provide
+    a way to surface these warnings prominently in the GitHub UI, appearing both
+    in the workflow run summary and as inline annotations in pull requests. This
+    significantly improves the discoverability of warnings that might otherwise
+    go unnoticed, helping developers address issues before merging code.
 
-  module Annotation = Annotation
-  module Assignee = Assignee
-  module Config = Config
-  module Review_mode = Review_mode
-  module Reviewdog_utils = Reviewdog_utils
-  module Summary_table = Summary_table
-end
+    The optional [hints] parameter provides additional context or suggestions
+    for resolving the warning. When GitHub annotations are enabled, hints are
+    included in the annotation message with a "Hints: " prefix. *)
+val warning
+  :  ?loc:Loc.t
+  -> print_gh_annotation_warnings:bool
+  -> ?hints:Pp_tty.t list
+  -> Pp_tty.t list
+  -> unit
