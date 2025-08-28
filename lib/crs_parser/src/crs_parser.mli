@@ -73,6 +73,7 @@ val grep
   -> Cr_comment.t list
 
 module Private : sig
+  module Crs_ignore = Crs_ignore
   module Github_annotation = Github_annotation
   module Invalid_cr_parser = Invalid_cr_parser
   module User_message = User_message

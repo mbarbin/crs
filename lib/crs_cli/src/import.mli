@@ -19,5 +19,6 @@
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
 
+module Crs_ignore = Crs_parser.Private.Crs_ignore
 module Github_annotation = Crs_parser.Private.Github_annotation
 module User_message = Crs_parser.Private.User_message

@@ -42,6 +42,7 @@ let main =
             , Command.group
                 ~summary:"Utils related to config files."
                 [ "validate", Cmd__tools__config__validate.main ] )
+          ; "crs-ignore", Cmd__tools__crs_ignore.main
           ; "emacs-grep", Cmd__tools__emacs_grep.main
           ; "enclosing-repo-info", Cmd__tools__enclosing_repo_info.main
           ; ( "github"

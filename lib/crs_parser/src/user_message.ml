@@ -54,3 +54,9 @@ let warning ?loc ~emit_github_annotations ?hints messages =
   if emit_github_annotations
   then emit_github_annotation ~severity:Warning ~loc ~messages ~hints
 ;;
+
+let error ?loc ~emit_github_annotations ?hints messages =
+  Err.error ?loc ?hints messages;
+  if emit_github_annotations
+  then emit_github_annotation ~severity:Error ~loc ~messages ~hints
+;;

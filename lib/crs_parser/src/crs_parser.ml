@@ -105,106 +105,132 @@ let () =
 ;;
 
 let grep ~vcs ~repo_root ~below =
-  let files_to_grep =
-    match Vcs.ls_files vcs ~repo_root ~below with
-    | [] -> []
-    | _ :: _ as files_to_grep ->
+  match Vcs.ls_files vcs ~repo_root ~below with
+  | [] -> []
+  | _ :: _ as files_below ->
+    let files_to_grep =
       let stdin_text =
-        files_to_grep
+        files_below
         |> List.map ~f:Vcs.Path_in_repo.to_string
         |> String.concat ~sep:null_separator
       in
       let stdout_ref = ref "<Unknown>" in
       let stderr_ref = ref "<Unknown>" in
-      (match
-         let prog =
-           match Lazy.force find_xargs with
-           | Some prog -> prog
-           | None -> failwith "Cannot find xargs in PATH" [@coverage off]
-         in
-         let stdin_reader, stdin_writer = Spawn.safe_pipe () in
-         let stdout_reader, stdout_writer = Spawn.safe_pipe () in
-         let stderr_reader, stderr_writer = Spawn.safe_pipe () in
-         let pid =
-           Spawn.spawn
-             ~cwd:(Path (Vcs.Repo_root.to_string repo_root))
-             ~prog
-             ~argv:
-               [ "xargs"
-               ; "-0"
-               ; "grep"
-               ; "--no-messages"
-               ; "-E"
-               ; "-l"
-               ; "--binary-files=without-match"
-               ; cr_pattern_egrep
-               ]
-             ~stdin:stdin_reader
-             ~stdout:stdout_writer
-             ~stderr:stderr_writer
-             ()
-         in
-         Unix.close stdin_reader;
-         Unix.close stdout_writer;
-         Unix.close stderr_writer;
-         let () =
-           let stdin_oc = Unix.out_channel_of_descr stdin_writer in
-           Out_channel.output_string stdin_oc stdin_text;
-           Out_channel.flush stdin_oc;
-           Unix.close stdin_writer
-         in
-         let stdout = read_all_from_fd stdout_reader in
-         stdout_ref := stdout;
-         let stderr = read_all_from_fd stderr_reader in
-         stderr_ref := stderr;
-         let pid', process_status = waitpid_non_intr pid in
-         assert (pid = pid');
-         match process_status with
-         | Unix.WEXITED n ->
-           (* The exit code of [xargs] is not consistent on all of the platforms
-              that we'd like to support. While it always returns [0] in case of
-              a match, when the inner [grep] doesn't find a match and returns
-              [1], the outer call to [xargs] may return [1] or [123] depending
-              on things like the OS. *)
-           if
-             Int.equal n 0
-             || ((Int.equal n 123 || Int.equal n 1 (* On MacOS *))
-                 && String.is_empty stderr)
-           then (
-             let files = stdout |> String.split_lines |> List.map ~f:Vcs.Path_in_repo.v in
-             `Files files)
-           else `Error (`Exited n)
-         | Unix.WSIGNALED n -> `Error (`Signaled n) [@coverage off]
-         | Unix.WSTOPPED n -> `Error (`Stopped n) [@coverage off]
-       with
-       | `Files files -> files
-       | `Error exit_status ->
-         let stdout = !stdout_ref in
-         let stderr = !stderr_ref in
-         raise
-           (Err.E
-              (Err.create
-                 [ Pp.text "Process xargs exited abnormally."
-                 ; Err.sexp
-                     [%sexp
-                       { exit_status : Exit_status.t; stdout : string; stderr : string }]
-                 ]))
-       | exception exn ->
-         raise
-           (Err.E
-              (Err.create [ Pp.text "Error while running xargs process."; Err.exn exn ]))
-         [@coverage off])
-  in
-  List.concat_map files_to_grep ~f:(fun path_in_repo ->
-    let file_contents =
-      In_channel.read_all
-        (Vcs.Repo_root.append repo_root path_in_repo |> Absolute_path.to_string)
-      |> Vcs.File_contents.create
+      match
+        let prog =
+          match Lazy.force find_xargs with
+          | Some prog -> prog
+          | None -> failwith "Cannot find xargs in PATH" [@coverage off]
+        in
+        let stdin_reader, stdin_writer = Spawn.safe_pipe () in
+        let stdout_reader, stdout_writer = Spawn.safe_pipe () in
+        let stderr_reader, stderr_writer = Spawn.safe_pipe () in
+        let pid =
+          Spawn.spawn
+            ~cwd:(Path (Vcs.Repo_root.to_string repo_root))
+            ~prog
+            ~argv:
+              [ "xargs"
+              ; "-0"
+              ; "grep"
+              ; "--no-messages"
+              ; "-E"
+              ; "-l"
+              ; "--binary-files=without-match"
+              ; cr_pattern_egrep
+              ]
+            ~stdin:stdin_reader
+            ~stdout:stdout_writer
+            ~stderr:stderr_writer
+            ()
+        in
+        Unix.close stdin_reader;
+        Unix.close stdout_writer;
+        Unix.close stderr_writer;
+        let () =
+          let stdin_oc = Unix.out_channel_of_descr stdin_writer in
+          Out_channel.output_string stdin_oc stdin_text;
+          Out_channel.flush stdin_oc;
+          Unix.close stdin_writer
+        in
+        let stdout = read_all_from_fd stdout_reader in
+        stdout_ref := stdout;
+        let stderr = read_all_from_fd stderr_reader in
+        stderr_ref := stderr;
+        let pid', process_status = waitpid_non_intr pid in
+        assert (pid = pid');
+        match process_status with
+        | Unix.WEXITED n ->
+          (* The exit code of [xargs] is not consistent on all of the platforms
+             that we'd like to support. While it always returns [0] in case of
+             a match, when the inner [grep] doesn't find a match and returns
+             [1], the outer call to [xargs] may return [1] or [123] depending
+             on things like the OS. *)
+          if
+            Int.equal n 0
+            || ((Int.equal n 123 || Int.equal n 1 (* On MacOS *))
+                && String.is_empty stderr)
+          then (
+            let files = stdout |> String.split_lines |> List.map ~f:Vcs.Path_in_repo.v in
+            `Files files)
+          else `Error (`Exited n)
+        | Unix.WSIGNALED n -> `Error (`Signaled n) [@coverage off]
+        | Unix.WSTOPPED n -> `Error (`Stopped n) [@coverage off]
+      with
+      | `Files files -> files
+      | `Error exit_status ->
+        let stdout = !stdout_ref in
+        let stderr = !stderr_ref in
+        raise
+          (Err.E
+             (Err.create
+                [ Pp.text "Process xargs exited abnormally."
+                ; Err.sexp
+                    [%sexp
+                      { exit_status : Exit_status.t; stdout : string; stderr : string }]
+                ]))
+      | exception exn ->
+        raise
+          (Err.E
+             (Err.create [ Pp.text "Error while running xargs process."; Err.exn exn ]))
+        [@coverage off]
     in
-    parse_file ~path:path_in_repo ~file_contents)
+    (match files_to_grep with
+     | [] -> []
+     | _ :: _ ->
+       let crs_ignore_rules =
+         let filename = Fsegment.to_string Crs_ignore.filename in
+         let crs_ignore_files =
+           let files_in_repo =
+             if Vcs.Path_in_repo.equal below Vcs.Path_in_repo.root
+             then files_below
+             else Vcs.ls_files vcs ~repo_root ~below:Vcs.Path_in_repo.root
+           in
+           List.filter files_in_repo ~f:(fun file ->
+             String.equal filename (Fpath.basename (Vcs.Path_in_repo.to_fpath file)))
+         in
+         List.map crs_ignore_files ~f:(fun path ->
+           Crs_ignore.File.load_exn
+             ~repo_root
+             ~path
+             ~invalid_patterns_are_errors:false
+             ~emit_github_annotations:false)
+         |> Crs_ignore.Rules.create
+       in
+       List.concat_map files_to_grep ~f:(fun path ->
+         if Crs_ignore.Rules.is_file_ignored crs_ignore_rules ~path
+         then []
+         else (
+           let file_contents =
+             In_channel.read_all
+               (Vcs.Repo_root.append repo_root path |> Absolute_path.to_string)
+             |> Vcs.File_contents.create
+           in
+           parse_file ~path ~file_contents)))
 ;;
 
 module Private = struct
+  module Crs_ignore = Crs_ignore
   module Github_annotation = Github_annotation
   module Invalid_cr_parser = Invalid_cr_parser
   module User_message = User_message
