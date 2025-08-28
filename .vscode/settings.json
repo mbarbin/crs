@@ -21,6 +21,7 @@
         "EINTR",
         "eldev",
         "elisp",
+        "execp",
         "fname",
         "Fpath",
         "Fsegment",
