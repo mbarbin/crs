@@ -62,7 +62,7 @@ jobs:
           echo "BIN_NAME=$bin_name" >> $GITHUB_ENV
 
       - name: Attest Build Provenance
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@v3
         with:
           subject-path: "${{ env.BIN_NAME }}"
 
