@@ -2,3 +2,15 @@
  (dev
   (odoc
    (warnings fatal))))
+
+(rule
+ (alias runtest)
+ (action
+  (diff .dunolint-config.sexp .dunolint-config.sexp.gen)))
+
+(rule
+ (package crs-tests)
+ (action
+  (with-stdout-to
+   .dunolint-config.sexp.gen
+   (run %{bin:generate-dunolint-config}))))

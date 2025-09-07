@@ -1,0 +1,5 @@
+(executable
+ (name main)
+ (public_name generate-dunolint-config)
+ (package crs-tests)
+ (libraries dunolint-lib))

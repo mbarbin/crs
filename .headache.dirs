@@ -1,6 +1,7 @@
 # List of directories for headache.sh
 # Add new directories below. Lines starting with '#' are ignored.
 bin
+dunolint-config
 lib/cr_comment/src
 lib/cr_comment/test
 lib/crs_cli/src

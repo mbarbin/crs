@@ -103,6 +103,11 @@
   conf-hg
   (crs
    (= :version))
+  ;; The version of dunolint-lib used must match the version of the [dunolint]
+  ;; executable that is installed by the CI jobs, in order for the config to be
+  ;; of the expected format.
+  (dunolint-lib
+   (= 0.0.20250907))
   (expect_test_helpers_core
    (>= v0.17))
   (file-rewriter
