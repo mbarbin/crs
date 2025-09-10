@@ -5,12 +5,13 @@
 
 (rule
  (alias runtest)
+ (package crs-tests)
  (action
-  (diff .dunolint-config.sexp .dunolint-config.sexp.gen)))
+  (diff dunolint dunolint-gen)))
 
 (rule
  (package crs-tests)
  (action
   (with-stdout-to
-   .dunolint-config.sexp.gen
+   dunolint-gen
    (run %{bin:generate-dunolint-config}))))
