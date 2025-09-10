@@ -2,4 +2,5 @@
  (name main)
  (public_name generate-dunolint-config)
  (package crs-tests)
- (libraries dunolint-lib))
+ ;; CR mbarbin: Temporary have a fragment triggering a lint to test.
+ (libraries dunolint-lib base))

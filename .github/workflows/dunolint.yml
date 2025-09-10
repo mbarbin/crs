@@ -21,9 +21,7 @@ jobs:
       - name: Install dunolint
         uses: mbarbin/dunolint-actions/setup-dunolint@v1.0.0-alpha.2
         with:
-          dunolint-version: 0.0.20250907
+          dunolint-version: 0.0.20250910-1
 
       - name: Lint Check
         uses: mbarbin/dunolint-actions/lint-check@v1.0.0-alpha.2
-        with:
-          dunolint-config: .dunolint-config.sexp
