@@ -21,7 +21,16 @@
 
 open Dunolint.Config.V0.Std
 
-let skip_paths = [ path (glob "_build/**"); path (glob ".git/**") ]
+let skip_paths =
+  [ path (glob "_build/**")
+  ; path (glob "_coverage/**")
+  ; path (glob ".git/**")
+  ; path (glob "doc/node_modules/**")
+  ; path (glob "doc/build/**")
+  ; path (glob "doc/.docusaurus/**")
+  ]
+;;
+
 let rules = []
 
 let config =
