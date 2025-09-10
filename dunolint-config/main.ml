@@ -19,23 +19,27 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-open Dunolint.Config.V0.Std
+open! Dunolint.Config.V1.Std
 
 let skip_paths =
-  [ path (glob "_build/**")
-  ; path (glob "_coverage/**")
-  ; path (glob ".git/**")
-  ; path (glob "doc/node_modules/**")
-  ; path (glob "doc/build/**")
-  ; path (glob "doc/.docusaurus/**")
+  [ "_build/**"
+  ; "_coverage/**"
+  ; ".git/**"
+  ; "doc/node_modules/**"
+  ; "doc/build/**"
+  ; "doc/.docusaurus/**"
   ]
 ;;
 
-let rules = []
+let rules = ref []
 
 let config =
-  let skip_subtree = cond [ or_ skip_paths, skip_subtree ] in
-  Dunolint.Config.v0 (Dunolint.Config.V0.create ~skip_subtree ~rules ())
+  Dunolint.Config.v1
+    (Dunolint.Config.V1.create
+       (List.concat
+          [ List.map (fun path -> `skip_paths [ Dunolint.Glob.v path ]) skip_paths
+          ; List.rev !rules
+          ]))
 ;;
 
 let () =

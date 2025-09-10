@@ -18,7 +18,7 @@ depends: [
   "conf-git"
   "conf-hg"
   "crs" {= version}
-  "dunolint-lib" {= "0.0.20250907"}
+  "dunolint-lib" {= "0.0.20250910-1"}
   "expect_test_helpers_core" {>= "v0.17"}
   "file-rewriter" {>= "0.0.3"}
   "fpath" {>= "0.7.3"}
