@@ -5,8 +5,8 @@
 (****************************************************************************)
 
 type t =
-  { source : Source.t option [@yojson.option]
-  ; severity : Severity.t option [@yojson.option]
+  { source : Source.t option [@yojson.default None]
+  ; severity : Severity.t option [@yojson.default None]
   ; diagnostics : Diagnostic.t list
   }
 [@@deriving equal, compare, yojson]

@@ -30,6 +30,7 @@
   pp
   pplumbing.err
   pplumbing.pp-tty
+  ppx_deriving_yojson.runtime
   print-table
   reviewdog
   stdio
@@ -51,5 +52,4 @@
    ppx_hash
    ppx_here
    ppx_sexp_conv
-   ppx_sexp_value
-   ppx_yojson_conv)))
+   ppx_sexp_value)))

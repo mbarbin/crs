@@ -6,6 +6,6 @@
 
 type t =
   { start : Position.t
-  ; end_ : Position.t option [@yojson.option] [@key "end"]
+  ; end_ : Position.t option [@yojson.default None] [@key "end"]
   }
 [@@deriving equal, compare, yojson]

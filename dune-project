@@ -48,6 +48,8 @@
    (>= 0.0.14))
   (ppx_compare
    (>= v0.17))
+  (ppx_deriving_yojson
+   (>= 3.9))
   (ppx_enumerate
    (>= v0.17))
   (ppx_hash
@@ -57,8 +59,6 @@
   (ppx_sexp_conv
    (>= v0.17))
   (ppx_sexp_value
-   (>= v0.17))
-  (ppx_yojson_conv
    (>= v0.17))
   (ppxlib
    (>= 0.33))
@@ -129,6 +129,8 @@
    (>= 0.0.14))
   (ppx_compare
    (>= v0.17))
+  (ppx_deriving_yojson
+   (>= 3.9))
   (ppx_enumerate
    (>= v0.17))
   (ppx_expect
@@ -142,10 +144,6 @@
   (ppx_sexp_conv
    (>= v0.17))
   (ppx_sexp_value
-   (>= v0.17))
-  (ppx_yojson_conv
-   (>= v0.17))
-  (ppx_yojson_conv_lib
    (>= v0.17))
   (ppxlib
    (>= 0.33))
@@ -234,6 +232,8 @@
    (>= 0.0.14))
   (ppx_compare
    (>= v0.17))
+  (ppx_deriving_yojson
+   (>= 3.9))
   (ppx_enumerate
    (>= v0.17))
   (ppx_expect
@@ -249,10 +249,6 @@
   (ppx_sexp_conv
    (>= v0.17))
   (ppx_sexp_value
-   (>= v0.17))
-  (ppx_yojson_conv
-   (>= v0.17))
-  (ppx_yojson_conv_lib
    (>= v0.17))
   (ppxlib
    (>= 0.33))

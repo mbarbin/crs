@@ -6,6 +6,6 @@
 
 type t =
   { name : string
-  ; url : string option [@yojson.option]
+  ; url : string option [@yojson.default None]
   }
 [@@deriving equal, compare, yojson]

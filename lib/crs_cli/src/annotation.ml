@@ -126,8 +126,8 @@ let to_reviewdog_diagnostic t : Reviewdog.Diagnostic.t =
   ; severity = Some (Severity.to_reviewdog t.severity)
   ; source = None
   ; code = None
-  ; suggestions = None
+  ; suggestions = []
   ; original_output = Some (Cr_comment.reindented_content t.cr)
-  ; related_locations = None
+  ; related_locations = []
   }
 ;;

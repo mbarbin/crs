@@ -36,21 +36,27 @@ module Annotation_severity = struct
   ;;
 end
 
-open! Ppx_yojson_conv_lib.Yojson_conv.Primitives
-
 module User_handle = struct
   type t = Vcs.User_handle.t [@@deriving sexp_of]
 
-  let t_of_yojson json =
-    match json |> string_of_yojson |> Vcs.User_handle.of_string with
-    | Ok t -> t
-    | Error (`Msg msg) ->
-      raise (Ppx_yojson_conv_lib.Yojson_conv.Of_yojson_error (Failure msg, json))
+  let of_yojson json =
+    match (json : Yojson.Safe.t) with
+    | `String str ->
+      (match Vcs.User_handle.of_string str with
+       | Ok _ as ok -> ok
+       | Error (`Msg msg) -> Error msg)
+    | _ -> Error "User handle expected to be a json string."
   ;;
 end
 
 module User_list = struct
-  type t = User_handle.t list [@@deriving of_yojson]
+  type t = User_handle.t list
+
+  let of_yojson json : (t, string) Result.t =
+    match (json : Yojson.Safe.t) with
+    | `List xs -> Ppx_deriving_yojson_runtime.map_bind User_handle.of_yojson [] xs
+    | _ -> Error "User handle list expected to be a list of json strings."
+  ;;
 end
 
 type t =
@@ -94,6 +100,18 @@ let get_json_enum_constructor json ~loc ~field_name =
 ;;
 
 let parse_json json ~loc ~emit_github_annotations =
+  let of_yojson_exn f json =
+    match f json with
+    | Ok x -> x
+    | Error msg ->
+      Err.raise
+        ~loc
+        Pp.O.
+          [ Pp.text "Invalid config."
+          ; Pp.text "In: " ++ Pp.text (Yojson.Safe.to_string json)
+          ; Pp.text msg
+          ]
+  in
   match json with
   | `Assoc fields ->
     (* Track which fields have been accessed *)
@@ -104,13 +122,13 @@ let parse_json json ~loc ~emit_github_annotations =
     in
     let default_repo_owner =
       match field "default_repo_owner" with
-      | Some json -> Some (User_handle.t_of_yojson json)
+      | Some json -> Some (of_yojson_exn User_handle.of_yojson json)
       | None -> None
     in
     let user_mentions_allowlist =
       let field_name = "user_mentions_allowlist" in
       match field field_name with
-      | Some json -> Some (User_list.t_of_yojson json)
+      | Some json -> Some (of_yojson_exn User_list.of_yojson json)
       | None ->
         (* See [upgrading-crs] guide in the documentation for more details about
            deprecated fields and compatibility transitions in the configs. *)
@@ -129,7 +147,7 @@ let parse_json json ~loc ~emit_github_annotations =
                  ++ Pp.text "."
                ]
              ~hints:[ Pp.text "Upgrade the config to use the new name." ];
-           Some (User_list.t_of_yojson json))
+           Some (of_yojson_exn User_list.of_yojson json))
     in
     let severity_field ~field_name =
       match field field_name with
@@ -213,27 +231,7 @@ let empty =
 
 let load_exn ~path ~emit_github_annotations =
   match Yojson_five.Safe.from_file (Fpath.to_string path) with
+  | Ok json -> parse_json json ~loc:(Loc.of_file ~path) ~emit_github_annotations
   | Error msg ->
     Err.raise ~loc:(Loc.of_file ~path) [ Pp.text "Not a valid json file."; Pp.text msg ]
-  | Ok json ->
-    (match
-       match parse_json json ~loc:(Loc.of_file ~path) ~emit_github_annotations with
-       | t -> Ok t
-       | exception Ppx_yojson_conv_lib.Yojson_conv.Of_yojson_error (exn, json) ->
-         Error (exn, json)
-     with
-     | Ok t -> t
-     | Error (exn, json) ->
-       let msg =
-         match exn with
-         | Failure msg -> Pp.text msg
-         | exn -> Err.exn exn [@coverage off]
-       in
-       Err.raise
-         ~loc:(Loc.of_file ~path)
-         Pp.O.
-           [ Pp.text "Invalid config."
-           ; Pp.text "In: " ++ Pp.text (Yojson.Safe.to_string json)
-           ; msg
-           ])
 ;;
