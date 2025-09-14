@@ -53,8 +53,6 @@ let main =
        ; diagnostics
        }
      in
-     (* CR mbarbin: A test CR in the PR to exercise the end-to-end workflow with
-        reviewdog in the GitHub Actions. *)
      let json = Reviewdog.Diagnostic_result.to_yojson diagnostic_result in
      print_endline (Yojson.Safe.pretty_to_string ~std:true json);
      ())
