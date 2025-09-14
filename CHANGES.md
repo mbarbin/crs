@@ -1,3 +1,13 @@
+## 0.0.2025XXXX (unreleased)
+
+### Changed
+
+- Switch to `ppx_deriving_yojson` (#86, @mbarbin).
+
+### Fixed
+
+- Prepare for compatibility with OCaml 5.4.0 (#86, @mbarbin).
+
 ## 0.0.20250911 (2025-09-11)
 
 ### Added
