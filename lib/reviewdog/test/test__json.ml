@@ -5,20 +5,20 @@
 (****************************************************************************)
 
 let round t =
+  let json = Reviewdog.Diagnostic_result.to_yojson t in
   match
-    t
-    |> Reviewdog.Diagnostic_result.yojson_of_t
+    json
     |> Yojson.Safe.to_basic
     |> Reviewdog_rdf.decode_json_diagnostic_result
     |> Reviewdog_rdf.encode_json_diagnostic_result
     |> Yojson.Basic.pretty_to_string ~std:true
     |> Yojson.Safe.from_string
-    |> Reviewdog.Diagnostic_result.t_of_yojson
+    |> Reviewdog.Diagnostic_result.of_yojson
   with
-  | t -> t
-  | exception Ppx_yojson_conv_lib.Yojson_conv.Of_yojson_error (exn, json) ->
+  | Ok t -> t
+  | Error msg ->
     (let json = Yojson.Safe.to_string json in
-     raise_s [%sexp "Of_yojson_error", { exn : Exn.t; json : string }])
+     raise_s [%sexp "Of_yojson_error", { msg : string; json : string }])
     [@coverage off]
 ;;
 

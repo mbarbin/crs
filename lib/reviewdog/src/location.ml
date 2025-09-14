@@ -6,6 +6,6 @@
 
 type t =
   { path : string
-  ; range : Range.t option [@yojson.option]
+  ; range : Range.t option [@yojson.default None]
   }
 [@@deriving equal, compare, yojson]

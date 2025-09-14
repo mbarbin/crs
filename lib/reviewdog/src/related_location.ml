@@ -5,7 +5,7 @@
 (****************************************************************************)
 
 type t =
-  { message : string option [@yojson.option]
+  { message : string option [@yojson.default None]
   ; location : Location.t
   }
 [@@deriving equal, compare, yojson]

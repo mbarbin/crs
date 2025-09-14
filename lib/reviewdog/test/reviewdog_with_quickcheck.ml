@@ -78,9 +78,9 @@ module Diagnostic = struct
     ; severity : Severity.t option
     ; source : Source.t option
     ; code : Code.t option
-    ; suggestions : Suggestion.t list option
+    ; suggestions : Suggestion.t list
     ; original_output : string option
-    ; related_locations : Related_location.t list option
+    ; related_locations : Related_location.t list
     }
   [@@deriving compare, equal, quickcheck, sexp_of]
 end

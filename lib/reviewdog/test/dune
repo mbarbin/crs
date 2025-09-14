@@ -17,7 +17,6 @@
   base
   base_quickcheck
   expect_test_helpers_core.expect_test_helpers_base
-  ppx_yojson_conv_lib
   reviewdog
   reviewdog_rdf
   yojson)

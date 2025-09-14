@@ -8,7 +8,7 @@ You can choose to install crs from either:
 - From source (most recent version, PRs, etc.)
 - GitHub Actions (see [Setup crs for GitHub Actions](./setup-crs-for-github-actions.md))
 
-Releases are currently versioned using the scheme `0.0.YYYMMDD` while we are in the early stages of development.
+Releases are currently versioned using the scheme `0.0.YYYYMMDD` while we are in the early stages of development.
 
 ## Pre-compiled Binaries
 

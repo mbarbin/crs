@@ -192,7 +192,7 @@ $ crs tools config validate invalid-wrong-type.json
 File "invalid-wrong-type.json", line 1, characters 0-0:
 Error: Invalid config.
 In: "bob"
-list_of_yojson: list needed
+User handle list expected to be a list of json strings.
 [123]
 ```
 

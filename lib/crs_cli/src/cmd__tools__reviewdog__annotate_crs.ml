@@ -53,7 +53,7 @@ let main =
        ; diagnostics
        }
      in
-     let json = Reviewdog.Diagnostic_result.yojson_of_t diagnostic_result in
+     let json = Reviewdog.Diagnostic_result.to_yojson diagnostic_result in
      print_endline (Yojson.Safe.pretty_to_string ~std:true json);
      ())
 ;;

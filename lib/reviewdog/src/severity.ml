@@ -12,11 +12,11 @@ type t =
 [@@deriving compare, equal, enumerate]
 
 let of_string = function
-  | "UNKNOWN_SEVERITY" -> Unknown_severity
-  | "ERROR" -> Error
-  | "WARNING" -> Warning
-  | "INFO" -> Info
-  | str -> failwith (Printf.sprintf "Invalid severity: %s" str)
+  | "UNKNOWN_SEVERITY" -> Ok Unknown_severity
+  | "ERROR" -> Ok Error
+  | "WARNING" -> Ok Warning
+  | "INFO" -> Ok Info
+  | str -> Error (Printf.sprintf "Invalid severity: %s" str)
 ;;
 
 let to_string = function
@@ -26,10 +26,10 @@ let to_string = function
   | Info -> "INFO"
 ;;
 
-let yojson_of_t t = `String (to_string t)
+let to_yojson t = `String (to_string t)
 
-let t_of_yojson json =
+let of_yojson json =
   match (json : Yojson.Safe.t) with
   | `String str | `List [ `String str ] -> of_string str
-  | json -> failwith (Printf.sprintf "Invalid severity: %s" (Yojson.Safe.to_string json))
+  | json -> Error (Printf.sprintf "Invalid severity: %s" (Yojson.Safe.to_string json))
 ;;

@@ -172,7 +172,7 @@ Test invalid type for user handle (should be string, not array).
   File "crs-config.json", line 1, characters 0-0:
   Error: Invalid config.
   In: ["not","a","string"]
-  string_of_yojson: string needed
+  User handle expected to be a json string.
   [123]
 
 Test invalid user handle with forbidden characters.
@@ -198,7 +198,7 @@ Test user_mentions_allowlist with invalid type (integer instead of list).
   File "crs-config.json", line 1, characters 0-0:
   Error: Invalid config.
   In: 42
-  list_of_yojson: list needed
+  User handle list expected to be a list of json strings.
   [123]
 
 Test deprecated field with GitHub annotation warnings.
