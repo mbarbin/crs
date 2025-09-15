@@ -2,3 +2,16 @@
  (dev
   (odoc
    (warnings fatal))))
+
+(rule
+ (alias runtest)
+ (package crs-tests)
+ (action
+  (diff dunolint dunolint-gen)))
+
+(rule
+ (package crs-tests)
+ (action
+  (with-stdout-to
+   dunolint-gen
+   (run %{bin:generate-dunolint-config}))))

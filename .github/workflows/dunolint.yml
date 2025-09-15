@@ -1,0 +1,27 @@
+name: Dunolint Workflows
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - "**" # This will match pull requests targeting any branch
+
+permissions:
+  contents: read
+
+jobs:
+  dunolint-workflows:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Install dunolint
+        uses: mbarbin/dunolint-actions/setup-dunolint@v1.0.0-alpha.2
+        with:
+          dunolint-version: 0.0.20250910-1
+
+      - name: Lint Check
+        uses: mbarbin/dunolint-actions/lint-check@v1.0.0-alpha.2

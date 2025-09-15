@@ -1,0 +1,8 @@
+(lang dune 3.17)
+
+(lock_dir
+ (repositories overlay upstream mbarbin))
+
+(repository
+ (name mbarbin)
+ (url "git+https://github.com/mbarbin/opam-repository.git"))
