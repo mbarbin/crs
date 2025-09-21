@@ -12,6 +12,8 @@
   -open
   Fpath_base
   -open
+  Pplumbing_err
+  -open
   Expect_test_helpers_base
   -open
   Volgo
@@ -28,7 +30,7 @@
   fpath
   fpath-base
   loc
-  pplumbing.err
+  pplumbing-err
   print-table
   printbox
   printbox-md

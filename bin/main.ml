@@ -19,4 +19,4 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-let () = Cmdlang_cmdliner_runner.run Crs_cli.main ~name:"crs" ~version:"%%VERSION%%"
+let () = Cmdlang_cmdliner_err_runner.run Crs_cli.main ~name:"crs" ~version:"%%VERSION%%"

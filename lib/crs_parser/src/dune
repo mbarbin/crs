@@ -10,6 +10,10 @@
   -open
   Base
   -open
+  Pplumbing_pp_tty
+  -open
+  Pplumbing_err
+  -open
   Fpath_base
   -open
   Stdio
@@ -22,8 +26,8 @@
   fpath-base
   loc
   pp
-  pplumbing.err
-  pplumbing.pp-tty
+  pplumbing-err
+  pplumbing-pp-tty
   re
   spawn
   stdio

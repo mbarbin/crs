@@ -30,6 +30,8 @@
    (>= v0.17))
   (cmdlang
    (>= 0.0.9))
+  (cmdlang-cmdliner-err-runner
+   (>= 0.0.16))
   (file-rewriter
    (>= 0.0.3))
   (fpath
@@ -42,8 +44,10 @@
    (>= 0.0.2))
   (pp
    (>= 2.0.0))
-  (pplumbing
-   (>= 0.0.14))
+  (pplumbing-err
+   (>= 0.0.16))
+  (pplumbing-pp-tty
+   (>= 0.0.16))
   (ppx_compare
    (>= v0.17))
   (ppx_deriving_yojson
@@ -95,6 +99,8 @@
    (>= v0.17))
   (cmdlang
    (>= 0.0.9))
+  (cmdlang-cmdliner-err-runner
+   (>= 0.0.16))
   (cmdlang-stdlib-runner
    (>= 0.0.9))
   conf-git
@@ -123,8 +129,10 @@
    (>= 3.1))
   (pp
    (>= 2.0.0))
-  (pplumbing
-   (>= 0.0.14))
+  (pplumbing-err
+   (>= 0.0.16))
+  (pplumbing-pp-tty
+   (>= 0.0.16))
   (ppx_compare
    (>= v0.17))
   (ppx_deriving_yojson
@@ -196,6 +204,8 @@
    (>= 2.8.3))
   (cmdlang
    (>= 0.0.9))
+  (cmdlang-cmdliner-err-runner
+   (>= 0.0.16))
   conf-git
   conf-hg
   (crs
@@ -226,8 +236,10 @@
    (>= 3.1))
   (pp
    (>= 2.0.0))
-  (pplumbing
-   (>= 0.0.14))
+  (pplumbing-err
+   (>= 0.0.16))
+  (pplumbing-pp-tty
+   (>= 0.0.16))
   (ppx_compare
    (>= v0.17))
   (ppx_deriving_yojson
