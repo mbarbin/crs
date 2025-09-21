@@ -9,6 +9,6 @@
   (pps
    -unused-code-warnings=force
    ppx_compare
-   ppx_enumerate
    ppx_deriving_yojson
+   ppx_enumerate
    ppx_sexp_conv)))
