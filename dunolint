@@ -1,0 +1,62 @@
+(lang dunolint 1.0)
+
+;; With some exceptions everything else is instrumented
+(rule
+ (cond
+  ((path (glob lib/reviewdog/**)) return)
+  (true
+   (enforce
+    (dune
+     (instrumentation
+     (backend bisect_ppx)))))))
+
+;; Test lib naming
+(rule
+ (cond
+  ((path
+    (glob **/test/*))
+   (enforce
+    (dune
+     (library
+      (and
+       (public_name
+        (is_prefix crs-tests.))
+       (name
+        (is_suffix _test)))))))))
+
+;; Configure the ppx_js_style linter
+(rule
+ (cond
+  ((path (glob lib/reviewdog/test/**)) return)
+  (true
+   (enforce
+    (dune
+     (lint
+      (pps
+       (and
+        (pp ppx_js_style)
+        (flag
+         (name -allow-let-operators)
+         (param none)
+         (applies_to
+          (pp ppx_js_style)))
+        (flag
+         (name -check-doc-comments)
+         (param none)
+         (applies_to
+          (pp ppx_js_style)))))))))))
+
+;; Configure ppx flags
+(rule
+ (cond
+  ((dune
+    (preprocess (pps true)))
+   (enforce
+    (dune
+     (preprocess
+      (pps
+       (flag
+        (name -unused-code-warnings)
+        (param
+         (equals force))
+        (applies_to driver)))))))))
