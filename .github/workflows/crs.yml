@@ -25,7 +25,7 @@ jobs:
 
       - name: Setup dune
         id: setup-dune
-        uses: ocaml-dune/setup-dune@v0.0.1
+        uses: mbarbin/setup-dune@b5f5154dbe381e40c33d8d22fbc92d6fe3c52c87 # v1.0.0
         with:
           automagic: false
 
