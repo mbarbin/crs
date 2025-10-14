@@ -120,6 +120,8 @@ let parse_json json ~loc ~emit_github_annotations =
       Hash_set.add used_fields field_name;
       get_json_field ~loc ~fields ~field_name
     in
+    (* This allows $schema to be present without causing a warning. *)
+    ignore (field "$schema" : Yojson.Safe.t option);
     let default_repo_owner =
       match field "default_repo_owner" with
       | Some json -> Some (of_yojson_exn User_handle.of_yojson json)

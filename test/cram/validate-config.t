@@ -248,6 +248,3 @@ Test that we support having a field for json schemas.
   > EOF
 
   $ crs tools config validate crs-config.json
-  File "crs-config.json", line 1, characters 0-0:
-  Warning: Unknown config field "$schema".
-  Hint: Check the documentation for valid field names.
