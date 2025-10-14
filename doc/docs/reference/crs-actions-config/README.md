@@ -158,7 +158,7 @@ $ crs tools config validate valid-minimal.json
 <!-- $MDX file=valid-full.json -->
 ```json
 {
-  "$schema": "https://github.com/mbarbin/crs/releases/download/0.0.20250914/crs-config.schema.json",
+  "$schema": "https://github.com/mbarbin/crs/releases/download/0.0.20251014/crs-config.schema.json",
   "default_repo_owner": "alice",
   "user_mentions_allowlist": [
     "alice",
