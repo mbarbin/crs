@@ -219,3 +219,29 @@ Test deprecated field with GitHub annotation warnings.
   was renamed [user_mentions_allowlist].
   Hint: Upgrade the config to use the new name.
   ::warning file=crs-config.json,line=1,col=1,endLine=1,endColumn=1,title=crs::The config field name [user_mentions_whitelist] is deprecated and was renamed%0A[user_mentions_allowlist].%0AHints: Upgrade the config to use the new%0Aname.
+
+Monitor the error message for empty fields.
+
+  $ cat > crs-config.json <<EOF
+  > { "": "hello"
+  > , "default_repo_owner": "user1"
+  > }
+  > EOF
+
+  $ crs tools config validate crs-config.json
+  File "crs-config.json", line 1, characters 0-0:
+  Warning: Unknown config field: []
+  Hint: Check the documentation for valid field names.
+
+Test that we support having a field for json schemas.
+
+  $ cat > crs-config.json <<EOF
+  > { "\$schema": "path/to/crs-config.schema.json"
+  > , "default_repo_owner": "user1"
+  > }
+  > EOF
+
+  $ crs tools config validate crs-config.json
+  File "crs-config.json", line 1, characters 0-0:
+  Warning: Unknown config field: [$schema]
+  Hint: Check the documentation for valid field names.
