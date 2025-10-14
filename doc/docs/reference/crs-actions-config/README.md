@@ -14,7 +14,7 @@ Here's a complete working example showing all available configuration options:
 ```json
 {
   // Enable editor validation and auto-completion (replace with your crs version).
-  "$schema": "https://github.com/mbarbin/crs/releases/download/v1.2.3/crs-config.schema.json",
+  "$schema": "https://github.com/mbarbin/crs/releases/download/0.0.20251014/crs-config.schema.json",
 
   // Alice takes over CRs that are otherwise hard to assign.
   default_repo_owner: "alice",
@@ -97,7 +97,7 @@ Add a `$schema` field to your `.github/crs-config.json` that matches your instal
 <!-- $MDX skip -->
 ```json
 {
-  "$schema": "https://github.com/mbarbin/crs/releases/download/v1.2.3/crs-config.schema.json",
+  "$schema": "https://github.com/mbarbin/crs/releases/download/0.0.20251014/crs-config.schema.json",
   "default_repo_owner": "alice",
   "user_mentions_allowlist": ["alice", "bob"]
 }

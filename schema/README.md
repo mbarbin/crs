@@ -13,7 +13,7 @@ The schema is distributed through two channels:
 1. **GitHub releases** (primary) - `.github/workflows/release-artifacts.yml` extracts the schema from the opam destdir and uploads it as a release artifact
    - Schema is retrieved from `$OPAM_DESTDIR/share/crs/schema/crs-config.schema.json`
    - Uploaded alongside platform-specific binaries
-   - Accessed via versioned URLs like `https://github.com/mbarbin/crs/releases/download/v1.2.3/crs-config.schema.json`
+   - Accessed via versioned URLs like `https://github.com/mbarbin/crs/releases/download/0.0.20251014/crs-config.schema.json`
    - This is the primary distribution mechanism that users reference in their configs
 
 2. **Opam installation** (secondary, for offline use if needed) - `schema/dune` installs the file to `share_root` under `crs/schema/`

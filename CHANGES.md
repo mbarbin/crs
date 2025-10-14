@@ -1,7 +1,8 @@
-## 0.0.2025XXXX (unreleased)
+## 0.0.20251014 (2025-10-14)
 
 ### Added
 
+- Distribute a json schema for `crs-config.json` files (#92, @mbarbin).
 - Added local dunolint invariants (#91, @mbarbin).
 
 ### Changed
