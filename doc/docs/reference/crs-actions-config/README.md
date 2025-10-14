@@ -2,19 +2,20 @@
 
 This document provides a complete reference for the `crs-config.json` configuration file used by CRs Actions in GitHub Actions workflows.
 
-## Configuration File Location
+## Overview
 
-The configuration file should be placed at `.github/crs-config.json` in your repository root.
+The configuration file should be placed at `.github/crs-config.json` in your repository root. The file uses JSON5 format, which supports comments and trailing commas.
 
-## Configuration Schema
+## Quick Start
 
-The file uses JSON5 format, which supports comments and trailing commas.
-
-### Complete Example
+Here's a complete working example showing all available configuration options:
 
 <!-- $MDX file=complete-example.json -->
 ```json
 {
+  // Enable editor validation and auto-completion (replace with your crs version).
+  "$schema": "https://github.com/mbarbin/crs/releases/download/v1.2.3/crs-config.schema.json",
+
   // Alice takes over CRs that are otherwise hard to assign.
   default_repo_owner: "alice",
 
@@ -32,15 +33,9 @@ The file uses JSON5 format, which supports comments and trailing commas.
 }
 ```
 
-You can validate a configuration file using the *crs* cli like this:
+Replace `v1.2.3` with your installed `crs` version (check with `crs --version`). The `$schema` field enables editor validation and auto-completion features (see [Validation](#validation) section below).
 
-```bash
-$ crs tools config validate complete-example.json
-```
-
-The command silently exit 0 when the config is valid, or otherwise complains on *stderr* and a non zero exit code (examples below).
-
-## Fields Reference
+## Configuration Reference
 
 ### `default_repo_owner`
 
@@ -55,11 +50,13 @@ If the repository is owned by an individual, this would typically be that user. 
 
 - **Type:** `array of strings` (optional)
 - **Example:** `["alice", "bob", "charlie"]`
-- **Default** same as supplying an empty array (no user enabled).
+- **Default:** `[]` (empty array - no mentions allowed)
 
-Enables a specific list of users to be notified in annotation comments when notifications are requested. This is a protection measure to avoid spamming users that do not have ties to a repository in particular, or simply do not wish to be notified via CRs.
+List of users who can be mentioned in CR annotations using `@username` mentions. Only users explicitly listed here can be notified through GitHub mentions.
 
-When specified, only users in this allowlist can be mentioned in CR annotations. This helps prevent typos in usernames and ensures CRs are only assigned to valid team members.
+If this field is not provided, it defaults to an empty list, meaning no user mentions are allowed. This is a protection measure to avoid spamming users who do not have ties to the repository or do not wish to be notified via CRs.
+
+Adding users to this list enables notifications for them and helps prevent typos in usernames by restricting mentions to known team members.
 
 ### `invalid_crs_annotation_severity`
 
@@ -77,15 +74,56 @@ Controls the GitHub annotation severity level for invalid CR syntax. This determ
 
 Controls the GitHub annotation severity level for CRs that are due now (such as in the PR where they were found).
 
-## GitHub Annotation Severity Levels
+#### About Annotation Severity Levels
 
-The severity levels map to GitHub's annotation levels. See [GitHub's documentation on annotation levels](https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-error-message) for details on how these are displayed in the UI.
+The severity levels map to GitHub's annotation levels (see [GitHub's documentation](https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-error-message) for details):
 
 - **Error**: Most prominent display, typically for critical issues
-- **Warning**: Medium prominence, suitable for issues that should be addressed (default for `invalid_crs_annotation_severity`)
-- **Info**: Informational notice messages (default for `crs_due_now_annotation_severity`)
+- **Warning**: Medium prominence, suitable for issues that should be addressed
+- **Info**: Informational notice messages
 
 ## Validation
+
+Configuration files can be validated in two ways: real-time validation in your editor using JSON Schema, or batch validation using the `crs` CLI command.
+
+### Editor Validation with JSON Schema
+
+CRs provides a JSON Schema that enables real-time validation and editor features like auto-completion, inline validation, and hover documentation.
+
+#### Enabling Schema Validation
+
+Add a `$schema` field to your `.github/crs-config.json` that matches your installed `crs` version:
+
+<!-- $MDX skip -->
+```json
+{
+  "$schema": "https://github.com/mbarbin/crs/releases/download/v1.2.3/crs-config.schema.json",
+  "default_repo_owner": "alice",
+  "user_mentions_allowlist": ["alice", "bob"]
+}
+```
+
+Replace `v1.2.3` with your installed `crs` version. Check your version with:
+
+<!-- $MDX skip -->
+```bash
+$ crs --version
+```
+
+**Important:** When you upgrade `crs`, update the version in the `$schema` URL to match. Editors cache schemas, so using `latest` can cause validation issues when the cached schema doesn't match your installed version.
+
+#### Editor Features
+
+Once the `$schema` field is added, editors like VS Code will:
+
+- **Validate** - Show red squiggles for invalid values or unknown fields
+- **Auto-complete** - Press Ctrl+Space to see available fields and enum values
+- **Hover documentation** - Hover over fields to see their descriptions and valid values
+- **Inline hints** - Get suggestions for default values
+
+**Note:** Editors cache the schema locally after the first fetch, so schema validation works offline once cached.
+
+### Command-Line Validation
 
 The `crs` CLI provides a validation command to check your configuration files. The validation checks:
 - JSON syntax correctness
@@ -93,7 +131,7 @@ The `crs` CLI provides a validation command to check your configuration files. T
 - Value type correctness
 - Enum values validity
 
-### Basic Validation
+#### Basic Validation
 
 To validate your configuration file:
 
@@ -102,11 +140,9 @@ To validate your configuration file:
 crs tools config validate .github/crs-config.json
 ```
 
-### Validation Examples
+#### Validation Examples
 
-#### Valid Minimal Configuration
-
-At the moment all fields in the config are optional, so an empty json object is a minimal valid configuration:
+**Valid Minimal Configuration** - At the moment all fields in the config are optional, so an empty json object is a minimal valid configuration:
 
 <!-- $MDX file=valid-minimal.json -->
 ```json
@@ -117,13 +153,12 @@ At the moment all fields in the config are optional, so an empty json object is 
 $ crs tools config validate valid-minimal.json
 ```
 
-#### Valid Full Configuration
-
-A complete configuration with all optional fields, in regular json:
+**Valid Full Configuration** - A complete configuration with all optional fields, in regular json:
 
 <!-- $MDX file=valid-full.json -->
 ```json
 {
+  "$schema": "https://github.com/mbarbin/crs/releases/download/0.0.20250914/crs-config.schema.json",
   "default_repo_owner": "alice",
   "user_mentions_allowlist": [
     "alice",
@@ -139,9 +174,7 @@ A complete configuration with all optional fields, in regular json:
 $ crs tools config validate valid-full.json
 ```
 
-#### Configuration with Selected Fields Only
-
-Since all fields are optional, you can have a configuration with just specific fields:
+**Configuration with Selected Fields Only** - Since all fields are optional, you can have a configuration with just specific fields:
 
 <!-- $MDX file=minimal-with-allowlist.json -->
 ```json
@@ -154,11 +187,7 @@ Since all fields are optional, you can have a configuration with just specific f
 $ crs tools config validate minimal-with-allowlist.json
 ```
 
-### Invalid Config Examples
-
-#### Warning: Use of wrapped enum
-
-Enum values used to be wrapped in the config format. This is still supported for compatibility but now this creates a warning:
+**Warning: Use of wrapped enum** - Enum values used to be wrapped in the config format. This is still supported for compatibility but now this creates a warning:
 
 <!-- $MDX file=wrapped-enum.json -->
 ```json
@@ -175,9 +204,7 @@ expected to be a json string rather than a list.
 Hint: Change it to simply: "Warning"
 ```
 
-#### Invalid: Wrong Type for Field
-
-Configuration with incorrect type for `user_mentions_allowlist`:
+**Invalid: Wrong Type for Field** - Configuration with incorrect type for `user_mentions_allowlist`:
 
 <!-- $MDX file=invalid-wrong-type.json -->
 ```json
@@ -196,9 +223,7 @@ User handle list expected to be a list of json strings.
 [123]
 ```
 
-#### Invalid: Bad Severity Value
-
-Configuration with invalid annotation severity:
+**Invalid: Bad Severity Value** - Configuration with invalid annotation severity:
 
 <!-- $MDX file=invalid-severity.json -->
 ```json

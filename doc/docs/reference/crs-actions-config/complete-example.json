@@ -1,4 +1,7 @@
 {
+  // Enable editor validation and auto-completion (replace with your crs version).
+  "$schema": "https://github.com/mbarbin/crs/releases/download/v1.2.3/crs-config.schema.json",
+
   // Alice takes over CRs that are otherwise hard to assign.
   default_repo_owner: "alice",
 
