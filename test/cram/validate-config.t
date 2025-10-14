@@ -92,11 +92,11 @@ Unknown fields.
 
   $ crs tools config validate crs-config.json
   File "crs-config.json", line 1, characters 0-0:
-  Warning: Unknown config field: [unknown_field2]
+  Warning: Unknown config field "unknown_field2".
   Hint: Check the documentation for valid field names.
   
   File "crs-config.json", line 1, characters 0-0:
-  Warning: Unknown config field: [unknown_field1]
+  Warning: Unknown config field "unknown_field1".
   Hint: Check the documentation for valid field names.
 
 Invalid value.
@@ -236,7 +236,7 @@ Monitor the error message for empty fields.
 
   $ crs tools config validate crs-config.json
   File "crs-config.json", line 1, characters 0-0:
-  Warning: Unknown config field: []
+  Warning: Unknown config field "".
   Hint: Check the documentation for valid field names.
 
 Test that we support having a field for json schemas.
@@ -249,5 +249,5 @@ Test that we support having a field for json schemas.
 
   $ crs tools config validate crs-config.json
   File "crs-config.json", line 1, characters 0-0:
-  Warning: Unknown config field: [$schema]
+  Warning: Unknown config field "$schema".
   Hint: Check the documentation for valid field names.
