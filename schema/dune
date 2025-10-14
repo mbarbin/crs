@@ -1,0 +1,5 @@
+(install
+ (package crs)
+ (section share_root)
+ (files
+  (crs-config.schema.json as crs/schema/crs-config.schema.json)))

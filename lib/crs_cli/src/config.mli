@@ -44,9 +44,9 @@ type t [@@deriving sexp_of]
 (** {1 Getters} *)
 
 (** [default_repo_owner] When not in a PR, the default_repo_owner may be used to
-    assigned certain kinds of otherwise not easy to assign to a particular user.
-    For example, invalid CRs when creating CRs annotation for a particular
-    commit outside of a pull request.
+    assign certain kinds of CRs that are otherwise not easy to assign to a
+    particular user. For example, invalid CRs when creating CR annotations for
+    a particular commit outside of a pull request.
 
     If the repository is owned by an individual, this would typically be that
     user. If the repository is owned by an organization, this may be set to a
@@ -54,13 +54,22 @@ type t [@@deriving sexp_of]
     isn't set, such CRs will simply not be assigned to any one in particular. *)
 val default_repo_owner : t -> Vcs.User_handle.t option
 
-(** [user_mentions_allowlist] enables a specific list of users to be notified in
-    annotations comments, when notifications is requested. This is a protection
-    measure to avoid spamming users that do not have ties to a repo in
-    particular, or simply do not wish to be notified via CRs. *)
+(** [user_mentions_allowlist] is the list of users who can be mentioned in
+    annotation comments using ["@" ^ user_name] mentions. Only users in this
+    list can be notified. If not provided, defaults to an empty list (no
+    mentions allowed). This is a protection measure to avoid spamming users that
+    do not have ties to a repo in particular, or simply do not wish to be
+    notified via CRs. *)
 val user_mentions_allowlist : t -> Vcs.User_handle.t list option
 
+(** [invalid_crs_annotation_severity] controls the GitHub annotation severity
+    level for invalid CR syntax. This determines how prominently invalid CRs
+    are displayed in GitHub's UI. Defaults to [Warning] if not provided. *)
 val invalid_crs_annotation_severity : t -> Annotation_severity.t option
+
+(** [crs_due_now_annotation_severity] controls the GitHub annotation severity
+    level for CRs that are due now (such as in the PR where they were found).
+    Defaults to [Info] if not provided. *)
 val crs_due_now_annotation_severity : t -> Annotation_severity.t option
 
 (** {1 Create configs} *)

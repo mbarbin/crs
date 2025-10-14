@@ -1,4 +1,14 @@
 {
+  // This config uses a relative path to the schema from the source tree. This
+  // is intentional: in this repository, CRs Actions (.github/workflows/crs.yml)
+  // builds and runs the crs binary from the checked-out sources, not from a
+  // versioned release. The schema reference must stay in sync with the local
+  // build to validate against the latest config format.
+  //
+  // Normal repositories using crs should instead reference a version-pinned
+  // schema URL matching their installed crs version. See the documentation at
+  // doc/docs/reference/crs-actions-config/README.md for details.
+  "$schema": "../schema/crs-config.schema.json",
   "default_repo_owner": "mbarbin",
   "user_mentions_allowlist": [
     "mbarbin"

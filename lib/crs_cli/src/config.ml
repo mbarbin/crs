@@ -114,12 +114,14 @@ let parse_json json ~loc ~emit_github_annotations =
   in
   match json with
   | `Assoc fields ->
-    (* Track which fields have been accessed *)
+    (* Track which fields have been accessed. *)
     let used_fields = Hash_set.create (module String) in
     let field field_name =
       Hash_set.add used_fields field_name;
       get_json_field ~loc ~fields ~field_name
     in
+    (* This allows $schema to be present without causing a warning. *)
+    ignore (field "$schema" : Yojson.Safe.t option);
     let default_repo_owner =
       match field "default_repo_owner" with
       | Some json -> Some (of_yojson_exn User_handle.of_yojson json)
@@ -192,7 +194,7 @@ let parse_json json ~loc ~emit_github_annotations =
         User_message.warning
           ~loc
           ~emit_github_annotations
-          Pp.O.[ Pp.text "Unknown config field: " ++ Pp_tty.kwd (module String) name ]
+          [ Pp.textf "Unknown config field \"%s\"." name ]
           ~hints:[ Pp.text "Check the documentation for valid field names." ]);
     { default_repo_owner
     ; user_mentions_allowlist

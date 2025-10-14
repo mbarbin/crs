@@ -1,3 +1,13 @@
+## 0.0.2025XXXX (unreleased)
+
+### Added
+
+- Added local dunolint invariants (#91, @mbarbin).
+
+### Changed
+
+- Switch to `pplumbing-*` split packages (#87, @mbarbin).
+
 ## 0.0.20250914 (2025-09-14)
 
 ### Changed

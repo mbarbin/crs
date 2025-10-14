@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/mbarbin/crs/releases/download/%%VERSION%%/crs-config.schema.json",
+  "title": "CRs Actions Config",
+  "description": "Configuration file for CRs Actions in GitHub workflows",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "The JSON schema for this configuration file"
+    },
+    "default_repo_owner": {
+      "type": "string",
+      "description": "When not in a pull request context, this username may be used to assign certain kinds of CRs that are otherwise not easy to assign to a particular user. For example, invalid CRs when creating CR annotations for a particular commit outside of a pull request.",
+      "examples": ["alice", "bob"]
+    },
+    "user_mentions_allowlist": {
+      "type": "array",
+      "description": "List of users who can be mentioned in CR annotations using @ mentions. Only users in this list can be notified. Defaults to an empty list (no mentions allowed) if not provided. This is a protection measure to avoid spamming users.",
+      "items": {
+        "type": "string",
+        "description": "GitHub username"
+      },
+      "uniqueItems": true,
+      "default": [],
+      "examples": [["alice", "bob", "charlie"]]
+    },
+    "invalid_crs_annotation_severity": {
+      "type": "string",
+      "description": "Controls the GitHub annotation severity level for invalid CR syntax. This determines how prominently invalid CRs are displayed in GitHub's UI.",
+      "enum": ["Error", "Warning", "Info"],
+      "default": "Warning"
+    },
+    "crs_due_now_annotation_severity": {
+      "type": "string",
+      "description": "Controls the GitHub annotation severity level for CRs that are due now (such as in the PR where they were found).",
+      "enum": ["Error", "Warning", "Info"],
+      "default": "Info"
+    }
+  }
+}
