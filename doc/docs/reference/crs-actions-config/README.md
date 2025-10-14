@@ -33,7 +33,7 @@ Here's a complete working example showing all available configuration options:
 }
 ```
 
-Replace `v1.2.3` with your installed `crs` version (check with `crs --version`). The `$schema` field enables editor validation and auto-completion features (see [Validation](#validation) section below).
+Replace `0.0.20251014` with your installed `crs` version (check with `crs --version`). The `$schema` field enables editor validation and auto-completion features (see [Validation](#validation) section below).
 
 ## Configuration Reference
 
@@ -103,7 +103,7 @@ Add a `$schema` field to your `.github/crs-config.json` that matches your instal
 }
 ```
 
-Replace `v1.2.3` with your installed `crs` version. Check your version with:
+Replace `0.0.20251014` with your installed `crs` version. Check your version with:
 
 <!-- $MDX skip -->
 ```bash
