@@ -82,15 +82,21 @@ at some future point.
   ((invalid_crs_annotation_severity Warning)
    (crs_due_now_annotation_severity Info))
 
-Unknown field.
+Unknown fields.
 
   $ cat > crs-config.json <<EOF
-  > { unknown_field: "Hello" }
+  > { unknown_field2: "Hello"
+  > , unknown_field1: "Hello"
+  > }
   > EOF
 
   $ crs tools config validate crs-config.json
   File "crs-config.json", line 1, characters 0-0:
-  Warning: Unknown config field: [unknown_field]
+  Warning: Unknown config field: [unknown_field2]
+  Hint: Check the documentation for valid field names.
+  
+  File "crs-config.json", line 1, characters 0-0:
+  Warning: Unknown config field: [unknown_field1]
   Hint: Check the documentation for valid field names.
 
 Invalid value.
