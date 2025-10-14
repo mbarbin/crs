@@ -1,4 +1,10 @@
 {
+    "files.associations": {
+        "**/crs-config.json": "jsonc"
+    },
+    "[jsonc]": {
+        "files.insertFinalNewline": true
+    },
     "cSpell.words": [
         "alist",
         "autofmt",
