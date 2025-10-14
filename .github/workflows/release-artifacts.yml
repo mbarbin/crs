@@ -60,6 +60,9 @@ jobs:
           bin_name="${{ github.workspace }}/crs-$TAG_NAME-$os-$arch"
           cp "$OPAM_DESTDIR/bin/crs" $bin_name
           echo "BIN_NAME=$bin_name" >> $GITHUB_ENV
+          schema_name="${{ github.workspace }}/crs-config.schema.json"
+          cp "$OPAM_DESTDIR/share/crs/schema/crs-config.schema.json" $schema_name
+          echo "SCHEMA_NAME=$schema_name" >> $GITHUB_ENV
 
       - name: Attest Build Provenance
         uses: actions/attest-build-provenance@v3
@@ -70,4 +73,6 @@ jobs:
         uses: softprops/action-gh-release@72f2c25fcb47643c292f7107632f7a47c1df5cd8 # v2.3.2
         with:
           tag_name: ${{ env.TAG_NAME }}
-          files: ${{ env.BIN_NAME }}
+          files: |
+            ${{ env.BIN_NAME }}
+            ${{ env.SCHEMA_NAME }}
