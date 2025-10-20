@@ -22,7 +22,7 @@ depends: [
   "expect_test_helpers_core" {>= "v0.17"}
   "file-rewriter" {>= "0.0.3"}
   "fpath" {>= "0.7.3"}
-  "fpath-base" {>= "0.3.1"}
+  "fpath-base" {>= "0.4.0"}
   "loc" {>= "0.2.2"}
   "ocaml-protoc" {>= "3.1"}
   "pageantty" {>= "0.0.2"}

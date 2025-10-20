@@ -64,7 +64,7 @@ let%expect_test "parent of relative_path" =
   test (Relative_path.v "a/b/");
   [%expect {| (a/) |}];
   test Relative_path.empty;
-  [%expect {| (./../) |}];
+  [%expect {| () |}];
   ()
 ;;
 
@@ -82,25 +82,15 @@ let%expect_test "relative empty chop_prefix" =
       ~prefix:Relative_path.empty
       (Vcs.Path_in_repo.to_relative_path path)
   in
-  (* mbarbin: At the moment this doesn't work. I think of this as a bug of
-     [Relative_path.chop_prefix], or at least this is not a behavior I intended.
-     I will consider fixing this upstream and reconsider the test here.
-     Currently we leave it as monitoring the current behavior for reference. *)
-  require [%here] (Option.is_none suffix);
+  require [%here] (Option.is_some suffix);
   print_s [%sexp { suffix : Relative_path.t option }];
-  [%expect {| ((suffix ())) |}];
+  [%expect {| ((suffix (.crs-ignore))) |}];
   ()
 ;;
 
-let better_chop_prefix ~prefix path =
-  if Relative_path.equal prefix Relative_path.empty
-  then Some path
-  else Relative_path.chop_prefix ~prefix path
-;;
-
-let%expect_test "better_chop_prefix" =
+let%expect_test "chop_prefix" =
   let suffix =
-    better_chop_prefix
+    Relative_path.chop_prefix
       ~prefix:Relative_path.empty
       (Vcs.Path_in_repo.to_relative_path path)
   in
@@ -108,13 +98,13 @@ let%expect_test "better_chop_prefix" =
   print_s [%sexp { suffix : Relative_path.t option }];
   [%expect {| ((suffix (.crs-ignore))) |}];
   let suffix =
-    better_chop_prefix ~prefix:(Relative_path.v "./a/") (Relative_path.v "a/b")
+    Relative_path.chop_prefix ~prefix:(Relative_path.v "./a/") (Relative_path.v "a/b")
   in
   require [%here] (Option.is_some suffix);
   print_s [%sexp { suffix : Relative_path.t option }];
   [%expect {| ((suffix (b))) |}];
   let suffix =
-    better_chop_prefix ~prefix:(Relative_path.v "./a") (Relative_path.v "a/b")
+    Relative_path.chop_prefix ~prefix:(Relative_path.v "./a") (Relative_path.v "a/b")
   in
   require [%here] (Option.is_some suffix);
   print_s [%sexp { suffix : Relative_path.t option }];

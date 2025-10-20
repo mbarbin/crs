@@ -181,12 +181,6 @@ module File = struct
   ;;
 end
 
-let better_chop_prefix ~prefix path =
-  if Relative_path.equal prefix Relative_path.empty
-  then Some path
-  else Relative_path.chop_prefix ~prefix path
-;;
-
 module Rules = struct
   module Marked_entry = struct
     type t =
@@ -204,7 +198,7 @@ module Rules = struct
       }
 
     let is_file_ignored t ~path =
-      match better_chop_prefix ~prefix:t.directory path with
+      match Relative_path.chop_prefix ~prefix:t.directory path with
       | None ->
         (* File is not in the same directory, thus it is not ignored by the
            patterns of this file. This execution path is currently not exercised

@@ -40,13 +40,17 @@ let loc_to_string loc ~repo_root ~below ~path_display_mode =
     match (path_display_mode : Path_display_mode.t) with
     | Absolute ->
       (Vcs.Repo_root.append repo_root fname |> Absolute_path.to_string) [@coverage off]
+    | Relative_to_repo_root -> Printf.sprintf "./%s" (Vcs.Path_in_repo.to_string fname)
     | Relative_to_cwd ->
       (match
          Relative_path.chop_prefix (Vcs.Path_in_repo.to_relative_path fname) ~prefix:below
        with
        | Some path -> Printf.sprintf "./%s" (Relative_path.to_string path)
-       | None -> Printf.sprintf "./%s" (Vcs.Path_in_repo.to_string fname))
-    | Relative_to_repo_root -> Printf.sprintf "./%s" (Vcs.Path_in_repo.to_string fname)
+       | None ->
+         (* From [fpath-base.0.4.0], [chop_prefix] returns [Some fname] when
+            below is the empty path. We are not grepping for CRs upward of the
+            [below] directory, thus this case is not exercised. *)
+         Printf.sprintf "./%s" (Vcs.Path_in_repo.to_string fname) [@coverage off])
   in
   Printf.sprintf "%s:%d:" path loc.pos_lnum
 ;;
