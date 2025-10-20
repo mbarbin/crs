@@ -20,6 +20,9 @@
 (********************************************************************************)
 
 open! Import
+module Json = Yojson_five.Basic
+
+exception Json_error of Json.t * string
 
 module Annotation_severity = struct
   type t =
@@ -39,23 +42,24 @@ end
 module User_handle = struct
   type t = Vcs.User_handle.t [@@deriving sexp_of]
 
-  let of_yojson json =
-    match (json : Yojson.Safe.t) with
+  let of_json json =
+    match (json : Json.t) with
     | `String str ->
       (match Vcs.User_handle.of_string str with
-       | Ok _ as ok -> ok
-       | Error (`Msg msg) -> Error msg)
-    | _ -> Error "User handle expected to be a json string."
+       | Ok t -> t
+       | Error (`Msg msg) -> raise (Json_error (json, msg)))
+    | _ -> raise (Json_error (json, "User handle expected to be a json string."))
   ;;
 end
 
 module User_list = struct
   type t = User_handle.t list
 
-  let of_yojson json : (t, string) Result.t =
-    match (json : Yojson.Safe.t) with
-    | `List xs -> Ppx_deriving_yojson_runtime.map_bind User_handle.of_yojson [] xs
-    | _ -> Error "User handle list expected to be a list of json strings."
+  let of_json json : t =
+    match (json : Json.t) with
+    | `List xs -> List.map xs ~f:User_handle.of_json
+    | _ ->
+      raise (Json_error (json, "User handle list expected to be a list of json strings."))
   ;;
 end
 
@@ -67,23 +71,6 @@ type t =
   }
 [@@deriving sexp_of]
 
-let get_json_field ~loc ~fields ~field_name =
-  match
-    List.filter_map fields ~f:(fun (name, json) ->
-      Option.some_if (String.equal name field_name) json)
-  with
-  | [] -> None
-  | [ f ] -> Some f
-  | _ :: _ :: _ ->
-    Err.raise
-      ~loc
-      Pp.O.
-        [ Pp.text "Json object field "
-          ++ Pp_tty.kwd (module String) field_name
-          ++ Pp.text " is duplicated in this config."
-        ]
-;;
-
 let get_json_enum_constructor json ~loc ~field_name =
   match json with
   | `String str -> `Unwrapped str
@@ -92,114 +79,118 @@ let get_json_enum_constructor json ~loc ~field_name =
     Err.raise
       ~loc
       Pp.O.
-        [ Pp.text "In: " ++ Pp.text (Yojson.Safe.to_string json)
+        [ Pp.text "In: " ++ Pp.text (Json.to_string json)
         ; Pp.text "Field "
           ++ Pp_tty.kwd (module String) field_name
           ++ Pp.text " expected to be a json string."
         ]
 ;;
 
-let parse_json json ~loc ~emit_github_annotations =
-  let of_yojson_exn f json =
-    match f json with
-    | Ok x -> x
-    | Error msg ->
+let raise_duplicate_field ~loc field_name =
+  Err.raise
+    ~loc
+    Pp.O.
+      [ Pp.text "Json object field "
+        ++ Pp_tty.kwd (module String) field_name
+        ++ Pp.text " is duplicated in this config."
+      ]
+;;
+
+let set_field_once ~loc ~field_name ref_cell value =
+  match !ref_cell with
+  | Some _ -> raise_duplicate_field ~loc field_name
+  | None -> ref_cell := Some value
+;;
+
+let parse_severity_field ~loc ~emit_github_annotations ~field_name json =
+  let parse_string str =
+    match Annotation_severity.of_string str with
+    | Some t -> t
+    | None ->
       Err.raise
         ~loc
         Pp.O.
-          [ Pp.text "Invalid config."
-          ; Pp.text "In: " ++ Pp.text (Yojson.Safe.to_string json)
-          ; Pp.text msg
+          [ Pp.text "Field " ++ Pp_tty.kwd (module String) field_name ++ Pp.text ":"
+          ; Pp.textf "Unsupported annotation severity %S." str
           ]
   in
+  match get_json_enum_constructor json ~loc ~field_name with
+  | `Unwrapped str -> parse_string str
+  | `Wrapped str ->
+    let severity = parse_string str in
+    User_message.warning
+      ~loc
+      ~emit_github_annotations
+      Pp.O.
+        [ Pp.text "The config field name "
+          ++ Pp_tty.kwd (module String) field_name
+          ++ Pp.text " is now expected to be a json string rather than a list."
+        ]
+      ~hints:[ Pp.textf "Change it to simply: %S" str ];
+    severity
+;;
+
+let parse_json json ~loc ~emit_github_annotations =
   match json with
   | `Assoc fields ->
-    (* Track which fields have been accessed. *)
-    let used_fields = Hash_set.create (module String) in
-    let field field_name =
-      Hash_set.add used_fields field_name;
-      get_json_field ~loc ~fields ~field_name
-    in
-    (* This allows $schema to be present without causing a warning. *)
-    ignore (field "$schema" : Yojson.Safe.t option);
-    let default_repo_owner =
-      match field "default_repo_owner" with
-      | Some json -> Some (of_yojson_exn User_handle.of_yojson json)
-      | None -> None
-    in
-    let user_mentions_allowlist =
-      let field_name = "user_mentions_allowlist" in
-      match field field_name with
-      | Some json -> Some (of_yojson_exn User_list.of_yojson json)
-      | None ->
+    let default_repo_owner_ref = ref None in
+    let user_mentions_allowlist_ref = ref None in
+    let invalid_crs_annotation_severity_ref = ref None in
+    let crs_due_now_annotation_severity_ref = ref None in
+    List.iter fields ~f:(fun (field_name, value) ->
+      match field_name with
+      | "$schema" ->
+        (* This allows $schema to be present without causing a warning. *)
+        ()
+      | "default_repo_owner" ->
+        set_field_once ~loc ~field_name default_repo_owner_ref (User_handle.of_json value)
+      | "user_mentions_allowlist" ->
+        set_field_once
+          ~loc
+          ~field_name
+          user_mentions_allowlist_ref
+          (User_list.of_json value)
+      | "user_mentions_whitelist" ->
         (* See [upgrading-crs] guide in the documentation for more details about
            deprecated fields and compatibility transitions in the configs. *)
-        let deprecated_field_name = "user_mentions_whitelist" in
-        (match field deprecated_field_name with
-         | None -> None
-         | Some json ->
-           User_message.warning
-             ~loc
-             ~emit_github_annotations
-             Pp.O.
-               [ Pp.text "The config field name "
-                 ++ Pp_tty.kwd (module String) deprecated_field_name
-                 ++ Pp.text " is deprecated and was renamed "
-                 ++ Pp_tty.kwd (module String) field_name
-                 ++ Pp.text "."
-               ]
-             ~hints:[ Pp.text "Upgrade the config to use the new name." ];
-           Some (of_yojson_exn User_list.of_yojson json))
-    in
-    let severity_field ~field_name =
-      match field field_name with
-      | None -> None
-      | Some json ->
-        let parse_string str =
-          match Annotation_severity.of_string str with
-          | Some t -> t
-          | None ->
-            Err.raise
-              ~loc
-              Pp.O.
-                [ Pp.text "Field " ++ Pp_tty.kwd (module String) field_name ++ Pp.text ":"
-                ; Pp.textf "Unsupported annotation severity %S." str
-                ]
-        in
-        (match get_json_enum_constructor json ~loc ~field_name with
-         | `Unwrapped str -> Some (parse_string str)
-         | `Wrapped str ->
-           let severity = parse_string str in
-           User_message.warning
-             ~loc
-             ~emit_github_annotations
-             Pp.O.
-               [ Pp.text "The config field name "
-                 ++ Pp_tty.kwd (module String) field_name
-                 ++ Pp.text " is now expected to be a json string rather than a list."
-               ]
-             ~hints:[ Pp.textf "Change it to simply: %S" str ];
-           Some severity)
-    in
-    let invalid_crs_annotation_severity =
-      severity_field ~field_name:"invalid_crs_annotation_severity"
-    in
-    let crs_due_now_annotation_severity =
-      severity_field ~field_name:"crs_due_now_annotation_severity"
-    in
-    (* Emit warnings for any unknown fields *)
-    List.iter fields ~f:(fun (name, _) ->
-      if not (Hash_set.mem used_fields name)
-      then
         User_message.warning
           ~loc
           ~emit_github_annotations
-          [ Pp.textf "Unknown config field \"%s\"." name ]
+          Pp.O.
+            [ Pp.text "The config field name "
+              ++ Pp_tty.kwd (module String) field_name
+              ++ Pp.text " is deprecated and was renamed "
+              ++ Pp_tty.kwd (module String) "user_mentions_allowlist"
+              ++ Pp.text "."
+            ]
+          ~hints:[ Pp.text "Upgrade the config to use the new name." ];
+        set_field_once
+          ~loc
+          ~field_name:"user_mentions_allowlist"
+          user_mentions_allowlist_ref
+          (User_list.of_json value)
+      | "invalid_crs_annotation_severity" ->
+        set_field_once
+          ~loc
+          ~field_name
+          invalid_crs_annotation_severity_ref
+          (parse_severity_field ~loc ~emit_github_annotations ~field_name value)
+      | "crs_due_now_annotation_severity" ->
+        set_field_once
+          ~loc
+          ~field_name
+          crs_due_now_annotation_severity_ref
+          (parse_severity_field ~loc ~emit_github_annotations ~field_name value)
+      | _ ->
+        User_message.warning
+          ~loc
+          ~emit_github_annotations
+          [ Pp.textf "Unknown config field \"%s\"." field_name ]
           ~hints:[ Pp.text "Check the documentation for valid field names." ]);
-    { default_repo_owner
-    ; user_mentions_allowlist
-    ; invalid_crs_annotation_severity
-    ; crs_due_now_annotation_severity
+    { default_repo_owner = !default_repo_owner_ref
+    ; user_mentions_allowlist = !user_mentions_allowlist_ref
+    ; invalid_crs_annotation_severity = !invalid_crs_annotation_severity_ref
+    ; crs_due_now_annotation_severity = !crs_due_now_annotation_severity_ref
     }
   | _ -> Err.raise ~loc [ Pp.text "Config expected to be a json object." ]
 ;;
@@ -232,8 +223,18 @@ let empty =
 ;;
 
 let load_exn ~path ~emit_github_annotations =
-  match Yojson_five.Safe.from_file (Fpath.to_string path) with
-  | Ok json -> parse_json json ~loc:(Loc.of_file ~path) ~emit_github_annotations
+  match Json.from_file (Fpath.to_string path) with
+  | Ok json ->
+    let loc = Loc.of_file ~path in
+    (try parse_json json ~loc ~emit_github_annotations with
+     | Json_error (json, msg) ->
+       Err.raise
+         ~loc
+         Pp.O.
+           [ Pp.text "Invalid config."
+           ; Pp.text "In: " ++ Pp.text (Json.to_string json)
+           ; Pp.text msg
+           ])
   | Error msg ->
     Err.raise ~loc:(Loc.of_file ~path) [ Pp.text "Not a valid json file."; Pp.text msg ]
 ;;

@@ -34,7 +34,6 @@
   pp
   pplumbing-err
   pplumbing-pp-tty
-  ppx_deriving_yojson.runtime
   print-table
   reviewdog
   stdio
