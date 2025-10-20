@@ -130,41 +130,52 @@ module Header : sig
 
     (** {1 Deprecated}
 
-        The following is deprecated and will be soon annotated as such with ocaml
-        alerts. Please migrate, and do not use in new code. *)
+        The following is deprecated. Please migrate, and do not use in new code. *)
 
     (** This was renamed [status]. Hint: Run [ocamlmig migrate]. *)
     val kind : t -> Status.t Loc.Txt.t
+    [@@ocaml.deprecated
+      "[since 2025-10] Use [Header.With_loc.status]. Hint: Run [ocamlmig migrate]"]
     [@@migrate { repl = Rel.status }]
 
     (** This was renamed [reporter]. Hint: Run [ocamlmig migrate]. *)
     val reported_by : t -> Vcs.User_handle.t Loc.Txt.t
+    [@@ocaml.deprecated
+      "[since 2025-10] Use [Header.With_loc.reporter]. Hint: Run [ocamlmig migrate]"]
     [@@migrate { repl = Rel.reporter }]
 
     (** This was renamed [recipient]. Hint: Run [ocamlmig migrate]. *)
     val for_ : t -> Vcs.User_handle.t Loc.Txt.t option
+    [@@ocaml.deprecated
+      "[since 2025-10] Use [Header.With_loc.recipient]. Hint: Run [ocamlmig migrate]"]
     [@@migrate { repl = Rel.recipient }]
 
     (** This was renamed [qualifier]. Hint: Run [ocamlmig migrate]. *)
     val due : t -> Qualifier.t Loc.Txt.t
+    [@@ocaml.deprecated
+      "[since 2025-10] Use [Header.With_loc.qualifier]. Hint: Run [ocamlmig migrate]"]
     [@@migrate { repl = Rel.qualifier }]
   end
 
   (** {1 Deprecated}
 
-      The following is deprecated and will be soon annotated as such with ocaml
-      alerts. Please migrate, and do not use in new code. *)
+      The following is deprecated. Please migrate, and do not use in new code. *)
 
   (** This was renamed [reporter]. Hint: Run [ocamlmig migrate]. *)
   val reported_by : t -> Vcs.User_handle.t
+  [@@ocaml.deprecated
+    "[since 2025-10] Use [Header.reporter]. Hint: Run [ocamlmig migrate]"]
   [@@migrate { repl = Rel.reporter }]
 
   (** This was renamed [recipient]. Hint: Run [ocamlmig migrate]. *)
   val for_ : t -> Vcs.User_handle.t option
+  [@@ocaml.deprecated
+    "[since 2025-10] Use [Header.recipient]. Hint: Run [ocamlmig migrate]"]
   [@@migrate { repl = Rel.recipient }]
 
   (** This was renamed [status]. Hint: Run [ocamlmig migrate]. *)
   val kind : t -> Status.t
+  [@@ocaml.deprecated "[since 2025-10] Use [Header.status]. Hint: Run [ocamlmig migrate]"]
   [@@migrate { repl = Rel.status }]
 end
 
@@ -271,13 +282,16 @@ end
 
 (** {1 Deprecated}
 
-    The following is deprecated and will be soon annotated as such with ocaml
-    alerts. Please migrate, and do not use in new code. *)
+    The following is deprecated. Please migrate, and do not use in new code. *)
 
 (** This was renamed [priority]. Hint: Run [ocamlmig migrate]. *)
 val work_on : t -> Priority.t
+[@@ocaml.deprecated
+  "[since 2025-10] Use [Cr_comment.priority]. Hint: Run [ocamlmig migrate]"]
 [@@migrate { repl = Rel.priority }]
 
 (** This was renamed [status]. Hint: Run [ocamlmig migrate]. *)
 val kind : t -> Status.t
+[@@ocaml.deprecated
+  "[since 2025-10] Use [Cr_comment.status]. Hint: Run [ocamlmig migrate]"]
 [@@migrate { repl = Rel.status }]
