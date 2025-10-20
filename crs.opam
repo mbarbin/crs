@@ -15,7 +15,7 @@ depends: [
   "cmdlang-cmdliner-err-runner" {>= "0.0.16"}
   "file-rewriter" {>= "0.0.3"}
   "fpath" {>= "0.7.3"}
-  "fpath-base" {>= "0.3.1"}
+  "fpath-base" {>= "0.4.0"}
   "loc" {>= "0.2.2"}
   "pageantty" {>= "0.0.2"}
   "pp" {>= "2.0.0"}

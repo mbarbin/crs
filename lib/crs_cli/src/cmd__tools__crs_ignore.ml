@@ -21,12 +21,6 @@
 
 open! Import
 
-let better_chop_prefix ~prefix path =
-  if Relative_path.equal prefix Relative_path.empty
-  then Some path
-  else Relative_path.chop_prefix ~prefix path
-;;
-
 let find_crs_ignore_files files_in_repo =
   let filename = Fsegment.to_string Crs_ignore.filename in
   List.filter files_in_repo ~f:(fun file ->
@@ -73,7 +67,9 @@ let list_included_files_cmd =
      let included_files =
        List.filter files_in_repo ~f:(fun path ->
          Option.is_some
-           (better_chop_prefix ~prefix:below (Vcs.Path_in_repo.to_relative_path path))
+           (Relative_path.chop_prefix
+              ~prefix:below
+              (Vcs.Path_in_repo.to_relative_path path))
          && not (Crs_ignore.Rules.is_file_ignored rules ~path))
        |> List.sort ~compare:Vcs.Path_in_repo.compare
      in
@@ -121,7 +117,9 @@ let list_ignored_files_cmd =
      let ignored_files =
        List.filter files_in_repo ~f:(fun path ->
          Option.is_some
-           (better_chop_prefix ~prefix:below (Vcs.Path_in_repo.to_relative_path path))
+           (Relative_path.chop_prefix
+              ~prefix:below
+              (Vcs.Path_in_repo.to_relative_path path))
          && Crs_ignore.Rules.is_file_ignored rules ~path)
        |> List.sort ~compare:Vcs.Path_in_repo.compare
      in
