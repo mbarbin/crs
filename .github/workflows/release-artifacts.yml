@@ -69,10 +69,17 @@ jobs:
         with:
           subject-path: "${{ env.BIN_NAME }}"
 
-      - name: Upload Release Artifacts
+      - name: Upload Platform-Specific Binary
         uses: softprops/action-gh-release@6cbd405e2c4e67a21c47fa9e383d020e4e28b836 # v2.3.3
         with:
           tag_name: ${{ env.TAG_NAME }}
           files: |
             ${{ env.BIN_NAME }}
+
+      - name: Upload Platform-Independent Artifacts
+        if: matrix.os == 'ubuntu-latest'
+        uses: softprops/action-gh-release@6cbd405e2c4e67a21c47fa9e383d020e4e28b836 # v2.3.3
+        with:
+          tag_name: ${{ env.TAG_NAME }}
+          files: |
             ${{ env.SCHEMA_NAME }}
