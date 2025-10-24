@@ -188,8 +188,7 @@
 
 (package
  (name crs-dev)
- (synopsis
-  "Package to regroup dev targets for the project, documentation, and more")
+ (synopsis "Package to regroup dev targets, documentation, and more")
  (allow_empty) ; In case the package is wip or attached to stanzas that dune doesn't see.
  (depends
   (ocaml
