@@ -20,48 +20,48 @@
 (*_*******************************************************************************)
 
 (*_ This module is derived from Iron (v0.9.114.44+47), file
-  * [./hg/cr_comment.mli], which is released under Apache 2.0:
-  *
-  * Copyright (c) 2016-2017 Jane Street Group, LLC <opensource-contacts@janestreet.com>
-  *
-  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
-  * use this file except in compliance with the License. You may obtain a copy
-  * of the License at:
-  *
-  *     http://www.apache.org/licenses/LICENSE-2.0
-  *
-  * Unless required by applicable law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-  * License for the specific language governing permissions and limitations
-  * under the License.
-  *
-  * See the file `NOTICE.md` at the root of this repository for more details.
-  *
-  * Changes: ...
-  *
-  * - Remove dependency to [Core] and [Async].
-  * - Remove the [Stable] module - remove the versioning of the code.
-  * - Replace [Relpath] by [Vcs.Path_in_repo].
-  * - Remove [of_sexp] constructs.
-  * - Remove [Cr_comment_format].
-  * - Replace [Unresolved_name] by [Vcs.User_handle].
-  * - Remove [deriving fields] ppx constructs.
-  * - Remove alternate names and aliases resolution.
-  * - Remove incremental computation features.
-  * - Remove summary tables.
-  * - Remove invariant checks.
-  * - Use [Vcs] instead of [Hg].
-  * - Remove [Crs_due_now_and_soon].
-  * - Remove support for extra headers.
-  * - Remove support for attributes.
-  * - Remove assignee computation (left as external work).
-  * - Do not export [Raw].
-  * - Rename [Processed] to [Header].
-  * - Remove support for printing CRs without their content.
-  * - Compute positions and offsets with [Loc].
-  * - Add [comment_prefix].
-*)
+ * [./hg/cr_comment.mli], which is released under Apache 2.0:
+ *
+ * Copyright (c) 2016-2017 Jane Street Group, LLC <opensource-contacts@janestreet.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at:
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ *
+ * See the file `NOTICE.md` at the root of this repository for more details.
+ *
+ * Changes: ...
+ *
+ * - Remove dependency to [Core] and [Async].
+ * - Remove the [Stable] module - remove the versioning of the code.
+ * - Replace [Relpath] by [Vcs.Path_in_repo].
+ * - Remove [of_sexp] constructs.
+ * - Remove [Cr_comment_format].
+ * - Replace [Unresolved_name] by [Vcs.User_handle].
+ * - Remove [deriving fields] ppx constructs.
+ * - Remove alternate names and aliases resolution.
+ * - Remove incremental computation features.
+ * - Remove summary tables.
+ * - Remove invariant checks.
+ * - Use [Vcs] instead of [Hg].
+ * - Remove [Crs_due_now_and_soon].
+ * - Remove support for extra headers.
+ * - Remove support for attributes.
+ * - Remove assignee computation (left as external work).
+ * - Do not export [Raw].
+ * - Rename [Processed] to [Header].
+ * - Remove support for printing CRs without their content.
+ * - Compute positions and offsets with [Loc].
+ * - Add [comment_prefix].
+ *)
 
 (** Code review comments embedded in source code.
 
