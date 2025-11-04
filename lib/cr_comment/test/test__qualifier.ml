@@ -19,26 +19,26 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-let%expect_test "to_string" =
-  List.iter Cr_comment.Status.all ~f:(fun status ->
+let%expect_test "all" =
+  List.iter Cr_comment.Qualifier.all ~f:(fun qualifier ->
+    let priority = Cr_comment.Qualifier.priority qualifier in
     print_s
-      [%sexp
-        { status : Cr_comment.Status.t
-        ; to_string = (Cr_comment.Status.to_string status : string)
-        }]);
+      [%sexp { qualifier : Cr_comment.Qualifier.t; priority : Cr_comment.Priority.t }]);
   [%expect
     {|
-    ((status    CR)
-     (to_string CR))
-    ((status    XCR)
-     (to_string XCR))
+    ((qualifier None)
+     (priority  Now))
+    ((qualifier Soon)
+     (priority  Soon))
+    ((qualifier Someday)
+     (priority  Someday))
     |}];
   ()
 ;;
 
 let%expect_test "equal" =
-  require_equal [%here] (module Cr_comment.Status) CR CR;
-  require_not_equal [%here] (module Cr_comment.Status) CR XCR;
+  require_equal [%here] (module Cr_comment.Qualifier) None None;
+  require_not_equal [%here] (module Cr_comment.Qualifier) None Soon;
   [%expect {||}];
   ()
 ;;
@@ -47,9 +47,10 @@ let%expect_test "compare" =
   print_s
     [%sexp
       (List.sort
-         (List.concat [ List.rev Cr_comment.Status.all; [ XCR; CR; XCR ] ])
-         ~compare:Cr_comment.Status.compare
-       : Cr_comment.Status.t list)];
-  [%expect {| (CR CR XCR XCR XCR) |}];
+         (List.concat
+            [ List.rev Cr_comment.Qualifier.all; [ Soon; None; Someday; None ] ])
+         ~compare:Cr_comment.Qualifier.compare
+       : Cr_comment.Qualifier.t list)];
+  [%expect {| (None None None Soon Soon Someday Someday) |}];
   ()
 ;;
