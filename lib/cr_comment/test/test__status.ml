@@ -44,10 +44,12 @@ let%expect_test "equal" =
 ;;
 
 let%expect_test "compare" =
+  let cr = Cr_comment.Status.CR in
+  let xcr = Cr_comment.Status.XCR in
   print_s
     [%sexp
       (List.sort
-         (List.concat [ List.rev Cr_comment.Status.all; [ XCR; CR; XCR ] ])
+         (List.concat [ List.rev Cr_comment.Status.all; [ xcr; cr; xcr ] ])
          ~compare:Cr_comment.Status.compare
        : Cr_comment.Status.t list)];
   [%expect {| (CR CR XCR XCR XCR) |}];
