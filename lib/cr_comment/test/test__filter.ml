@@ -54,6 +54,24 @@ let%expect_test "all" =
   ()
 ;;
 
+let%expect_test "equal" =
+  require_equal [%here] (module Cr_comment.Filter) All All;
+  require_not_equal [%here] (module Cr_comment.Filter) All Invalid;
+  [%expect {||}];
+  ()
+;;
+
+let%expect_test "compare" =
+  print_s
+    [%sexp
+      (List.sort
+         (List.concat [ List.rev Cr_comment.Filter.all; [ Soon; Invalid; Someday; Now ] ])
+         ~compare:Cr_comment.Filter.compare
+       : Cr_comment.Filter.t list)];
+  [%expect {| (All Invalid Invalid CRs XCRs Now Now Soon Soon Someday Someday) |}];
+  ()
+;;
+
 let%expect_test "string count" =
   let count = List.length Cr_comment.Filter.all in
   let string_count =
