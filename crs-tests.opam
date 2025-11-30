@@ -24,11 +24,11 @@ depends: [
   "fpath" {>= "0.7.3"}
   "fpath-base" {>= "0.4.0"}
   "loc" {>= "0.2.2"}
-  "ocaml-protoc" {>= "3.1"}
+  "ocaml-protoc" {>= "4.0"}
   "pageantty" {>= "0.0.2"}
   "patdiff" {>= "v0.17"}
-  "pbrt" {>= "3.1"}
-  "pbrt_yojson" {>= "3.1"}
+  "pbrt" {>= "4.0"}
+  "pbrt_yojson" {>= "4.0"}
   "pp" {>= "2.0.0"}
   "pplumbing-err" {>= "0.0.16"}
   "pplumbing-pp-tty" {>= "0.0.16"}
