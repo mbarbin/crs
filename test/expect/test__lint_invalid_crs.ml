@@ -77,16 +77,7 @@ let () =
         File_rewriter.replace file_rewriter ~range:(Loc.range for_or_to.loc) ~text:"for"));
   [%expect
     {|
-    -1,15 +1,15
-
-      let () =
-        (* $CR *)
-        ()
-      ;;
-
-      let () =
-        (* $CR user: This a valid one. *)
-        ()
+    -10,6 +10,6
       ;;
 
       let () =

@@ -1,3 +1,10 @@
+## 0.0.202XXXXX (unreleased)
+
+### Changed
+
+- Upgrade test deps `ocaml-protoc` & all to `4.0` (#99, @mbarbin).
+- Reduce printed context in some tests diffs (#99, @mbarbin).
+
 ## 0.0.20251014 (2025-10-14)
 
 ### Added

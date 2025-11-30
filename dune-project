@@ -118,15 +118,15 @@
   (loc
    (>= 0.2.2))
   (ocaml-protoc
-   (>= 3.1))
+   (>= 4.0))
   (pageantty
    (>= 0.0.2))
   (patdiff
    (>= v0.17))
   (pbrt
-   (>= 3.1))
+   (>= 4.0))
   (pbrt_yojson
-   (>= 3.1))
+   (>= 4.0))
   (pp
    (>= 2.0.0))
   (pplumbing-err
@@ -224,15 +224,15 @@
   (mdx
    (>= 2.4))
   (ocaml-protoc
-   (>= 3.1))
+   (>= 4.0))
   (pageantty
    (>= 0.0.2))
   (patdiff
    (>= v0.17))
   (pbrt
-   (>= 3.1))
+   (>= 4.0))
   (pbrt_yojson
-   (>= 3.1))
+   (>= 4.0))
   (pp
    (>= 2.0.0))
   (pplumbing-err
