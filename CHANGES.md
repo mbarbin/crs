@@ -1,3 +1,9 @@
+## 0.0.202XXXXX (unreleased)
+
+### Changed
+
+- Reduce printed context in some tests diffs (#PR, @mbarbin).
+
 ## 0.0.20251014 (2025-10-14)
 
 ### Added
