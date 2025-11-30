@@ -132,10 +132,7 @@ let () = ()
               })));
   [%expect
     {|
-    -1,11 +1,11
-
-      let () =
-        (* $CR user1: Message *)
+    -4,8 +4,8
         ()
       ;;
 
@@ -145,7 +142,8 @@ let () = ()
 
     -|(* $CR user1 for user2: This third message *)
     +|(* $CR user1: This third message *)
-      let () = () |}];
+      let () = ()
+    |}];
   ()
 ;;
 
@@ -181,7 +179,7 @@ let () = ()
             ~text:" for assignee")));
   [%expect
     {|
-    -1,16 +1,16
+    -1,6 +1,6
 
       let () =
     -|  (* $CR user1: Message *)
@@ -189,8 +187,7 @@ let () = ()
         ()
       ;;
 
-      let () =
-        (* $CR user1 for user2: Message *)
+    -9,8 +9,8
         ()
       ;;
 
@@ -299,7 +296,7 @@ let () =
                ~text:"-soon"))));
   [%expect
     {|
-    -1,21 +1,21
+    -1,11 +1,11
 
       let () =
     -|  (* $CR user1: Message *)
@@ -310,17 +307,6 @@ let () =
       let () =
     -|  (* $CR user1 for user2: Message *)
     +|  (* $CR-soon user1 for user2: Message *)
-        ()
-      ;;
-
-      (* $XCR jdoe: This other message *)
-      let () = ()
-
-      (* $CR-someday user1: This third message *)
-      let () = ()
-
-      let () =
-        (* $CR-soon user1: Message *)
         ()
       ;;
     |}];
@@ -362,11 +348,7 @@ let () = ()
              File_rewriter.replace file_rewriter ~range:(Loc.range loc) ~text:"someday"))));
   [%expect
     {|
-    -1,19 +1,19
-
-      let () =
-        (* $CR user1: Message *)
-        ()
+    -5,7 +5,7
       ;;
 
       let () =
@@ -374,15 +356,6 @@ let () = ()
     +|  (* $CR-someday user1 for user2: Message *)
         ()
       ;;
-
-      (* $XCR-soon jdoe: This other message *)
-      let () = ()
-
-      (* $XCR jdoe: This other message *)
-      let () = ()
-
-      (* $CR-someday user1: This third message *)
-      let () = ()
     |}];
   ()
 ;;
@@ -424,11 +397,7 @@ let () = ()
               })));
   [%expect
     {|
-    -1,19 +1,19
-
-      let () =
-        (* $CR user1: Message *)
-        ()
+    -5,15 +5,15
       ;;
 
       let () =
