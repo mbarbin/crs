@@ -20,12 +20,15 @@
   -open
   Volgo_base
   -open
-  Cmdlang)
+  Cmdlang
+  -open
+  Crs_stdlib)
  (libraries
   base
   cmdlang
   cr_comment
   crs_parser
+  crs_stdlib
   file-rewriter
   fpath
   fpath-base

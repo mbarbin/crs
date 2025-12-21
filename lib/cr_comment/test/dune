@@ -10,10 +10,13 @@
   -open
   Base
   -open
-  Expect_test_helpers_base)
+  Expect_test_helpers_base
+  -open
+  Crs_stdlib)
  (libraries
   base
   cr_comment
+  crs_stdlib
   expect_test_helpers_core.expect_test_helpers_base)
  (inline_tests)
  (instrumentation

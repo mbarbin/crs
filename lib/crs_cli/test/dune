@@ -18,7 +18,9 @@
   -open
   Volgo
   -open
-  Cmdlang)
+  Cmdlang
+  -open
+  Crs_stdlib)
  (libraries
   base
   cmdlang
@@ -26,6 +28,7 @@
   cr_comment
   crs_cli
   crs_parser
+  crs_stdlib
   expect_test_helpers_core.expect_test_helpers_base
   fpath
   fpath-base

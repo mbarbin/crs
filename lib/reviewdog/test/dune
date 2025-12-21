@@ -12,10 +12,13 @@
   -open
   Expect_test_helpers_base
   -open
-  Base_quickcheck)
+  Base_quickcheck
+  -open
+  Crs_stdlib)
  (libraries
   base
   base_quickcheck
+  crs_stdlib
   expect_test_helpers_core.expect_test_helpers_base
   reviewdog
   reviewdog_rdf
