@@ -87,7 +87,12 @@ module Exit_status = struct
     | `Signaled of int
     | `Stopped of int
     ]
-  [@@deriving sexp_of]
+
+  let to_dyn : t -> Dyn.t = function
+    | `Exited i -> Dyn.variant "Exited" [ Dyn.int i ]
+    | `Signaled i -> Dyn.variant "Signaled" [ Dyn.int i ]
+    | `Stopped i -> Dyn.variant "Stopped" [ Dyn.int i ]
+  ;;
 end
 
 let null_separator = String.make 1 (Char.of_int_exn 0)
@@ -185,9 +190,12 @@ let grep ~vcs ~repo_root ~below =
           (Err.E
              (Err.create
                 [ Pp.text "Process xargs exited abnormally."
-                ; Err.sexp
-                    [%sexp
-                      { exit_status : Exit_status.t; stdout : string; stderr : string }]
+                ; Dyn.pp
+                    (Dyn.record
+                       [ "exit_status", exit_status |> Exit_status.to_dyn
+                       ; "stdout", stdout |> Dyn.string
+                       ; "stderr", stderr |> Dyn.string
+                       ])
                 ]))
       | exception exn ->
         raise

@@ -32,6 +32,7 @@
   pplumbing-err
   pplumbing-pp-tty
   re
+  sexplib0
   spawn
   stdio
   unix
@@ -40,12 +41,4 @@
   (backend bisect_ppx))
  (lint
   (pps ppx_js_style -allow-let-operators -check-doc-comments))
- (preprocess
-  (pps
-   -unused-code-warnings=force
-   ppx_compare
-   ppx_enumerate
-   ppx_hash
-   ppx_here
-   ppx_sexp_conv
-   ppx_sexp_value)))
+ (preprocess no_preprocessing))

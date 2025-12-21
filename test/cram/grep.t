@@ -93,26 +93,24 @@ A basic [sexp] output is available.
   ((path foo/a.txt) (whole_loc ((start foo/a.txt:2:0) (stop foo/a.txt:2:38)))
    (content_start_offset 31)
    (header
-    (Ok
-     ((status ((txt XCR) (loc ((start foo/a.txt:2:3) (stop foo/a.txt:2:6)))))
-      (qualifier
-       ((txt None) (loc ((start foo/a.txt:2:3) (stop foo/a.txt:2:6)))))
-      (reporter
-       ((txt user1) (loc ((start foo/a.txt:2:7) (stop foo/a.txt:2:12)))))
-      (recipient ()))))
+    (Ok (status ((txt XCR) (loc ((start foo/a.txt:2:3) (stop foo/a.txt:2:6)))))
+     (qualifier
+      ((txt None) (loc ((start foo/a.txt:2:3) (stop foo/a.txt:2:6)))))
+     (reporter
+      ((txt user1) (loc ((start foo/a.txt:2:7) (stop foo/a.txt:2:12)))))
+     (recipient ())))
    (comment_prefix "(*")
    (digest_of_condensed_content 9dce8eceb787a95abf3fccb037d164ea)
    (content "XCR user1: Fix this. Edit: Done."))
   ((path foo/b.txt) (whole_loc ((start foo/b.txt:1:0) (stop foo/b.txt:1:71)))
    (content_start_offset 3)
    (header
-    (Ok
-     ((status ((txt CR) (loc ((start foo/b.txt:1:3) (stop foo/b.txt:1:5)))))
-      (qualifier
-       ((txt Someday) (loc ((start foo/b.txt:1:6) (stop foo/b.txt:1:13)))))
-      (reporter
-       ((txt user1) (loc ((start foo/b.txt:1:14) (stop foo/b.txt:1:19)))))
-      (recipient ()))))
+    (Ok (status ((txt CR) (loc ((start foo/b.txt:1:3) (stop foo/b.txt:1:5)))))
+     (qualifier
+      ((txt Someday) (loc ((start foo/b.txt:1:6) (stop foo/b.txt:1:13)))))
+     (reporter
+      ((txt user1) (loc ((start foo/b.txt:1:14) (stop foo/b.txt:1:19)))))
+     (recipient ())))
    (comment_prefix "(*")
    (digest_of_condensed_content 22722b7a3948f75ec004a651d97d02bb)
    (content
@@ -122,14 +120,14 @@ A basic [sexp] output is available.
    (content_start_offset 35)
    (header
     (Ok
-     ((status
-       ((txt CR) (loc ((start foo/bar/b.txt:2:3) (stop foo/bar/b.txt:2:5)))))
-      (qualifier
-       ((txt Soon) (loc ((start foo/bar/b.txt:2:6) (stop foo/bar/b.txt:2:10)))))
-      (reporter
-       ((txt user1)
-        (loc ((start foo/bar/b.txt:2:11) (stop foo/bar/b.txt:2:16)))))
-      (recipient ()))))
+     (status
+      ((txt CR) (loc ((start foo/bar/b.txt:2:3) (stop foo/bar/b.txt:2:5)))))
+     (qualifier
+      ((txt Soon) (loc ((start foo/bar/b.txt:2:6) (stop foo/bar/b.txt:2:10)))))
+     (reporter
+      ((txt user1)
+       (loc ((start foo/bar/b.txt:2:11) (stop foo/bar/b.txt:2:16)))))
+     (recipient ())))
    (comment_prefix "(*")
    (digest_of_condensed_content 8b683d9bff5df08ee3642df3cf2426ce)
    (content "CR-soon user1: Hey, this is a code review comment"))
@@ -155,25 +153,23 @@ A basic [sexp] output is available.
   ((path foo/foo.c) (whole_loc ((start foo/foo.c:1:0) (stop foo/foo.c:1:60)))
    (content_start_offset 3)
    (header
-    (Ok
-     ((status ((txt CR) (loc ((start foo/foo.c:1:3) (stop foo/foo.c:1:5)))))
-      (qualifier
-       ((txt None) (loc ((start foo/foo.c:1:3) (stop foo/foo.c:1:5)))))
-      (reporter
-       ((txt user1) (loc ((start foo/foo.c:1:6) (stop foo/foo.c:1:11)))))
-      (recipient
-       (((txt user3) (loc ((start foo/foo.c:1:16) (stop foo/foo.c:1:21)))))))))
+    (Ok (status ((txt CR) (loc ((start foo/foo.c:1:3) (stop foo/foo.c:1:5)))))
+     (qualifier
+      ((txt None) (loc ((start foo/foo.c:1:3) (stop foo/foo.c:1:5)))))
+     (reporter
+      ((txt user1) (loc ((start foo/foo.c:1:6) (stop foo/foo.c:1:11)))))
+     (recipient
+      (((txt user3) (loc ((start foo/foo.c:1:16) (stop foo/foo.c:1:21))))))))
    (comment_prefix /*)
    (digest_of_condensed_content 4721a5c5f8a37bdcb9e065268bbd0153)
    (content "CR user1 for user3: Hey, this is a code review comment"))
   ((path hello) (whole_loc ((start hello:2:0) (stop hello:2:60)))
    (content_start_offset 15)
    (header
-    (Ok
-     ((status ((txt CR) (loc ((start hello:2:3) (stop hello:2:5)))))
-      (qualifier ((txt None) (loc ((start hello:2:3) (stop hello:2:5)))))
-      (reporter ((txt user1) (loc ((start hello:2:6) (stop hello:2:11)))))
-      (recipient (((txt user2) (loc ((start hello:2:16) (stop hello:2:21)))))))))
+    (Ok (status ((txt CR) (loc ((start hello:2:3) (stop hello:2:5)))))
+     (qualifier ((txt None) (loc ((start hello:2:3) (stop hello:2:5)))))
+     (reporter ((txt user1) (loc ((start hello:2:6) (stop hello:2:11)))))
+     (recipient (((txt user2) (loc ((start hello:2:16) (stop hello:2:21))))))))
    (comment_prefix "(*")
    (digest_of_condensed_content 970aabfe0c3d4ec5707918edd3f01a8a)
    (content "CR user1 for user2: Hey, this is a code review comment"))
@@ -307,7 +303,8 @@ matching. This involves running [xargs]. Let's cover for some failures there.
 
   $ PATH=".:$PATH" crs grep
   Error: Process xargs exited abnormally.
-  ((exit_status (Exited 42)) (stdout "Hello Fake xargs\n") (stderr ""))
+  { exit_status = Exited 42; stdout = "Hello Fake xargs\n\
+                                       "; stderr = "" }
   [123]
 
 When the return code is `1` or `123` we require stderr to be empty.
@@ -323,7 +320,8 @@ When the return code is `1` or `123` we require stderr to be empty.
 
   $ PATH=".:$PATH" crs grep
   Error: Process xargs exited abnormally.
-  ((exit_status (Exited 1)) (stdout "") (stderr "Hello Fake xargs\n"))
+  { exit_status = Exited 1; stdout = ""; stderr = "Hello Fake xargs\n\
+                                                   " }
   [123]
 
   $ cat > xargs <<EOF
@@ -337,7 +335,8 @@ When the return code is `1` or `123` we require stderr to be empty.
 
   $ PATH=".:$PATH" crs grep
   Error: Process xargs exited abnormally.
-  ((exit_status (Exited 123)) (stdout "") (stderr "Hello Fake xargs\n"))
+  { exit_status = Exited 123; stdout = ""; stderr = "Hello Fake xargs\n\
+                                                     " }
   [123]
 
   $ cat > xargs <<EOF

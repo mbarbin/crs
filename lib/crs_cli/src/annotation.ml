@@ -26,7 +26,17 @@ module Severity = struct
     | Error
     | Warning
     | Info
-  [@@deriving enumerate, sexp_of]
+
+  let all = [ Error; Warning; Info ]
+
+  let variant_constructor_name = function
+    | Error -> "Error"
+    | Warning -> "Warning"
+    | Info -> "Info"
+  ;;
+
+  let to_dyn t = Dyn.Variant (variant_constructor_name t, [])
+  let sexp_of_t t = Sexp.Atom (variant_constructor_name t)
 
   let to_string t =
     match sexp_of_t t with
@@ -55,8 +65,19 @@ type t =
   ; title : string
   ; message : string
   }
-[@@deriving sexp_of]
 
+let to_dyn { cr; severity; assignee; with_user_mention; title; message } =
+  Dyn.record
+    [ "cr", cr |> Cr_comment.to_dyn
+    ; "severity", severity |> Severity.to_dyn
+    ; "assignee", assignee |> Assignee.to_dyn
+    ; "with_user_mention", with_user_mention |> Dyn.bool
+    ; "title", title |> Dyn.string
+    ; "message", message |> Dyn.string
+    ]
+;;
+
+let sexp_of_t t = Dyn.to_sexp (to_dyn t)
 let message t = t.message
 let severity t = t.severity
 let assignee t = t.assignee

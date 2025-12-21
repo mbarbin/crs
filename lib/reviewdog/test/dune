@@ -36,5 +36,4 @@
    ppx_expect
    ppx_here
    base_quickcheck.ppx_quickcheck
-   ppx_sexp_conv
-   ppx_sexp_value)))
+   ppx_sexp_conv)))

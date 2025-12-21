@@ -22,16 +22,16 @@
 let%expect_test "all" =
   List.iter Cr_comment.Qualifier.all ~f:(fun qualifier ->
     let priority = Cr_comment.Qualifier.priority qualifier in
-    print_s
-      [%sexp { qualifier : Cr_comment.Qualifier.t; priority : Cr_comment.Priority.t }]);
+    print_dyn
+      (Dyn.record
+         [ "qualifier", qualifier |> Cr_comment.Qualifier.to_dyn
+         ; "priority", priority |> Cr_comment.Priority.to_dyn
+         ]));
   [%expect
     {|
-    ((qualifier None)
-     (priority  Now))
-    ((qualifier Soon)
-     (priority  Soon))
-    ((qualifier Someday)
-     (priority  Someday))
+    { qualifier = None; priority = Now }
+    { qualifier = Soon; priority = Soon }
+    { qualifier = Someday; priority = Someday }
     |}];
   ()
 ;;
@@ -44,13 +44,11 @@ let%expect_test "equal" =
 ;;
 
 let%expect_test "compare" =
-  print_s
-    [%sexp
-      (List.sort
-         (List.concat
-            [ List.rev Cr_comment.Qualifier.all; [ Soon; None; Someday; None ] ])
-         ~compare:Cr_comment.Qualifier.compare
-       : Cr_comment.Qualifier.t list)];
-  [%expect {| (None None None Soon Soon Someday Someday) |}];
+  print_dyn
+    (List.sort
+       (List.concat [ List.rev Cr_comment.Qualifier.all; [ Soon; None; Someday; None ] ])
+       ~compare:Cr_comment.Qualifier.compare
+     |> Dyn.list Cr_comment.Qualifier.to_dyn);
+  [%expect {| [ None; None; None; Soon; Soon; Someday; Someday ] |}];
   ()
 ;;

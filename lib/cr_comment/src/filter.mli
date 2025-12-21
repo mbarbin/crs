@@ -31,6 +31,8 @@ type t =
   | Someday
 [@@deriving compare, equal, enumerate, sexp_of]
 
+val to_dyn : t -> Dyn.t
+
 (** {1 Representation} *)
 
 (** A lowercase version of [t] for use e.g. as command line flags. *)

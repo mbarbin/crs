@@ -45,18 +45,3 @@
          (param none)
          (applies_to
           (pp ppx_js_style)))))))))))
-
-;; Configure ppx flags
-(rule
- (cond
-  ((dune
-    (preprocess (pps true)))
-   (enforce
-    (dune
-     (preprocess
-      (pps
-       (flag
-        (name -unused-code-warnings)
-        (param
-         (equals force))
-        (applies_to driver)))))))))

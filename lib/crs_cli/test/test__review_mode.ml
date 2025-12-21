@@ -30,7 +30,7 @@ let test args =
     in
     Cmdlang_stdlib_runner.eval cmd ~argv:(Array.of_list ("./main.exe" :: args))
   with
-  | Ok a -> print_s [%sexp (a : Review_mode.t)]
+  | Ok a -> print_dyn (a |> Review_mode.to_dyn)
   | Error (`Help _ | `Bad _) -> assert false
 ;;
 
@@ -67,7 +67,7 @@ let%expect_test "arg" =
     Warning: Review mode [pull-request] requires [--pull-request-base].
     It will become mandatory in the future, please attend.
     ::warning title=crs::Review mode [pull-request] requires [--pull-request-base].%0AIt will become mandatory in the future, please attend.
-    (Pull_request (author jdoe) (base ()))
+    Pull_request { author = "jdoe"; base = None }
     |}];
   let mock_rev_gen = Vcs.Mock_rev_gen.create ~name:"review" in
   let base = Vcs.Mock_rev_gen.next mock_rev_gen in
@@ -78,6 +78,9 @@ let%expect_test "arg" =
       ; "--pull-request-base=" ^ Vcs.Rev.to_string base
       ]);
   [%expect
-    {| (Pull_request (author jdoe) (base (6c3e826c6e1da1d8975aaca8fbfbbaac6c3e826c))) |}];
+    {|
+    Pull_request
+      { author = "jdoe"; base = Some "6c3e826c6e1da1d8975aaca8fbfbbaac6c3e826c" }
+    |}];
   ()
 ;;

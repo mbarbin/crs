@@ -21,12 +21,12 @@
 
 let%expect_test "all" =
   List.iter Cr_comment.Priority.all ~f:(fun priority ->
-    print_s [%sexp { priority : Cr_comment.Priority.t }]);
+    print_dyn (Dyn.record [ "priority", priority |> Cr_comment.Priority.to_dyn ]));
   [%expect
     {|
-    ((priority Now))
-    ((priority Soon))
-    ((priority Someday))
+    { priority = Now }
+    { priority = Soon }
+    { priority = Someday }
     |}];
   ()
 ;;

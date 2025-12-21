@@ -24,7 +24,8 @@ module Path_display_mode = struct
     | Absolute
     | Relative_to_repo_root
     | Relative_to_cwd
-  [@@deriving enumerate]
+
+  let all = [ Absolute; Relative_to_repo_root; Relative_to_cwd ]
 
   let to_string = function
     | Absolute -> "absolute"

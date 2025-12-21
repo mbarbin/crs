@@ -26,20 +26,29 @@ let%expect_test "stop" =
   let re = Re.compile Re.(group ~name (str "wo")) in
   (* [group_names] is available on this compiled regexp. *)
   let group_names = Re.group_names re in
-  print_s [%sexp { group_names : (string * int) list }];
-  [%expect {| ((group_names ((wo#name 1)))) |}];
+  print_dyn
+    (Dyn.record
+       [ ( "group_names"
+         , group_names |> Dyn.list (fun (s, i) -> Dyn.Tuple [ Dyn.string s; Dyn.int i ]) )
+       ]);
+  [%expect {| { group_names = [ ("wo#name", 1) ] } |}];
   let wo_index =
     List.find_exn group_names ~f:(fun (n, _) -> String.equal n name) |> snd
   in
-  print_s [%sexp { wo_index : int }];
-  [%expect {| ((wo_index 1)) |}];
+  print_dyn (Dyn.record [ "wo_index", wo_index |> Dyn.int ]);
+  [%expect {| { wo_index = 1 } |}];
   let group = Re.exec re "hello world" in
   (* The stop offset is excluded. *)
-  print_s [%sexp { get0 = (Re.Group.get group 0 : string) }];
-  [%expect {| ((get0 wo)) |}];
-  print_s [%sexp { offset = (Re.Group.offset group wo_index : int * int) }];
-  [%expect {| ((offset (6 8))) |}];
-  print_s [%sexp { stop = (Re.Group.stop group wo_index : int) }];
-  [%expect {| ((stop 8)) |}];
+  print_dyn (Dyn.record [ "get0", Re.Group.get group 0 |> Dyn.string ]);
+  [%expect {| { get0 = "wo" } |}];
+  print_dyn
+    (Dyn.record
+       [ ( "offset"
+         , Re.Group.offset group wo_index
+           |> fun (i, j) -> Dyn.Tuple [ Dyn.int i; Dyn.int j ] )
+       ]);
+  [%expect {| { offset = (6, 8) } |}];
+  print_dyn (Dyn.record [ "stop", Re.Group.stop group wo_index |> Dyn.int ]);
+  [%expect {| { stop = 8 } |}];
   ()
 ;;

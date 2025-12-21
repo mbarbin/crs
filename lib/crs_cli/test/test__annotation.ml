@@ -37,29 +37,32 @@ let%expect_test "sexp_of_t" =
         ~review_mode:Revision
         ~with_user_mentions:false
     in
-    print_s [%sexp (annotation : Annotation.t option)];
+    print_dyn (annotation |> Dyn.option Annotation.to_dyn);
     ());
   [%expect
     {|
-    ((
-      (cr (
-        (path                 my_file.ml)
-        (whole_loc            _)
-        (content_start_offset 3)
-        (header (
-          Ok (
-            (status    CR)
-            (qualifier None)
-            (reporter  user1)
-            (recipient (user2)))))
-        (comment_prefix "(*")
-        (digest_of_condensed_content 545e005050bf423184690dadd4c3393d)
-        (content "CR user1 for user2: Hello.")))
-      (severity Info)
-      (assignee ((user (user2)) (reason Recipient)))
-      (with_user_mention false)
-      (title             CR)
-      (message "This CR is assigned to user2 (CR recipient).")))
+    Some
+      { cr =
+          { path = "my_file.ml"
+          ; whole_loc = "_"
+          ; content_start_offset = 3
+          ; header =
+              Ok
+                { status = CR
+                ; qualifier = None
+                ; reporter = "user1"
+                ; recipient = Some "user2"
+                }
+          ; comment_prefix = "(*"
+          ; digest_of_condensed_content = "545e005050bf423184690dadd4c3393d"
+          ; content = "CR user1 for user2: Hello."
+          }
+      ; severity = Info
+      ; assignee = { user = Some "user2"; reason = Recipient }
+      ; with_user_mention = false
+      ; title = "CR"
+      ; message = "This CR is assigned to user2 (CR recipient)."
+      }
     |}];
   ()
 ;;
@@ -67,17 +70,16 @@ let%expect_test "sexp_of_t" =
 let%expect_test "severity" =
   List.iter Annotation.Severity.all ~f:(fun severity ->
     let on_github = Annotation.Severity.to_github severity in
-    print_s
-      [%sexp
-        { severity : Annotation.Severity.t; on_github : Github_annotation.Severity.t }]);
+    print_dyn
+      (Dyn.record
+         [ "severity", severity |> Annotation.Severity.to_dyn
+         ; "on_github", on_github |> Github_annotation.Severity.to_dyn
+         ]));
   [%expect
     {|
-    ((severity  Error)
-     (on_github Error))
-    ((severity  Warning)
-     (on_github Warning))
-    ((severity  Info)
-     (on_github Notice))
+    { severity = Error; on_github = Error }
+    { severity = Warning; on_github = Warning }
+    { severity = Info; on_github = Notice }
     |}];
   ()
 ;;
@@ -97,19 +99,20 @@ let%expect_test "getters" =
     | [ hd ] -> hd
     | _ -> assert false
   in
-  print_s
-    [%sexp
-      { severity = (Annotation.severity t : Annotation.Severity.t)
-      ; assignee = (Annotation.assignee t : Assignee.t)
-      ; with_user_mention = (Annotation.with_user_mention t : bool)
-      ; message = (Annotation.message t : string)
-      }];
+  print_dyn
+    (Dyn.record
+       [ "severity", Annotation.severity t |> Annotation.Severity.to_dyn
+       ; "assignee", Annotation.assignee t |> Assignee.to_dyn
+       ; "with_user_mention", Annotation.with_user_mention t |> Dyn.bool
+       ; "message", Annotation.message t |> Dyn.string
+       ]);
   [%expect
     {|
-    ((severity Info)
-     (assignee ((user (user2)) (reason Recipient)))
-     (with_user_mention false)
-     (message "This CR is assigned to user2 (CR recipient)."))
+    { severity = Info
+    ; assignee = { user = Some "user2"; reason = Recipient }
+    ; with_user_mention = false
+    ; message = "This CR is assigned to user2 (CR recipient)."
+    }
     |}];
   ()
 ;;

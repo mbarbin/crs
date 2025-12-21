@@ -49,7 +49,10 @@ type t =
       ; base : Vcs.Rev.t option
       }
   | Revision
-[@@deriving equal, sexp_of]
+
+val equal : t -> t -> bool
+val to_dyn : t -> Dyn.t
+val sexp_of_t : t -> Sexp.t
 
 (** Build a [t] from parsing arguments in the command line. For convenience and
     help users discover warnings during CI runs, this can optionally include CI

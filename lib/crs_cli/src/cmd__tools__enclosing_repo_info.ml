@@ -31,7 +31,10 @@ let main =
        - $(b,path_in_repo) : The path of the current directory related to the repo root \
        (relative path).\n\n\
        - $(b,vcs_kind) : The kind of version control for the enclosing repository \
-       (git|hg).")
+       (git|hg).\n\n\
+       This command is meant for debug and quick tests only. Its output is unstable and \
+       may change without semver updates. In particular it should not be relied on in \
+       scripts.")
     (let open Command.Std in
      let+ () = Arg.return () in
      let cwd = Unix.getcwd () |> Absolute_path.v in
@@ -42,10 +45,10 @@ let main =
        Common_helpers.relativize ~repo_root ~cwd ~path:(Relative_path.empty :> Fpath.t)
      in
      print_s
-       [%sexp
-         { repo_root : Vcs.Repo_root.t
-         ; path_in_repo : Vcs.Path_in_repo.t
-         ; vcs_kind : Enclosing_repo.Vcs_kind.t
-         }];
+       (Sexp.List
+          [ List [ Atom "repo_root"; repo_root |> Vcs.Repo_root.sexp_of_t ]
+          ; List [ Atom "path_in_repo"; path_in_repo |> Vcs.Path_in_repo.sexp_of_t ]
+          ; List [ Atom "vcs_kind"; vcs_kind |> Enclosing_repo.Vcs_kind.sexp_of_t ]
+          ]);
      ())
 ;;

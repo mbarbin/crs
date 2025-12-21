@@ -21,35 +21,21 @@
 
 let%expect_test "all" =
   List.iter Cr_comment.Filter.all ~f:(fun filter ->
-    print_s
-      [%sexp
-        { filter : Cr_comment.Filter.t
-        ; to_string = (Cr_comment.Filter.to_string filter : string)
-        ; shorthand = (Cr_comment.Filter.shorthand filter : char)
-        }]);
+    print_dyn
+      (Dyn.record
+         [ "filter", filter |> Cr_comment.Filter.to_dyn
+         ; "to_string", Cr_comment.Filter.to_string filter |> Dyn.string
+         ; "shorthand", Cr_comment.Filter.shorthand filter |> Dyn.char
+         ]));
   [%expect
     {|
-    ((filter    All)
-     (to_string all)
-     (shorthand a))
-    ((filter    Invalid)
-     (to_string invalid)
-     (shorthand i))
-    ((filter    CRs)
-     (to_string crs)
-     (shorthand c))
-    ((filter    XCRs)
-     (to_string xcrs)
-     (shorthand x))
-    ((filter    Now)
-     (to_string now)
-     (shorthand w))
-    ((filter    Soon)
-     (to_string soon)
-     (shorthand o))
-    ((filter    Someday)
-     (to_string someday)
-     (shorthand d))
+    { filter = All; to_string = "all"; shorthand = a }
+    { filter = Invalid; to_string = "invalid"; shorthand = i }
+    { filter = CRs; to_string = "crs"; shorthand = c }
+    { filter = XCRs; to_string = "xcrs"; shorthand = x }
+    { filter = Now; to_string = "now"; shorthand = w }
+    { filter = Soon; to_string = "soon"; shorthand = o }
+    { filter = Someday; to_string = "someday"; shorthand = d }
     |}];
   ()
 ;;
@@ -62,13 +48,13 @@ let%expect_test "equal" =
 ;;
 
 let%expect_test "compare" =
-  print_s
-    [%sexp
-      (List.sort
-         (List.concat [ List.rev Cr_comment.Filter.all; [ Soon; Invalid; Someday; Now ] ])
-         ~compare:Cr_comment.Filter.compare
-       : Cr_comment.Filter.t list)];
-  [%expect {| (All Invalid Invalid CRs XCRs Now Now Soon Soon Someday Someday) |}];
+  print_dyn
+    (List.sort
+       (List.concat [ List.rev Cr_comment.Filter.all; [ Soon; Invalid; Someday; Now ] ])
+       ~compare:Cr_comment.Filter.compare
+     |> Dyn.list Cr_comment.Filter.to_dyn);
+  [%expect
+    {| [ All; Invalid; Invalid; CRs; XCRs; Now; Now; Soon; Soon; Someday; Someday ] |}];
   ()
 ;;
 

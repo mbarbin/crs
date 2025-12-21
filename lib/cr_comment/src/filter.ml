@@ -27,14 +27,21 @@ type t =
   | Now
   | Soon
   | Someday
-[@@deriving compare, equal, enumerate, sexp_of]
+[@@deriving compare, equal, enumerate]
 
-let to_string = function
-  | (All | Invalid | CRs | XCRs | Now | Soon | Someday) as t ->
-    (match sexp_of_t t with
-     | Atom str -> String.lowercase str
-     | List _ -> assert false)
+let variant_constructor_name = function
+  | All -> "All"
+  | Invalid -> "Invalid"
+  | CRs -> "CRs"
+  | XCRs -> "XCRs"
+  | Now -> "Now"
+  | Soon -> "Soon"
+  | Someday -> "Someday"
 ;;
+
+let to_dyn t = Dyn.Variant (variant_constructor_name t, [])
+let sexp_of_t t = Sexp.Atom (variant_constructor_name t)
+let to_string t = String.lowercase (variant_constructor_name t)
 
 let shorthand = function
   | All -> 'a'

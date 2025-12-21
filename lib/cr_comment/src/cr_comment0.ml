@@ -71,11 +71,13 @@
  * - Compute positions and offsets with [Loc].
  * - Some minor changes to the [reindented] content rendering.
  * - Add [comment_prefix].
+ * - Add [Dyn] to replace [Error].
  *)
 
 module Digest_hex = struct
   type t = string [@@deriving compare, equal, sexp_of]
 
+  let to_dyn = Dyn.string
   let to_string t = t
   let create str = str |> Stdlib.Digest.string |> Stdlib.Digest.to_hex
 end
@@ -90,7 +92,20 @@ module Header = struct
       ; reporter : Vcs.User_handle.t Loc.Txt.t
       ; recipient : Vcs.User_handle.t Loc.Txt.t option
       }
-    [@@deriving equal, sexp_of]
+    [@@deriving equal]
+
+    let to_dyn { status; qualifier; reporter; recipient } =
+      let user_handle u = Dyn.stringable (module Vcs.User_handle) u in
+      let loc_user_handle ul = Loc.Txt.to_dyn user_handle ul in
+      Dyn.record
+        [ "status", status |> Loc.Txt.to_dyn Status.to_dyn
+        ; "qualifier", qualifier |> Loc.Txt.to_dyn Qualifier.to_dyn
+        ; "reporter", reporter |> loc_user_handle
+        ; "recipient", recipient |> Dyn.option loc_user_handle
+        ]
+    ;;
+
+    let sexp_of_t t = Dyn.to_sexp (to_dyn t)
   end
 
   include T
@@ -129,6 +144,12 @@ module Header = struct
   let kind = status
 end
 
+let or_dyn to_dyn r =
+  match r with
+  | Ok ok -> Dyn.Variant ("Ok", [ to_dyn ok ])
+  | Error dyn -> Dyn.Variant ("Error", [ dyn ])
+;;
+
 module T = struct
   [@@@coverage off]
 
@@ -136,12 +157,35 @@ module T = struct
     { path : Vcs.Path_in_repo.t
     ; whole_loc : Loc.t
     ; content_start_offset : int
-    ; header : Header.t Or_error.t
+    ; header : (Header.t, Dyn.t) Result.t
     ; comment_prefix : string
     ; digest_of_condensed_content : Digest_hex.t
     ; content : string
     }
-  [@@deriving equal, sexp_of]
+  [@@deriving equal]
+
+  let to_dyn
+        { path : Vcs.Path_in_repo.t
+        ; whole_loc : Loc.t
+        ; content_start_offset : int
+        ; header : (Header.t, Dyn.t) Result.t
+        ; comment_prefix : string
+        ; digest_of_condensed_content : Digest_hex.t
+        ; content : string
+        }
+    =
+    Dyn.record
+      [ "path", path |> Dyn.stringable (module Vcs.Path_in_repo)
+      ; "whole_loc", whole_loc |> Loc.to_dyn
+      ; "content_start_offset", content_start_offset |> Dyn.int
+      ; "header", header |> or_dyn Header.to_dyn
+      ; "comment_prefix", comment_prefix |> Dyn.string
+      ; "digest_of_condensed_content", digest_of_condensed_content |> Digest_hex.to_dyn
+      ; "content", content |> Dyn.string
+      ]
+  ;;
+
+  let sexp_of_t t = Dyn.to_sexp (to_dyn t)
 end
 
 include T
@@ -151,7 +195,12 @@ let content t = t.content
 let content_start_offset t = t.content_start_offset
 let comment_prefix t = t.comment_prefix
 let whole_loc t = t.whole_loc
-let header t = t.header
+
+let header t =
+  match t.header with
+  | Ok ok -> Ok ok
+  | Error dyn -> Error (Error.create_s (Dyn.to_sexp dyn))
+;;
 
 let create
       ~path

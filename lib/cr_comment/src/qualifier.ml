@@ -23,7 +23,16 @@ type t =
   | None
   | Soon
   | Someday
-[@@deriving compare, equal, enumerate, sexp_of]
+[@@deriving compare, equal, enumerate]
+
+let variant_constructor_name = function
+  | None -> "None"
+  | Soon -> "Soon"
+  | Someday -> "Someday"
+;;
+
+let to_dyn t = Dyn.Variant (variant_constructor_name t, [])
+let sexp_of_t t = Sexp.Atom (variant_constructor_name t)
 
 let priority : t -> Priority.t = function
   | None -> Now

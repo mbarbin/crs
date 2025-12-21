@@ -33,7 +33,17 @@ module Getters = struct
     ; recipient : string Loc.Txt.t option
     ; contents : string Loc.Txt.t
     }
-  [@@deriving sexp_of]
+
+  let to_dyn { status; qualifier; reporter; for_or_to; recipient; contents } =
+    Dyn.record
+      [ "status", status |> Loc.Txt.to_dyn Cr_comment.Status.to_dyn
+      ; "qualifier", qualifier |> Dyn.option (Loc.Txt.to_dyn Dyn.string)
+      ; "reporter", reporter |> Dyn.option (Loc.Txt.to_dyn Dyn.string)
+      ; "for_or_to", for_or_to |> Dyn.option (Loc.Txt.to_dyn Dyn.string)
+      ; "recipient", recipient |> Dyn.option (Loc.Txt.to_dyn Dyn.string)
+      ; "contents", contents |> Loc.Txt.to_dyn Dyn.string
+      ]
+  ;;
 
   let of_cr (cr : Invalid_cr.t) =
     { status = Invalid_cr.status cr
@@ -81,7 +91,7 @@ let test file_contents =
     List.iter crs ~f:(fun t ->
       print_endline "========================";
       let getters = Getters.of_cr t in
-      print_s [%sexp { getters : Getters.t }];
+      print_dyn (Dyn.record [ "getters", getters |> Getters.to_dyn ]);
       ()))
 ;;
 
@@ -122,14 +132,15 @@ let%expect_test "getters" =
   [%expect
     {|
     ========================
-    ((
-      getters (
-        (status CR)
-        (qualifier ())
-        (reporter  ())
-        (for_or_to ())
-        (recipient ())
-        (contents "Hello contents."))))
+    { getters =
+        { status = CR
+        ; qualifier = None
+        ; reporter = None
+        ; for_or_to = None
+        ; recipient = None
+        ; contents = "Hello contents."
+        }
+    }
     |}];
   test
     {|
@@ -138,14 +149,15 @@ let%expect_test "getters" =
   [%expect
     {|
     ========================
-    ((
-      getters (
-        (status CR)
-        (qualifier ())
-        (reporter  (user1))
-        (for_or_to (to))
-        (recipient (user2))
-        (contents "Hello contents."))))
+    { getters =
+        { status = CR
+        ; qualifier = None
+        ; reporter = Some "user1"
+        ; for_or_to = Some "to"
+        ; recipient = Some "user2"
+        ; contents = "Hello contents."
+        }
+    }
     |}];
   test
     {|
@@ -154,14 +166,15 @@ let%expect_test "getters" =
   [%expect
     {|
     ========================
-    ((
-      getters (
-        (status CR)
-        (qualifier (user))
-        (reporter  (Hello))
-        (for_or_to ())
-        (recipient ())
-        (contents contents.))))
+    { getters =
+        { status = CR
+        ; qualifier = Some "user"
+        ; reporter = Some "Hello"
+        ; for_or_to = None
+        ; recipient = None
+        ; contents = "contents."
+        }
+    }
     |}];
   test
     {|
@@ -170,14 +183,15 @@ let%expect_test "getters" =
   [%expect
     {|
     ========================
-    ((
-      getters (
-        (status XCR)
-        (qualifier (user))
-        (reporter  ())
-        (for_or_to ())
-        (recipient ())
-        (contents "Hello contents."))))
+    { getters =
+        { status = XCR
+        ; qualifier = Some "user"
+        ; reporter = None
+        ; for_or_to = None
+        ; recipient = None
+        ; contents = "Hello contents."
+        }
+    }
     |}];
   test
     {|
@@ -186,14 +200,15 @@ let%expect_test "getters" =
   [%expect
     {|
     ========================
-    ((
-      getters (
-        (status CR)
-        (qualifier (soneday))
-        (reporter  (user1))
-        (for_or_to (for))
-        (recipient (user#2))
-        (contents "Hello contents."))))
+    { getters =
+        { status = CR
+        ; qualifier = Some "soneday"
+        ; reporter = Some "user1"
+        ; for_or_to = Some "for"
+        ; recipient = Some "user#2"
+        ; contents = "Hello contents."
+        }
+    }
     |}];
   ()
 ;;

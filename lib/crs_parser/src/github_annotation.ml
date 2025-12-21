@@ -24,7 +24,15 @@ module Severity = struct
     | Error
     | Warning
     | Notice
-  [@@deriving sexp_of]
+
+  let variant_constructor_name = function
+    | Error -> "Error"
+    | Warning -> "Warning"
+    | Notice -> "Notice"
+  ;;
+
+  let to_dyn t = Dyn.variant (variant_constructor_name t) []
+  let sexp_of_t t = Sexp.Atom (variant_constructor_name t)
 
   let to_string = function
     | Error -> "error"
@@ -39,8 +47,17 @@ type t =
   ; title : string
   ; message : string
   }
-[@@deriving sexp_of]
 
+let to_dyn { loc; severity; title; message } =
+  Dyn.record
+    [ "loc", loc |> Loc.to_dyn
+    ; "severity", severity |> Severity.to_dyn
+    ; "title", title |> Dyn.string
+    ; "message", message |> Dyn.string
+    ]
+;;
+
+let sexp_of_t t = Dyn.to_sexp (to_dyn t)
 let create ~loc ~severity ~title ~message = { loc; severity; title; message }
 
 let to_loc_fields_internal ~loc =

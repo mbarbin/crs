@@ -21,17 +21,15 @@
 
 let%expect_test "to_string" =
   List.iter Cr_comment.Status.all ~f:(fun status ->
-    print_s
-      [%sexp
-        { status : Cr_comment.Status.t
-        ; to_string = (Cr_comment.Status.to_string status : string)
-        }]);
+    print_dyn
+      (Dyn.record
+         [ "status", status |> Cr_comment.Status.to_dyn
+         ; "to_string", Cr_comment.Status.to_string status |> Dyn.string
+         ]));
   [%expect
     {|
-    ((status    CR)
-     (to_string CR))
-    ((status    XCR)
-     (to_string XCR))
+    { status = CR; to_string = "CR" }
+    { status = XCR; to_string = "XCR" }
     |}];
   ()
 ;;
@@ -46,12 +44,11 @@ let%expect_test "equal" =
 let%expect_test "compare" =
   let cr = Cr_comment.Status.CR in
   let xcr = Cr_comment.Status.XCR in
-  print_s
-    [%sexp
-      (List.sort
-         (List.concat [ List.rev Cr_comment.Status.all; [ xcr; cr; xcr ] ])
-         ~compare:Cr_comment.Status.compare
-       : Cr_comment.Status.t list)];
-  [%expect {| (CR CR XCR XCR XCR) |}];
+  print_dyn
+    (List.sort
+       (List.concat [ List.rev Cr_comment.Status.all; [ xcr; cr; xcr ] ])
+       ~compare:Cr_comment.Status.compare
+     |> Dyn.list Cr_comment.Status.to_dyn);
+  [%expect {| [ CR; CR; XCR; XCR; XCR ] |}];
   ()
 ;;

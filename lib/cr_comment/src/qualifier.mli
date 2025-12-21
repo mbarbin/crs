@@ -42,6 +42,8 @@ type t =
   | Someday
 [@@deriving compare, equal, enumerate, sexp_of]
 
+val to_dyn : t -> Dyn.t
+
 (** This returns the priority according to the qualifier, if we were to take
     nothing else into account. *)
 val priority : t -> Priority.t

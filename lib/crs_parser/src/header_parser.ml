@@ -119,13 +119,13 @@ let make_re_helper () =
 let re_helper = lazy (make_re_helper ())
 
 let parse ~file_cache ~content_start_offset ~content =
-  let ( let* ) a f = Or_error.bind a ~f in
+  let ( let* ) a f = Result.bind a ~f in
   try
     let re_helper = Lazy.force re_helper in
     let* m =
       match Re.exec_opt re_helper.re content with
-      | None -> Or_error.error "Invalid CR comment" content String.sexp_of_t
-      | Some m -> Or_error.return m
+      | None -> Error (Dyn.Tuple [ Dyn.string "Invalid CR comment"; Dyn.string content ])
+      | Some m -> Ok m
     in
     let get index =
       match Re.Group.get_opt m index with
@@ -170,13 +170,16 @@ let parse ~file_cache ~content_start_offset ~content =
         (* dated CR -> CR-someday *)
         { Loc.Txt.txt = Cr_comment.Qualifier.Someday; loc }
     in
-    Or_error.return
-      (Cr_comment.Private.Header.create ~status ~qualifier ~reporter ~recipient)
+    Ok (Cr_comment.Private.Header.create ~status ~qualifier ~reporter ~recipient)
   with
   | exn ->
     (* This catches e.g. other invalid inputs such as invalid user names. *)
-    Or_error.error
-      "could not process CR"
-      (content, exn)
-      [%sexp_of: string * exn] [@coverage off]
+    let exn =
+      match exn with
+      | Invalid_argument str -> Dyn.variant "Invalid_argument" [ Dyn.string str ]
+      | Failure str -> Dyn.variant "Failure" [ Dyn.string str ]
+      | _ -> Dyn.string (Stdlib.Printexc.to_string exn)
+    in
+    (Error (Dyn.Tuple [ Dyn.string "Could not process CR."; Dyn.string content; exn ])
+    [@coverage off])
 ;;

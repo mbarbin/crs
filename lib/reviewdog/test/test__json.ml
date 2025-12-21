@@ -18,7 +18,9 @@ let round t =
   | Ok t -> t
   | Error msg ->
     (let json = Yojson.Safe.to_string json in
-     raise_s [%sexp "Of_yojson_error", { msg : string; json : string }])
+     Code_error.raise
+       "Of_yojson_error"
+       [ "msg", msg |> Dyn.string; "json", json |> Dyn.string ])
     [@coverage off]
 ;;
 

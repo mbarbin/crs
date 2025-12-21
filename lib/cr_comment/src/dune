@@ -27,5 +27,4 @@
    ppx_enumerate
    ppx_hash
    ppx_here
-   ppx_sexp_conv
-   ppx_sexp_value)))
+   ppx_sexp_conv)))

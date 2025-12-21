@@ -27,8 +27,10 @@ module Reason : sig
     | Default_repo_owner
     | No_default_repo_owner
     | Pull_request_author
-  [@@deriving enumerate, sexp_of]
 
+  val all : t list
+  val to_dyn : t -> Dyn.t
+  val sexp_of_t : t -> Sexp.t
   val to_string_hum : t -> string
 end
 
@@ -36,6 +38,7 @@ type t =
   { user : Vcs.User_handle.t option
   ; reason : Reason.t
   }
-[@@deriving sexp_of]
 
+val to_dyn : t -> Dyn.t
+val sexp_of_t : t -> Sexp.t
 val compute : cr:Cr_comment.t -> config:Config.t -> review_mode:Review_mode.t -> t

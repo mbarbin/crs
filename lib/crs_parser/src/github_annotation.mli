@@ -37,11 +37,15 @@ module Severity : sig
     | Error
     | Warning
     | Notice
-  [@@deriving sexp_of]
+
+  val to_dyn : t -> Dyn.t
+  val sexp_of_t : t -> Sexp.t
 end
 
-type t [@@deriving sexp_of]
+type t
 
+val to_dyn : t -> Dyn.t
+val sexp_of_t : t -> Sexp.t
 val create : loc:Loc.t -> severity:Severity.t -> title:string -> message:string -> t
 
 (** {1 Serialize} *)

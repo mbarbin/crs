@@ -23,4 +23,13 @@ type t =
   | Now
   | Soon
   | Someday
-[@@deriving compare, equal, enumerate, sexp_of]
+[@@deriving compare, equal, enumerate]
+
+let variant_constructor_name = function
+  | Now -> "Now"
+  | Soon -> "Soon"
+  | Someday -> "Someday"
+;;
+
+let to_dyn t = Dyn.Variant (variant_constructor_name t, [])
+let sexp_of_t t = Sexp.Atom (variant_constructor_name t)

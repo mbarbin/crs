@@ -33,7 +33,7 @@ let test file_contents =
     require_equal [%here] (module Cr_comment.Priority) priority priority_via_header;
     print_endline "========================";
     print_endline (Cr_comment.reindented_content cr);
-    print_s [%sexp { priority : Cr_comment.Priority.t }])
+    print_dyn (Dyn.record [ "priority", priority |> Cr_comment.Priority.to_dyn ]))
 ;;
 
 let%expect_test "test-cases" =
@@ -42,34 +42,34 @@ let%expect_test "test-cases" =
     {|
     ========================
     CR user: Hello.
-    ((priority Now))
+    { priority = Now }
     ========================
     CR user for user2: Hello.
-    ((priority Now))
+    { priority = Now }
     ========================
     XCR user: Hello.
-    ((priority Now))
+    { priority = Now }
     ========================
     XCR user for user2: Hello.
-    ((priority Now))
+    { priority = Now }
     ========================
     CR-user: Invalid.
-    ((priority Now))
+    { priority = Now }
     ========================
     XCR-user: Invalid.
-    ((priority Now))
+    { priority = Now }
     ========================
     CR-soon user: Hello.
-    ((priority Soon))
+    { priority = Soon }
     ========================
     CR-someday user: Hello.
-    ((priority Someday))
+    { priority = Someday }
     ========================
     XCR-soon user: Hello.
-    ((priority Now))
+    { priority = Now }
     ========================
     XCR-someday user: Hello.
-    ((priority Now))
+    { priority = Now }
     |}];
   ()
 ;;

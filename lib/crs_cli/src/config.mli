@@ -36,10 +36,15 @@ module Annotation_severity : sig
     | Error
     | Warning
     | Info
-  [@@deriving sexp_of]
+
+  val to_dyn : t -> Dyn.t
+  val sexp_of_t : t -> Sexp.t
 end
 
-type t [@@deriving sexp_of]
+type t
+
+val to_dyn : t -> Dyn.t
+val sexp_of_t : t -> Sexp.t
 
 (** {1 Getters} *)
 

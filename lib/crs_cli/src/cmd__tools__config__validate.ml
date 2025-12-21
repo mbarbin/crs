@@ -32,5 +32,5 @@ let main =
        Common_helpers.emit_github_annotations_arg ~default:false
      in
      let config = Config.load_exn ~path:(Fpath.v path) ~emit_github_annotations in
-     if print then print_s [%sexp (config : Config.t)])
+     if print then print_s (config |> Config.sexp_of_t))
 ;;

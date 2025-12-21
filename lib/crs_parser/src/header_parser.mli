@@ -49,4 +49,4 @@ val parse
   :  file_cache:Loc.File_cache.t
   -> content_start_offset:Loc.Offset.t
   -> content:string
-  -> Cr_comment.Header.t Or_error.t
+  -> (Cr_comment.Header.t, Dyn.t) Result.t

@@ -74,12 +74,15 @@
 module Digest_hex : sig
   type t [@@deriving compare, equal, sexp_of]
 
+  val to_dyn : t -> Dyn.t
   val to_string : t -> string
   val create : string -> t
 end
 
 module Header : sig
   type t [@@deriving equal, sexp_of]
+
+  val to_dyn : t -> Dyn.t
 
   (** [reporter] is [user] in [CR user...]. *)
   val reporter : t -> Vcs.User_handle.t
@@ -183,6 +186,8 @@ end
     about a CR that was parsed from a file. *)
 type t [@@deriving equal, sexp_of]
 
+val to_dyn : t -> Dyn.t
+
 (** {1 Getters} *)
 
 val path : t -> Vcs.Path_in_repo.t
@@ -273,7 +278,7 @@ module Private : sig
     :  path:Vcs.Path_in_repo.t
     -> whole_loc:Loc.t
     -> content_start_offset:int
-    -> header:header Or_error.t
+    -> header:(header, Dyn.t) Result.t
     -> comment_prefix:string
     -> digest_of_condensed_content:Digest_hex.t
     -> content:string

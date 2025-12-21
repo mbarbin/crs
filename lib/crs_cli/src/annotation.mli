@@ -32,7 +32,10 @@ module Severity : sig
     | Error
     | Warning
     | Info
-  [@@deriving enumerate, sexp_of]
+
+  val all : t list
+  val to_dyn : t -> Dyn.t
+  val sexp_of_t : t -> Sexp.t
 
   (** Capitalized like the constructor (e.g. ["Error"]). *)
   val to_string : t -> string
@@ -41,7 +44,10 @@ module Severity : sig
   val to_reviewdog : t -> Reviewdog.Severity.t
 end
 
-type t [@@deriving sexp_of]
+type t
+
+val to_dyn : t -> Dyn.t
+val sexp_of_t : t -> Sexp.t
 
 (** When [with_user_mentions] is true, we prefix user names by '@' in
     annotations messages. See also {!val:write_username}. *)

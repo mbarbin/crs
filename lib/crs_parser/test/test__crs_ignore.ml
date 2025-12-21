@@ -30,7 +30,7 @@ let%expect_test "relative parent is dir_path" =
   let p = Relative_path.v "a/b" in
   let parent = Relative_path.parent p |> Option.value_exn ~here:[%here] in
   require [%here] (Relative_path.is_dir_path parent);
-  print_s [%sexp (parent : Relative_path.t)];
+  print_endline (parent |> Relative_path.to_string);
   [%expect {| a/ |}];
   ()
 ;;
@@ -39,7 +39,7 @@ let%expect_test "absolute parent is dir_path" =
   let p = Absolute_path.v "/a/b" in
   let parent = Absolute_path.parent p |> Option.value_exn ~here:[%here] in
   require [%here] (Absolute_path.is_dir_path parent);
-  print_s [%sexp (parent : Absolute_path.t)];
+  print_endline (parent |> Absolute_path.to_string);
   [%expect {| /a/ |}];
   ()
 ;;
@@ -48,32 +48,41 @@ let%expect_test "parent of dir_path" =
   let p = Relative_path.v "a/b/" in
   let parent = Relative_path.parent p |> Option.value_exn ~here:[%here] in
   require [%here] (Relative_path.is_dir_path parent);
-  print_s [%sexp (parent : Relative_path.t)];
+  print_endline (parent |> Relative_path.to_string);
   [%expect {| a/ |}];
   ()
 ;;
 
 let%expect_test "parent of relative_path" =
-  let test p = print_s [%sexp (Relative_path.parent p : Relative_path.t option)] in
+  let test p =
+    print_dyn
+      (Relative_path.parent p |> Dyn.option (Dyn.stringable (module Relative_path)))
+  in
   test (Relative_path.v "a");
-  [%expect {| (./) |}];
+  [%expect {| Some "./" |}];
   test (Relative_path.v "a/b");
-  [%expect {| (a/) |}];
+  [%expect {| Some "a/" |}];
   test (Relative_path.v "a/");
-  [%expect {| (./) |}];
+  [%expect {| Some "./" |}];
   test (Relative_path.v "a/b/");
-  [%expect {| (a/) |}];
+  [%expect {| Some "a/" |}];
   test Relative_path.empty;
-  [%expect {| () |}];
+  [%expect {| None |}];
   ()
 ;;
 
 let%expect_test "relative empty is dir_path" =
   let parent = Relative_path.empty in
   require [%here] (Relative_path.is_dir_path parent);
-  print_s [%sexp (parent : Relative_path.t)];
+  print_endline (parent |> Relative_path.to_string);
   [%expect {| ./ |}];
   ()
+;;
+
+let print_suffix ~suffix =
+  print_dyn
+    (Dyn.record
+       [ "suffix", suffix |> Dyn.option (Dyn.stringable (module Relative_path)) ])
 ;;
 
 let%expect_test "relative empty chop_prefix" =
@@ -83,8 +92,8 @@ let%expect_test "relative empty chop_prefix" =
       (Vcs.Path_in_repo.to_relative_path path)
   in
   require [%here] (Option.is_some suffix);
-  print_s [%sexp { suffix : Relative_path.t option }];
-  [%expect {| ((suffix (.crs-ignore))) |}];
+  print_suffix ~suffix;
+  [%expect {| { suffix = Some ".crs-ignore" } |}];
   ()
 ;;
 
@@ -95,20 +104,20 @@ let%expect_test "chop_prefix" =
       (Vcs.Path_in_repo.to_relative_path path)
   in
   require [%here] (Option.is_some suffix);
-  print_s [%sexp { suffix : Relative_path.t option }];
-  [%expect {| ((suffix (.crs-ignore))) |}];
+  print_suffix ~suffix;
+  [%expect {| { suffix = Some ".crs-ignore" } |}];
   let suffix =
     Relative_path.chop_prefix ~prefix:(Relative_path.v "./a/") (Relative_path.v "a/b")
   in
   require [%here] (Option.is_some suffix);
-  print_s [%sexp { suffix : Relative_path.t option }];
-  [%expect {| ((suffix (b))) |}];
+  print_suffix ~suffix;
+  [%expect {| { suffix = Some "b" } |}];
   let suffix =
     Relative_path.chop_prefix ~prefix:(Relative_path.v "./a") (Relative_path.v "a/b")
   in
   require [%here] (Option.is_some suffix);
-  print_s [%sexp { suffix : Relative_path.t option }];
-  [%expect {| ((suffix (b))) |}];
+  print_suffix ~suffix;
+  [%expect {| { suffix = Some "b" } |}];
   ()
 ;;
 
@@ -117,26 +126,26 @@ let%expect_test "absolute root chop_prefix" =
     Absolute_path.chop_prefix ~prefix:Absolute_path.root (Absolute_path.v "/a")
   in
   require [%here] (Option.is_some suffix);
-  print_s [%sexp { suffix : Relative_path.t option }];
-  [%expect {| ((suffix (a))) |}];
+  print_suffix ~suffix;
+  [%expect {| { suffix = Some "a" } |}];
   let suffix =
     Absolute_path.chop_prefix ~prefix:(Absolute_path.v "/a/") (Absolute_path.v "/a/b")
   in
   require [%here] (Option.is_some suffix);
-  print_s [%sexp { suffix : Relative_path.t option }];
-  [%expect {| ((suffix (b))) |}];
+  print_suffix ~suffix;
+  [%expect {| { suffix = Some "b" } |}];
   let suffix =
     Absolute_path.chop_prefix ~prefix:(Absolute_path.v "/a") (Absolute_path.v "/a/b")
   in
   require [%here] (Option.is_some suffix);
-  print_s [%sexp { suffix : Relative_path.t option }];
-  [%expect {| ((suffix (b))) |}];
+  print_suffix ~suffix;
+  [%expect {| { suffix = Some "b" } |}];
   ()
 ;;
 
 let%expect_test "is_file_ignored" =
   let test rules ~path =
-    print_s [%sexp (Crs_ignore.Rules.is_file_ignored rules ~path : bool)]
+    print_dyn (Crs_ignore.Rules.is_file_ignored rules ~path |> Dyn.bool)
   in
   let rules file_contents =
     let file =

@@ -30,7 +30,19 @@ module T = struct
         ; base : Vcs.Rev.t option
         }
     | Revision
-  [@@deriving equal, sexp_of]
+  [@@deriving equal]
+
+  let to_dyn = function
+    | Revision -> Dyn.variant "Revision" []
+    | Pull_request { author; base } ->
+      Dyn.inline_record
+        "Pull_request"
+        [ "author", author |> Dyn.stringable (module Vcs.User_handle)
+        ; "base", base |> Dyn.option (Dyn.stringable (module Vcs.Rev))
+        ]
+  ;;
+
+  let sexp_of_t t = Dyn.to_sexp (to_dyn t)
 end
 
 include T

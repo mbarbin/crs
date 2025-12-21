@@ -147,7 +147,7 @@ module File = struct
     let directory =
       Vcs.Path_in_repo.to_relative_path path
       |> Relative_path.parent
-      |> Option.value_exn ~here:[%here]
+      |> Option.value ~default:Relative_path.empty
       |> Relative_path.to_dir_path
     in
     let ignore_file_path = Vcs.Repo_root.append repo_root path in

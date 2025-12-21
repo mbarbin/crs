@@ -49,3 +49,5 @@ type t =
   | Soon
   | Someday
 [@@deriving compare, equal, enumerate, sexp_of]
+
+val to_dyn : t -> Dyn.t

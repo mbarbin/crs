@@ -29,7 +29,15 @@ module Annotation_severity = struct
     | Error
     | Warning
     | Info
-  [@@deriving sexp_of]
+
+  let variant_constructor_name = function
+    | Error -> "Error"
+    | Warning -> "Warning"
+    | Info -> "Info"
+  ;;
+
+  let to_dyn t = Dyn.Variant (variant_constructor_name t, [])
+  let sexp_of_t t = Sexp.Atom (variant_constructor_name t)
 
   let of_string = function
     | "Error" -> Some Error
@@ -40,7 +48,9 @@ module Annotation_severity = struct
 end
 
 module User_handle = struct
-  type t = Vcs.User_handle.t [@@deriving sexp_of]
+  type t = Vcs.User_handle.t
+
+  let to_dyn t = Dyn.stringable (module Vcs.User_handle) t
 
   let of_json json =
     match (json : Json.t) with
@@ -64,12 +74,36 @@ module User_list = struct
 end
 
 type t =
-  { default_repo_owner : User_handle.t option [@sexp.option]
-  ; user_mentions_allowlist : User_handle.t list option [@sexp.option]
-  ; invalid_crs_annotation_severity : Annotation_severity.t option [@sexp.option]
-  ; crs_due_now_annotation_severity : Annotation_severity.t option [@sexp.option]
+  { default_repo_owner : User_handle.t option
+  ; user_mentions_allowlist : User_handle.t list option
+  ; invalid_crs_annotation_severity : Annotation_severity.t option
+  ; crs_due_now_annotation_severity : Annotation_severity.t option
   }
-[@@deriving sexp_of]
+
+let to_dyn
+      { default_repo_owner
+      ; user_mentions_allowlist
+      ; invalid_crs_annotation_severity
+      ; crs_due_now_annotation_severity
+      }
+  =
+  let opt field d = function
+    | None -> []
+    | Some v -> [ field, d v ]
+  in
+  Dyn.record
+    (List.concat
+       [ default_repo_owner |> opt "default_repo_owner" User_handle.to_dyn
+       ; user_mentions_allowlist
+         |> opt "user_mentions_allowlist" (Dyn.list User_handle.to_dyn)
+       ; invalid_crs_annotation_severity
+         |> opt "invalid_crs_annotation_severity" Annotation_severity.to_dyn
+       ; crs_due_now_annotation_severity
+         |> opt "crs_due_now_annotation_severity" Annotation_severity.to_dyn
+       ])
+;;
+
+let sexp_of_t t = Dyn.to_sexp (to_dyn t)
 
 let get_json_enum_constructor json ~loc ~field_name =
   match json with

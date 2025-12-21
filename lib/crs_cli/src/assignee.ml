@@ -51,7 +51,28 @@ module Reason = struct
     | Default_repo_owner
     | No_default_repo_owner
     | Pull_request_author
-  [@@deriving enumerate, sexp_of]
+
+  let all =
+    [ Not_due_now
+    ; Recipient
+    ; Reporter
+    ; Default_repo_owner
+    ; No_default_repo_owner
+    ; Pull_request_author
+    ]
+  ;;
+
+  let variant_constructor_name = function
+    | Not_due_now -> "Not_due_now"
+    | Recipient -> "Recipient"
+    | Reporter -> "Reporter"
+    | Default_repo_owner -> "Default_repo_owner"
+    | No_default_repo_owner -> "No_default_repo_owner"
+    | Pull_request_author -> "Pull_request_author"
+  ;;
+
+  let to_dyn t = Dyn.Variant (variant_constructor_name t, [])
+  let sexp_of_t t = Sexp.Atom (variant_constructor_name t)
 
   let to_string_hum = function
     | Not_due_now -> "CR not due now"
@@ -67,7 +88,15 @@ type t =
   { user : Vcs.User_handle.t option
   ; reason : Reason.t
   }
-[@@deriving sexp_of]
+
+let to_dyn { user; reason } =
+  Dyn.record
+    [ "user", user |> Dyn.option (fun u -> Dyn.stringable (module Vcs.User_handle) u)
+    ; "reason", reason |> Reason.to_dyn
+    ]
+;;
+
+let sexp_of_t t = Dyn.to_sexp (to_dyn t)
 
 let of_raw
       ~(raw_assignee : Raw_assignee.t)

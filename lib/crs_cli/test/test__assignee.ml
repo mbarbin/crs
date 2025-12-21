@@ -24,25 +24,19 @@ module Config = Crs_cli.Private.Config
 
 let%expect_test "reasons" =
   List.iter Assignee.Reason.all ~f:(fun reason ->
-    print_s
-      [%sexp
-        { reason : Assignee.Reason.t
-        ; text = (Assignee.Reason.to_string_hum reason : string)
-        }]);
+    print_dyn
+      (Dyn.record
+         [ "reason", reason |> Assignee.Reason.to_dyn
+         ; "text", Assignee.Reason.to_string_hum reason |> Dyn.string
+         ]));
   [%expect
     {|
-    ((reason Not_due_now)
-     (text   "CR not due now"))
-    ((reason Recipient)
-     (text   "CR recipient"))
-    ((reason Reporter)
-     (text   "CR reporter"))
-    ((reason Default_repo_owner)
-     (text   "default repo owner"))
-    ((reason No_default_repo_owner)
-     (text   "no default repo owner configured"))
-    ((reason Pull_request_author)
-     (text   "PR author"))
+    { reason = Not_due_now; text = "CR not due now" }
+    { reason = Recipient; text = "CR recipient" }
+    { reason = Reporter; text = "CR reporter" }
+    { reason = Default_repo_owner; text = "default repo owner" }
+    { reason = No_default_repo_owner; text = "no default repo owner configured" }
+    { reason = Pull_request_author; text = "PR author" }
     |}];
   ()
 ;;
@@ -55,7 +49,7 @@ let test file_contents ~config ~review_mode =
     let assignee = Assignee.compute ~cr ~config ~review_mode in
     print_endline "========================";
     print_endline (Cr_comment.reindented_content cr);
-    print_s [%sexp { assignee : Assignee.t }])
+    print_dyn (Dyn.record [ "assignee", assignee |> Assignee.to_dyn ]))
 ;;
 
 let%expect_test "compute" =
@@ -65,34 +59,34 @@ let%expect_test "compute" =
     {|
     ========================
     CR user: Hello.
-    ((assignee ((user (owner)) (reason Default_repo_owner))))
+    { assignee = { user = Some "owner"; reason = Default_repo_owner } }
     ========================
     CR user for user2: Hello.
-    ((assignee ((user (user2)) (reason Recipient))))
+    { assignee = { user = Some "user2"; reason = Recipient } }
     ========================
     XCR user: Hello.
-    ((assignee ((user (user)) (reason Reporter))))
+    { assignee = { user = Some "user"; reason = Reporter } }
     ========================
     XCR user for user2: Hello.
-    ((assignee ((user (user)) (reason Reporter))))
+    { assignee = { user = Some "user"; reason = Reporter } }
     ========================
     CR-user: Invalid.
-    ((assignee ((user (owner)) (reason Default_repo_owner))))
+    { assignee = { user = Some "owner"; reason = Default_repo_owner } }
     ========================
     XCR-user: Invalid.
-    ((assignee ((user (owner)) (reason Default_repo_owner))))
+    { assignee = { user = Some "owner"; reason = Default_repo_owner } }
     ========================
     CR-soon user: Hello.
-    ((assignee ((user ()) (reason Not_due_now))))
+    { assignee = { user = None; reason = Not_due_now } }
     ========================
     CR-someday user: Hello.
-    ((assignee ((user ()) (reason Not_due_now))))
+    { assignee = { user = None; reason = Not_due_now } }
     ========================
     XCR-soon user: Hello.
-    ((assignee ((user (user)) (reason Reporter))))
+    { assignee = { user = Some "user"; reason = Reporter } }
     ========================
     XCR-someday user: Hello.
-    ((assignee ((user (user)) (reason Reporter))))
+    { assignee = { user = Some "user"; reason = Reporter } }
     |}];
   let config = Config.create ~default_repo_owner:(Vcs.User_handle.v "owner") () in
   test
@@ -103,34 +97,34 @@ let%expect_test "compute" =
     {|
     ========================
     CR user: Hello.
-    ((assignee ((user (pr-author)) (reason Pull_request_author))))
+    { assignee = { user = Some "pr-author"; reason = Pull_request_author } }
     ========================
     CR user for user2: Hello.
-    ((assignee ((user (user2)) (reason Recipient))))
+    { assignee = { user = Some "user2"; reason = Recipient } }
     ========================
     XCR user: Hello.
-    ((assignee ((user (user)) (reason Reporter))))
+    { assignee = { user = Some "user"; reason = Reporter } }
     ========================
     XCR user for user2: Hello.
-    ((assignee ((user (user)) (reason Reporter))))
+    { assignee = { user = Some "user"; reason = Reporter } }
     ========================
     CR-user: Invalid.
-    ((assignee ((user (pr-author)) (reason Pull_request_author))))
+    { assignee = { user = Some "pr-author"; reason = Pull_request_author } }
     ========================
     XCR-user: Invalid.
-    ((assignee ((user (pr-author)) (reason Pull_request_author))))
+    { assignee = { user = Some "pr-author"; reason = Pull_request_author } }
     ========================
     CR-soon user: Hello.
-    ((assignee ((user ()) (reason Not_due_now))))
+    { assignee = { user = None; reason = Not_due_now } }
     ========================
     CR-someday user: Hello.
-    ((assignee ((user ()) (reason Not_due_now))))
+    { assignee = { user = None; reason = Not_due_now } }
     ========================
     XCR-soon user: Hello.
-    ((assignee ((user (user)) (reason Reporter))))
+    { assignee = { user = Some "user"; reason = Reporter } }
     ========================
     XCR-someday user: Hello.
-    ((assignee ((user (user)) (reason Reporter))))
+    { assignee = { user = Some "user"; reason = Reporter } }
     |}];
   ()
 ;;
