@@ -32,6 +32,8 @@
    (>= 0.0.9))
   (cmdlang-cmdliner-err-runner
    (>= 0.0.16))
+  (dyn
+   (>= 3.17))
   (file-rewriter
    (>= 0.0.3))
   (fpath
@@ -40,6 +42,8 @@
    (>= 0.4.0))
   (loc
    (>= 0.2.2))
+  (ordering
+   (>= 3.17))
   (pageantty
    (>= 0.0.2))
   (pp
@@ -68,6 +72,8 @@
    (>= 0.1.0))
   (re
    (>= 1.12.0))
+  (sexplib0
+   (>= v0.17))
   (spawn
    (>= v0.17))
   (stdio

@@ -1,0 +1,10 @@
+(library
+ (name crs_stdlib)
+ (public_name crs.stdlib)
+ (flags :standard -w +a-4-40-41-42-44-45-48-66 -warn-error +a)
+ (libraries dyn ordering pp sexplib0)
+ (instrumentation
+  (backend bisect_ppx))
+ (lint
+  (pps ppx_js_style -allow-let-operators -check-doc-comments))
+ (preprocess no_preprocessing))

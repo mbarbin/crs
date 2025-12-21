@@ -13,10 +13,12 @@ depends: [
   "base" {>= "v0.17"}
   "cmdlang" {>= "0.0.9"}
   "cmdlang-cmdliner-err-runner" {>= "0.0.16"}
+  "dyn" {>= "3.17"}
   "file-rewriter" {>= "0.0.3"}
   "fpath" {>= "0.7.3"}
   "fpath-base" {>= "0.4.0"}
   "loc" {>= "0.2.2"}
+  "ordering" {>= "3.17"}
   "pageantty" {>= "0.0.2"}
   "pp" {>= "2.0.0"}
   "pplumbing-err" {>= "0.0.16"}
@@ -31,6 +33,7 @@ depends: [
   "ppxlib" {>= "0.33"}
   "print-table" {>= "0.1.0"}
   "re" {>= "1.12.0"}
+  "sexplib0" {>= "v0.17"}
   "spawn" {>= "v0.17"}
   "stdio" {>= "v0.17"}
   "volgo" {>= "0.0.18"}
