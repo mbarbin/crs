@@ -164,11 +164,7 @@
   (volgo-vcs
    (>= 0.0.18))
   (yojson
-   (>= 2.1.1))
-  (sherlodoc
-   (and
-    :with-doc
-    (>= 0.2)))))
+   (>= 2.1.1))))
 
 (package
  (name crs-dev)
@@ -252,10 +248,6 @@
   (volgo-vcs
    (>= 0.0.18))
   (odoc
-   (and
-    :with-doc
-    (>= 2.4.4)))
+   (>= 2.4.4))
   (sherlodoc
-   (and
-    :with-doc
-    (>= 0.2)))))
+   (>= 0.2))))

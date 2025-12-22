@@ -48,8 +48,8 @@ depends: [
   "volgo-git-unix" {>= "0.0.18"}
   "volgo-hg-unix" {>= "0.0.18"}
   "volgo-vcs" {>= "0.0.18"}
-  "odoc" {with-doc & >= "2.4.4"}
-  "sherlodoc" {with-doc & >= "0.2"}
+  "odoc" {>= "2.4.4"}
+  "sherlodoc" {>= "0.2"}
 ]
 build: [
   ["dune" "subst"] {dev}

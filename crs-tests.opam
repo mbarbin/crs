@@ -53,7 +53,6 @@ depends: [
   "volgo-hg-unix" {>= "0.0.18"}
   "volgo-vcs" {>= "0.0.18"}
   "yojson" {>= "2.1.1"}
-  "sherlodoc" {with-doc & >= "0.2"}
   "odoc" {with-doc}
 ]
 build: [
