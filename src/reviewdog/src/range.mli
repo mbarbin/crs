@@ -8,4 +8,5 @@ type t =
   { start : Position.t
   ; end_ : Position.t option
   }
-[@@deriving equal, compare, yojson]
+
+val to_json : t -> Yojson.Basic.t

@@ -8,4 +8,5 @@ type t =
   { name : string
   ; url : string option
   }
-[@@deriving equal, compare, yojson]
+
+val to_json : t -> Yojson.Basic.t

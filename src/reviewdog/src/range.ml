@@ -6,6 +6,15 @@
 
 type t =
   { start : Position.t
-  ; end_ : Position.t option [@yojson.default None] [@key "end"]
+  ; end_ : Position.t option
   }
-[@@deriving equal, compare, yojson]
+
+let to_json { start; end_ } : Yojson.Basic.t =
+  `Assoc
+    (List.concat
+       [ [ "start", Position.to_json start ]
+       ; (match end_ with
+          | None -> []
+          | Some end_pos -> [ "end", Position.to_json end_pos ])
+       ])
+;;

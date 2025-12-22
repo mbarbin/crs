@@ -14,4 +14,5 @@ type t =
   ; original_output : string option
   ; related_locations : Related_location.t list
   }
-[@@deriving equal, compare, yojson]
+
+val to_json : t -> Yojson.Basic.t

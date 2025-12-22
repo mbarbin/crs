@@ -38,8 +38,8 @@ let test file_contents ~config ~review_mode ~with_user_mentions =
     ; diagnostics
     }
   in
-  let json = Reviewdog.Diagnostic_result.to_yojson diagnostic_result in
-  print_endline (Yojson.Safe.pretty_to_string ~std:true json)
+  let json = Reviewdog.Diagnostic_result.to_json diagnostic_result in
+  print_endline (Yojson.Basic.pretty_to_string ~std:true json)
 ;;
 
 let%expect_test "compute" =
@@ -51,8 +51,6 @@ let%expect_test "compute" =
   [%expect
     {|
     {
-      "source": { "name": "crs", "url": "https://github.com/mbarbin/crs" },
-      "severity": "INFO",
       "diagnostics": [
         {
           "message": "This CR is unassigned (no default repo owner configured).",
@@ -150,7 +148,9 @@ let%expect_test "compute" =
           "severity": "INFO",
           "originalOutput": "XCR-someday user: Hello."
         }
-      ]
+      ],
+      "source": { "name": "crs", "url": "https://github.com/mbarbin/crs" },
+      "severity": "INFO"
     }
     |}];
   let config = Config.create ~invalid_crs_annotation_severity:Error () in
@@ -162,8 +162,6 @@ let%expect_test "compute" =
   [%expect
     {|
     {
-      "source": { "name": "crs", "url": "https://github.com/mbarbin/crs" },
-      "severity": "INFO",
       "diagnostics": [
         {
           "message": "This invalid CR is unassigned (no default repo owner configured).",
@@ -177,7 +175,9 @@ let%expect_test "compute" =
           "severity": "ERROR",
           "originalOutput": "CR-invalid : Invalid"
         }
-      ]
+      ],
+      "source": { "name": "crs", "url": "https://github.com/mbarbin/crs" },
+      "severity": "INFO"
     }
     |}];
   ()

@@ -1,28 +1,12 @@
 (library
  (name reviewdog_test)
  (package crs-tests)
- (flags
-  :standard
-  -w
-  +a-4-40-41-42-44-45-48-66
-  -warn-error
-  +a
-  -open
-  Base
-  -open
-  Base_quickcheck
-  -open
-  Crs_stdlib)
- (libraries base base_quickcheck crs_stdlib reviewdog reviewdog_rdf yojson)
+ (flags :standard -w +a-4-40-41-42-44-45-48-66 -warn-error +a)
+ (libraries reviewdog yojson)
  (inline_tests)
  (instrumentation
   (backend bisect_ppx))
  (lint
   (pps ppx_js_style -allow-let-operators -check-doc-comments))
  (preprocess
-  (pps
-   -unused-code-warnings=force
-   ppx_compare
-   ppx_expect
-   base_quickcheck.ppx_quickcheck
-   ppx_sexp_conv)))
+  (pps ppx_expect)))

@@ -9,4 +9,5 @@ type t =
   ; severity : Severity.t option
   ; diagnostics : Diagnostic.t list
   }
-[@@deriving equal, compare, yojson]
+
+val to_json : t -> Yojson.Basic.t

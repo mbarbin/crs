@@ -128,8 +128,6 @@ Let's test the reviewdog annotations too.
 
   $ crs tools reviewdog annotate-crs | tee without-config
   {
-    "source": { "name": "crs", "url": "https://github.com/mbarbin/crs" },
-    "severity": "INFO",
     "diagnostics": [
       {
         "message": "This XCR is assigned to user1 (CR reporter).",
@@ -179,13 +177,15 @@ Let's test the reviewdog annotations too.
         "severity": "INFO",
         "originalOutput": "CR user1 for user2: Hey, this is a code review comment"
       }
-    ]
+    ],
+    "source": { "name": "crs", "url": "https://github.com/mbarbin/crs" },
+    "severity": "INFO"
   }
 
   $ crs tools reviewdog annotate-crs --config=crs-config.json > with-config
 
   $ diff without-config with-config
-  30c30
+  28c28
   <       "message": "This CR is unassigned (no default repo owner configured).",
   ---
   >       "message": "This CR is assigned to user1 (default repo owner).",
@@ -199,15 +199,15 @@ Let's test the reviewdog annotations too.
   >  > for-pull-request
 
   $ diff with-config for-pull-request
-  6c6
+  4c4
   <       "message": "This XCR is assigned to user1 (CR reporter).",
   ---
   >       "message": "This XCR is assigned to @user1 (CR reporter).",
-  30c30
+  28c28
   <       "message": "This CR is assigned to user1 (default repo owner).",
   ---
   >       "message": "This CR is assigned to @pr-author (PR author).",
-  42c42
+  40c40
   <       "message": "This CR is assigned to user2 (CR recipient).",
   ---
   >       "message": "This CR is assigned to @user2 (CR recipient).",

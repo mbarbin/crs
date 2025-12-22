@@ -6,6 +6,15 @@
 
 type t =
   { path : string
-  ; range : Range.t option [@yojson.default None]
+  ; range : Range.t option
   }
-[@@deriving equal, compare, yojson]
+
+let to_json { path; range } : Yojson.Basic.t =
+  `Assoc
+    (List.concat
+       [ [ "path", `String path ]
+       ; (match range with
+          | None -> []
+          | Some r -> [ "range", Range.to_json r ])
+       ])
+;;

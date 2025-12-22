@@ -8,4 +8,5 @@ type t =
   { line : int
   ; column : int
   }
-[@@deriving equal, compare, yojson]
+
+val to_json : t -> Yojson.Basic.t

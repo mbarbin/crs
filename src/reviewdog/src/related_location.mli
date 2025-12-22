@@ -8,4 +8,5 @@ type t =
   { message : string option
   ; location : Location.t
   }
-[@@deriving equal, compare, yojson]
+
+val to_json : t -> Yojson.Basic.t

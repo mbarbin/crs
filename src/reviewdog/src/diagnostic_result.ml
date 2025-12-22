@@ -5,8 +5,20 @@
 (****************************************************************************)
 
 type t =
-  { source : Source.t option [@yojson.default None]
-  ; severity : Severity.t option [@yojson.default None]
+  { source : Source.t option
+  ; severity : Severity.t option
   ; diagnostics : Diagnostic.t list
   }
-[@@deriving equal, compare, yojson]
+
+let to_json { source; severity; diagnostics } : Yojson.Basic.t =
+  `Assoc
+    (List.concat
+       [ [ "diagnostics", `List (List.map Diagnostic.to_json diagnostics) ]
+       ; (match source with
+          | None -> []
+          | Some s -> [ "source", Source.to_json s ])
+       ; (match severity with
+          | None -> []
+          | Some s -> [ "severity", Severity.to_json s ])
+       ])
+;;
