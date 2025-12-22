@@ -30,7 +30,14 @@ module T = struct
         ; base : Vcs.Rev.t option
         }
     | Revision
-  [@@deriving equal]
+
+  let equal t1 t2 =
+    match t1, t2 with
+    | Pull_request _, Revision | Revision, Pull_request _ -> false
+    | Revision, Revision -> true
+    | Pull_request { author = a1; base = b1 }, Pull_request { author = a2; base = b2 } ->
+      Vcs.User_handle.equal a1 a2 && Option.equal Vcs.Rev.equal b1 b2
+  ;;
 
   let to_dyn = function
     | Revision -> Dyn.variant "Revision" []
@@ -66,7 +73,8 @@ module Name_compatibility = struct
     | Pull_request
     | Commit
     | Revision
-  [@@deriving enumerate]
+
+  let all = [ Pull_request; Commit; Revision ]
 
   let to_name : t -> Name.t = function
     | Pull_request -> Pull_request

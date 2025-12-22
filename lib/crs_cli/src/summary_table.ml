@@ -27,13 +27,28 @@ module By_type = struct
       | XCR
       | Soon
       | Someday
-    [@@deriving compare, sexp_of]
 
-    let to_string t =
-      match sexp_of_t t with
-      | Atom a -> a
-      | List _ -> assert false
+    let variant_constructor_name = function
+      | Invalid -> "Invalid"
+      | CR -> "CR"
+      | XCR -> "XCR"
+      | Soon -> "Soon"
+      | Someday -> "Someday"
     ;;
+
+    let variant_constructor_rank = function
+      | Invalid -> 0
+      | CR -> 1
+      | XCR -> 2
+      | Soon -> 3
+      | Someday -> 4
+    ;;
+
+    let compare t1 t2 =
+      Int.compare (variant_constructor_rank t1) (variant_constructor_rank t2)
+    ;;
+
+    let to_string = variant_constructor_name
 
     let of_cr (cr : Cr_comment.t) =
       match Cr_comment.header cr with
@@ -111,7 +126,14 @@ module Key = struct
     { reporter : Vcs.User_handle.t
     ; recipient : Vcs.User_handle.t option
     }
-  [@@deriving compare]
+
+  let compare t ({ reporter; recipient } as t2) =
+    if phys_equal t t2
+    then 0
+    else (
+      let r = Vcs.User_handle.compare t.reporter reporter in
+      if r <> 0 then r else Option.compare Vcs.User_handle.compare t.recipient recipient)
+  ;;
 
   let of_header (h : Cr_comment.Header.t) =
     { reporter = Cr_comment.Header.reporter h; recipient = Cr_comment.Header.recipient h }

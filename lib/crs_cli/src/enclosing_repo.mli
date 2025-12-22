@@ -31,7 +31,8 @@ module Vcs_kind : sig
     [ `Git
     | `Hg
     ]
-  [@@deriving sexp_of]
+
+  val sexp_of_t : t -> Sexp.t
 end
 
 (** The specific list of traits that must be implemented by a vcs backend in
