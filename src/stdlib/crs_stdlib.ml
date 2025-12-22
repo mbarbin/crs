@@ -154,7 +154,8 @@ module List = struct
     (* As a result of using local references, our inner loop does not need arguments. *)
     let[@tail_mod_cons] rec take_group () =
       match !l with
-      | ([] | [ _ ]) as group ->
+      | [] -> assert false
+      | [ _ ] as group ->
         l := [];
         group
       | x :: (y :: _ as tl) ->
@@ -220,7 +221,6 @@ module Result = struct
 
   let bind t ~f = bind t f
   let iter t ~f = iter f t
-  let map t ~f = map f t
 end
 
 module String = struct
@@ -252,13 +252,9 @@ module String = struct
   (* The following functions are copied from [Base] (MIT). See notice at the top
      of the file and project global notice for licensing information. *)
 
-  let rfindi ?pos t ~f =
+  let rfindi t ~f =
     let rec loop i = if i < 0 then None else if f i t.[i] then Some i else loop (i - 1) in
-    let pos =
-      match pos with
-      | Some pos -> pos
-      | None -> length t - 1
-    in
+    let pos = length t - 1 in
     (loop pos [@nontail])
   ;;
 

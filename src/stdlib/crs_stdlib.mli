@@ -92,7 +92,6 @@ module Result : sig
 
   val bind : ('a, 'e) t -> f:('a -> ('b, 'e) t) -> ('b, 'e) t
   val iter : ('a, _) t -> f:('a -> unit) -> unit
-  val map : ('a, 'e) t -> f:('a -> 'b) -> ('b, 'e) t
 end
 
 module String : sig
