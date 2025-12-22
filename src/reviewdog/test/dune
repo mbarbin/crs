@@ -10,19 +10,10 @@
   -open
   Base
   -open
-  Expect_test_helpers_base
-  -open
   Base_quickcheck
   -open
   Crs_stdlib)
- (libraries
-  base
-  base_quickcheck
-  crs_stdlib
-  expect_test_helpers_core.expect_test_helpers_base
-  reviewdog
-  reviewdog_rdf
-  yojson)
+ (libraries base base_quickcheck crs_stdlib reviewdog reviewdog_rdf yojson)
  (inline_tests)
  (instrumentation
   (backend bisect_ppx))
@@ -32,8 +23,6 @@
   (pps
    -unused-code-warnings=force
    ppx_compare
-   ppx_enumerate
    ppx_expect
-   ppx_here
    base_quickcheck.ppx_quickcheck
    ppx_sexp_conv)))

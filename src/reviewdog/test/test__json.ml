@@ -25,17 +25,23 @@ let round t =
 ;;
 
 let%expect_test "roundtrip" =
-  quickcheck_m
-    [%here]
+  Base_quickcheck.Test.run_exn
     (module Reviewdog_with_quickcheck.Diagnostic_result)
     ~f:(fun t1 ->
       let n1 = t1 |> round in
       let n2 = n1 |> round in
-      Expect_test_helpers_base.require_equal
-        [%here]
-        (module Reviewdog_with_quickcheck.Diagnostic_result)
-        n1
-        n2);
+      if not (Reviewdog_with_quickcheck.Diagnostic_result.equal n1 n2)
+      then (
+        (let n1 =
+           Sexp.to_string_hum (n1 |> Reviewdog_with_quickcheck.Diagnostic_result.sexp_of_t)
+         in
+         let n2 =
+           Sexp.to_string_hum (n2 |> Reviewdog_with_quickcheck.Diagnostic_result.sexp_of_t)
+         in
+         print_endline n1;
+         print_endline n2;
+         ())
+        [@coverage off]));
   [%expect {||}];
   ()
 ;;

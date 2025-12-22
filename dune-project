@@ -109,8 +109,6 @@
   conf-hg
   (crs
    (= :version))
-  (expect_test_helpers_core
-   (>= v0.17))
   (file-rewriter
    (>= 0.0.3))
   (fpath
