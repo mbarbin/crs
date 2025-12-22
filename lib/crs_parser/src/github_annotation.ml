@@ -19,6 +19,8 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
+module String = Base.String
+
 module Severity = struct
   type t =
     | Error
@@ -32,7 +34,6 @@ module Severity = struct
   ;;
 
   let to_dyn t = Dyn.variant (variant_constructor_name t) []
-  let sexp_of_t t = Sexp.Atom (variant_constructor_name t)
 
   let to_string = function
     | Error -> "error"
@@ -57,7 +58,6 @@ let to_dyn { loc; severity; title; message } =
     ]
 ;;
 
-let sexp_of_t t = Dyn.to_sexp (to_dyn t)
 let create ~loc ~severity ~title ~message = { loc; severity; title; message }
 
 let to_loc_fields_internal ~loc =

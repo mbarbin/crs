@@ -35,8 +35,8 @@ let%expect_test "to_string" =
 ;;
 
 let%expect_test "equal" =
-  require_equal [%here] (module Cr_comment.Status) CR CR;
-  require_not_equal [%here] (module Cr_comment.Status) CR XCR;
+  require_equal (module Cr_comment.Status) CR CR;
+  require_not_equal (module Cr_comment.Status) CR XCR;
   [%expect {||}];
   ()
 ;;

@@ -74,6 +74,8 @@
  * - Add [Dyn] to replace [Error].
  *)
 
+module String = Base.String
+
 module Digest_hex = struct
   type t = string [@@deriving compare, equal, sexp_of]
 

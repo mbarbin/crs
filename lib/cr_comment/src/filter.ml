@@ -40,8 +40,7 @@ let variant_constructor_name = function
 ;;
 
 let to_dyn t = Dyn.Variant (variant_constructor_name t, [])
-let sexp_of_t t = Sexp.Atom (variant_constructor_name t)
-let to_string t = String.lowercase (variant_constructor_name t)
+let to_string t = String.lowercase_ascii (variant_constructor_name t)
 
 let shorthand = function
   | All -> 'a'

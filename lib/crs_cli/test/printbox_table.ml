@@ -26,6 +26,8 @@
 (*  SPDX-License-Identifier: ISC                                            *)
 (****************************************************************************)
 
+module String = Base.String
+
 (* This was mostly an experiment. We ended up implementing a direct rendering
    from [Print_table] to markdown without [PrintBox] intermediary. Keeping for
    experimentations (test dependencies only). *)

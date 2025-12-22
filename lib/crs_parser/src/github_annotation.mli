@@ -39,13 +39,11 @@ module Severity : sig
     | Notice
 
   val to_dyn : t -> Dyn.t
-  val sexp_of_t : t -> Sexp.t
 end
 
 type t
 
 val to_dyn : t -> Dyn.t
-val sexp_of_t : t -> Sexp.t
 val create : loc:Loc.t -> severity:Severity.t -> title:string -> message:string -> t
 
 (** {1 Serialize} *)

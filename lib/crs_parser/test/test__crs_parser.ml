@@ -19,6 +19,12 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
+module String = struct
+  include Base.String
+
+  let to_dyn = Dyn.string
+end
+
 let path = Vcs.Path_in_repo.v "my_file.ml"
 
 let invariant ~(file_contents : Vcs.File_contents.t) cr =
@@ -33,7 +39,7 @@ let invariant ~(file_contents : Vcs.File_contents.t) cr =
       ~len:(content_start_offset - start_pos)
     |> String.strip
   in
-  require_equal [%here] (module String) comment_prefix recompute_prefix;
+  require_equal (module String) comment_prefix recompute_prefix;
   ()
 ;;
 
@@ -916,7 +922,6 @@ end
   let cr2 = List.hd_exn crs2 in
   let d1 = Cr_comment.digest_ignoring_minor_text_changes cr1 in
   require_equal
-    [%here]
     (module Cr_comment.Digest_hex)
     (Cr_comment.digest_ignoring_minor_text_changes cr1)
     (Cr_comment.digest_ignoring_minor_text_changes cr2);

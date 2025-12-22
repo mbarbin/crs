@@ -19,6 +19,8 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
+module String = Base.String
+
 let filename = Fsegment.v ".crs-ignore"
 
 module Entry = struct

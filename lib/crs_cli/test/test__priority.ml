@@ -30,7 +30,7 @@ let test file_contents =
       | Error _ -> Cr_comment.Priority.Now
       | Ok h -> Cr_comment.Header.priority h
     in
-    require_equal [%here] (module Cr_comment.Priority) priority priority_via_header;
+    require_equal (module Cr_comment.Priority) priority priority_via_header;
     print_endline "========================";
     print_endline (Cr_comment.reindented_content cr);
     print_dyn (Dyn.record [ "priority", priority |> Cr_comment.Priority.to_dyn ]))

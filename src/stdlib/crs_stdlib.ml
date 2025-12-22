@@ -26,3 +26,56 @@ module Ordering = Ordering
 let print pp = Format.printf "%a@." Pp.to_fmt pp
 let print_dyn dyn = print (Dyn.pp dyn)
 let phys_equal a b = a == b
+
+module Int = struct
+  include Stdlib.Int
+
+  let incr = Stdlib.incr
+  let to_dyn = Dyn.int
+end
+
+module String = struct
+  include Stdlib.StringLabels
+
+  let to_dyn = Dyn.string
+  let to_string t = t
+end
+
+let require_does_raise f =
+  match f () with
+  | _ -> Code_error.raise "Did not raise." []
+  | exception e -> print_endline (Printexc.to_string e)
+;;
+
+module With_equal_and_dyn = struct
+  module type S = sig
+    type t
+
+    val equal : t -> t -> bool
+    val to_dyn : t -> Dyn.t
+  end
+end
+
+let require_equal
+      (type a)
+      (module M : With_equal_and_dyn.S with type t = a)
+      (v1 : a)
+      (v2 : a)
+  =
+  if not (M.equal v1 v2)
+  then
+    Code_error.raise
+      "Values are not equal."
+      [ "v1", v1 |> M.to_dyn; "v2", v2 |> M.to_dyn ]
+;;
+
+let require_not_equal
+      (type a)
+      (module M : With_equal_and_dyn.S with type t = a)
+      (v1 : a)
+      (v2 : a)
+  =
+  if M.equal v1 v2
+  then
+    Code_error.raise "Values are  equal." [ "v1", v1 |> M.to_dyn; "v2", v2 |> M.to_dyn ]
+;;

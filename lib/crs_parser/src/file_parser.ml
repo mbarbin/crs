@@ -79,6 +79,8 @@
    XML    <!-- X?CR ... --> may not nest recursively
 *)
 
+module String = Base.String
+
 let find_ml_end =
   let regex = Re.compile Re.(alt [ str "(*"; str "*)" ]) in
   fun file_contents start_pos ->

@@ -10,18 +10,15 @@
   -open
   Base
   -open
-  Expect_test_helpers_base
-  -open
   Crs_stdlib)
  (libraries
   base
   cr_comment
-  crs_stdlib
-  expect_test_helpers_core.expect_test_helpers_base)
+  crs_stdlib)
  (inline_tests)
  (instrumentation
   (backend bisect_ppx))
  (lint
   (pps ppx_js_style -allow-let-operators -check-doc-comments))
  (preprocess
-  (pps ppx_expect ppx_here)))
+  (pps ppx_expect)))

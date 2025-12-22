@@ -56,6 +56,8 @@
  * - Migrate from [Re2] to [ocaml-re].
  *)
 
+module String = Base.String
+
 (* : and @ have other meanings in CR comments *)
 let word_t =
   Re.compl [ Re.char ' '; Re.char '\t'; Re.char '\n'; Re.char ':'; Re.char '@' ]
@@ -177,8 +179,8 @@ let parse ~file_cache ~content_start_offset ~content =
     let exn =
       match exn with
       | Invalid_argument str -> Dyn.variant "Invalid_argument" [ Dyn.string str ]
-      | Failure str -> Dyn.variant "Failure" [ Dyn.string str ]
-      | _ -> Dyn.string (Stdlib.Printexc.to_string exn)
+      | Failure str -> Dyn.variant "Failure" [ Dyn.string str ] [@coverage off]
+      | _ -> Dyn.string (Stdlib.Printexc.to_string exn) [@coverage off]
     in
     (Error (Dyn.Tuple [ Dyn.string "Could not process CR."; Dyn.string content; exn ])
     [@coverage off])

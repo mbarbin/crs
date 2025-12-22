@@ -19,6 +19,8 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
+module String = Base.String
+
 let%expect_test "all" =
   List.iter Cr_comment.Filter.all ~f:(fun filter ->
     print_dyn
@@ -41,8 +43,8 @@ let%expect_test "all" =
 ;;
 
 let%expect_test "equal" =
-  require_equal [%here] (module Cr_comment.Filter) All All;
-  require_not_equal [%here] (module Cr_comment.Filter) All Invalid;
+  require_equal (module Cr_comment.Filter) All All;
+  require_not_equal (module Cr_comment.Filter) All Invalid;
   [%expect {||}];
   ()
 ;;
@@ -66,7 +68,7 @@ let%expect_test "string count" =
       (List.map Cr_comment.Filter.all ~f:Cr_comment.Filter.to_string)
     |> Set.length
   in
-  require_equal [%here] (module Int) count string_count;
+  require_equal (module Int) count string_count;
   [%expect {||}];
   ()
 ;;
@@ -79,7 +81,7 @@ let%expect_test "shorthand count" =
       (List.map Cr_comment.Filter.all ~f:Cr_comment.Filter.shorthand)
     |> Set.length
   in
-  require_equal [%here] (module Int) count shorthand_count;
+  require_equal (module Int) count shorthand_count;
   [%expect {||}];
   ()
 ;;

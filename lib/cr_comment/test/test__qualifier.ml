@@ -37,8 +37,8 @@ let%expect_test "all" =
 ;;
 
 let%expect_test "equal" =
-  require_equal [%here] (module Cr_comment.Qualifier) None None;
-  require_not_equal [%here] (module Cr_comment.Qualifier) None Soon;
+  require_equal (module Cr_comment.Qualifier) None None;
+  require_not_equal (module Cr_comment.Qualifier) None Soon;
   [%expect {||}];
   ()
 ;;

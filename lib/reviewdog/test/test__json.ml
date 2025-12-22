@@ -31,7 +31,11 @@ let%expect_test "roundtrip" =
     ~f:(fun t1 ->
       let n1 = t1 |> round in
       let n2 = n1 |> round in
-      require_equal [%here] (module Reviewdog_with_quickcheck.Diagnostic_result) n1 n2);
+      Expect_test_helpers_base.require_equal
+        [%here]
+        (module Reviewdog_with_quickcheck.Diagnostic_result)
+        n1
+        n2);
   [%expect {||}];
   ()
 ;;

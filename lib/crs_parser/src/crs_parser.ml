@@ -46,6 +46,7 @@
  * - Use [Vcs] instead of [Hg].
  *)
 
+module String = Base.String
 module Unix = UnixLabels
 
 let cr_pattern_egrep = File_parser.cr_pattern_egrep

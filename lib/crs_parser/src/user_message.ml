@@ -19,6 +19,8 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
+module String = Base.String
+
 let pp_to_string pp =
   let buffer = Buffer.create 23 in
   let formatter = Stdlib.Format.formatter_of_buffer buffer in
