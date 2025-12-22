@@ -19,8 +19,6 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-module String = Base.String
-
 let pp_to_string pp =
   let buffer = Buffer.create 23 in
   let formatter = Stdlib.Format.formatter_of_buffer buffer in
@@ -29,7 +27,7 @@ let pp_to_string pp =
     Buffer.contents buffer
     |> String.split_lines
     |> List.map ~f:(fun s -> String.rstrip s ^ "\n")
-    |> String.concat
+    |> String.concat ~sep:""
   in
   contents
 ;;

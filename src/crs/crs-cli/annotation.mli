@@ -35,7 +35,7 @@ module Severity : sig
 
   val all : t list
   val to_dyn : t -> Dyn.t
-  val sexp_of_t : t -> Sexp.t
+  val sexp_of_t : t -> Sexplib0.Sexp.t
 
   (** Capitalized like the constructor (e.g. ["Error"]). *)
   val to_string : t -> string

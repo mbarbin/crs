@@ -19,12 +19,6 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-module String = struct
-  include Base.String
-
-  let to_dyn = Dyn.string
-end
-
 let path = Vcs.Path_in_repo.v "my_file.ml"
 
 let invariant ~(file_contents : Vcs.File_contents.t) cr =

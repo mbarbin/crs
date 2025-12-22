@@ -94,7 +94,7 @@ module By_type = struct
               (match row.type_ with
                | Invalid -> Style.fg_red
                | CR | XCR | Soon | Someday -> Style.default)
-            (Base.Int.to_string_hum row.count))
+            (Int.to_string_hum row.count))
       ]
   ;;
 
@@ -193,7 +193,7 @@ let columns =
     Print_table.O.(
       Column.make ~header ~align:Right (fun (row : Row.t) ->
         let count = count row in
-        if count = 0 then Cell.empty else Cell.text (Base.Int.to_string_hum count)))
+        if count = 0 then Cell.empty else Cell.text (Int.to_string_hum count)))
   in
   Print_table.O.
     [ Column.make ~header:"Reporter" (fun (row : Row.t) ->

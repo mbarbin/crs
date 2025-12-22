@@ -19,8 +19,6 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-module String = Base.String
-
 let%expect_test "all" =
   List.iter Cr_comment.Filter.all ~f:(fun filter ->
     print_dyn
@@ -61,12 +59,11 @@ let%expect_test "compare" =
 ;;
 
 let%expect_test "string count" =
+  let module String_set = Set.Make (String) in
   let count = List.length Cr_comment.Filter.all in
   let string_count =
-    Set.of_list
-      (module String)
-      (List.map Cr_comment.Filter.all ~f:Cr_comment.Filter.to_string)
-    |> Set.length
+    String_set.of_list (List.map Cr_comment.Filter.all ~f:Cr_comment.Filter.to_string)
+    |> String_set.cardinal
   in
   require_equal (module Int) count string_count;
   [%expect {||}];
@@ -74,12 +71,11 @@ let%expect_test "string count" =
 ;;
 
 let%expect_test "shorthand count" =
+  let module Char_set = Set.Make (Char) in
   let count = List.length Cr_comment.Filter.all in
   let shorthand_count =
-    Set.of_list
-      (module Char)
-      (List.map Cr_comment.Filter.all ~f:Cr_comment.Filter.shorthand)
-    |> Set.length
+    Char_set.of_list (List.map Cr_comment.Filter.all ~f:Cr_comment.Filter.shorthand)
+    |> Char_set.cardinal
   in
   require_equal (module Int) count shorthand_count;
   [%expect {||}];

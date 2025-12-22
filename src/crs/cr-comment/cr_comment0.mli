@@ -191,7 +191,7 @@ type t
 
 val equal : t -> t -> bool
 val to_dyn : t -> Dyn.t
-val sexp_of_t : t -> Sexp.t
+val sexp_of_t : t -> Sexplib0.Sexp.t
 
 (** {1 Getters} *)
 
@@ -215,7 +215,7 @@ val comment_prefix : t -> string
     the comments boundaries from [path] as well. *)
 val whole_loc : t -> Loc.t
 
-val header : t -> Header.t Or_error.t
+val header : t -> (Header.t, Dyn.t) Result.t
 val status : t -> Status.t
 
 (** [priority t] represents the expectation as to when work on the CR is meant

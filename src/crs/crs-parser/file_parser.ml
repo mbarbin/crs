@@ -79,8 +79,6 @@
    XML    <!-- X?CR ... --> may not nest recursively
 *)
 
-module String = Base.String
-
 let find_ml_end =
   let regex = Re.compile Re.(alt [ str "(*"; str "*)" ]) in
   fun file_contents start_pos ->
@@ -192,7 +190,7 @@ let find_comment_bounds =
         | `dashes n, '-' -> check_backwards (`dashes (n + 1))
         | `dashes n, '!'
         (* checking if we found <!-- *)
-          when n >= 2 && pos > 0 && Char.( = ) '<' file_contents.[pos - 1] ->
+          when n >= 2 && pos > 0 && Char.equal '<' file_contents.[pos - 1] ->
           end_block `xml (pos - 1)
         | `dashes n, _ -> if n >= 2 then end_lines sql_regex else None
         | `not_special, '/' -> check_backwards (`slashes 1)

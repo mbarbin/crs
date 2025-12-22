@@ -19,7 +19,6 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-module String = Base.String
 module Summary_table = Crs_cli.Private.Summary_table
 
 let path = Vcs.Path_in_repo.v "my_file.ml"
@@ -53,7 +52,7 @@ let parse_file ~path ~file_contents =
 let%expect_test "to_string" =
   let crs = parse_file ~path ~file_contents:test_cases in
   let table = Summary_table.make crs in
-  let print_table = Summary_table.to_print_table table |> Option.value_exn in
+  let print_table = Summary_table.to_print_table table |> Option.get in
   (* Ansi *)
   print_endline (Print_table.to_string_text print_table);
   [%expect
@@ -135,7 +134,7 @@ let%expect_test "to_string" =
 let%expect_test "empty columns" =
   let crs = parse_file ~path ~file_contents:"(* $CR-soon user: Hello CR! *)" in
   let table = Summary_table.make crs in
-  let print_table = Summary_table.to_print_table table |> Option.value_exn in
+  let print_table = Summary_table.to_print_table table |> Option.get in
   let printbox = Printbox_table.of_print_table print_table in
   print_endline (PrintBox_text.to_string printbox ^ "\n");
   [%expect

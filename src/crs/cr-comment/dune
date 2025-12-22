@@ -8,12 +8,10 @@
   -warn-error
   +a
   -open
-  Base
-  -open
   Volgo
   -open
   Crs_stdlib)
- (libraries base crs_stdlib fpath loc volgo)
+ (libraries crs_stdlib fpath loc sexplib0 volgo)
  (instrumentation
   (backend bisect_ppx))
  (lint

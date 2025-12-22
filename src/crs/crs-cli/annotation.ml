@@ -36,7 +36,7 @@ module Severity = struct
   ;;
 
   let to_dyn t = Dyn.Variant (variant_constructor_name t, [])
-  let sexp_of_t t = Sexp.Atom (variant_constructor_name t)
+  let sexp_of_t t = Sexplib0.Sexp.Atom (variant_constructor_name t)
 
   let to_string t =
     match sexp_of_t t with

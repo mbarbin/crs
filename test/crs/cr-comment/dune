@@ -8,10 +8,8 @@
   -warn-error
   +a
   -open
-  Base
-  -open
   Crs_stdlib)
- (libraries base cr_comment crs_stdlib)
+ (libraries cr_comment crs_stdlib)
  (inline_tests)
  (instrumentation
   (backend bisect_ppx))

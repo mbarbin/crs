@@ -19,8 +19,6 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-module String = Base.String
-
 let test ~path ~file_contents:original_contents ~f =
   let file_contents =
     (* In this test we want to avoid test CRs to be mistaken for actual CRs,
