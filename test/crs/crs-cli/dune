@@ -1,6 +1,6 @@
 (library
  (name crs_cli_test)
- (public_name crs-tests.crs_cli_test)
+ (package crs-tests)
  (flags
   :standard
   -w

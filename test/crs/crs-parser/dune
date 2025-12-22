@@ -1,6 +1,6 @@
 (library
  (name crs_parser_test)
- (public_name crs-tests.crs_parser_test)
+ (package crs-tests)
  (flags
   :standard
   -w

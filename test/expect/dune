@@ -1,6 +1,6 @@
 (library
- (name crs_expect_tests)
- (public_name crs-tests.expect-tests)
+ (name crs_expect_test)
+ (package crs-tests)
  (inline_tests)
  (flags
   :standard

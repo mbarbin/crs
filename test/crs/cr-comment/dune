@@ -1,6 +1,6 @@
 (library
  (name cr_comment_test)
- (public_name crs-tests.cr_comment_test)
+ (package crs-tests)
  (flags
   :standard
   -w
