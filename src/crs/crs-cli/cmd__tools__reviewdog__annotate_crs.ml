@@ -54,6 +54,6 @@ let main =
        }
      in
      let json = Reviewdog.Diagnostic_result.to_json diagnostic_result in
-     print_endline (Yojson.Basic.pretty_to_string ~std:true json);
+     print_endline (Json.to_string json);
      ())
 ;;

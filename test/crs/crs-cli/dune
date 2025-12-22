@@ -34,8 +34,7 @@
   printbox-text
   reviewdog
   uutf
-  volgo
-  yojson)
+  volgo)
  (inline_tests)
  (instrumentation
   (backend bisect_ppx))

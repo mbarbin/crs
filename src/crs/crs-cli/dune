@@ -39,7 +39,6 @@
   volgo
   volgo-git-unix
   volgo-hg-unix
-  yojson
   yojson-five)
  (instrumentation
   (backend bisect_ppx))

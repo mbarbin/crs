@@ -20,9 +20,6 @@
 (********************************************************************************)
 
 open! Import
-module Json = Yojson_five.Basic
-
-exception Json_error of Json.t * string
 
 module Annotation_severity = struct
   type t =
@@ -36,7 +33,7 @@ module Annotation_severity = struct
     | Info -> "Info"
   ;;
 
-  let to_dyn t = Dyn.Variant (variant_constructor_name t, [])
+  let to_json t : Json.t = `String (variant_constructor_name t)
 
   let of_string = function
     | "Error" -> Some Error
@@ -49,15 +46,15 @@ end
 module User_handle = struct
   type t = Vcs.User_handle.t
 
-  let to_dyn t = Dyn.stringable (module Vcs.User_handle) t
+  let to_json t : Json.t = `String (Vcs.User_handle.to_string t)
 
   let of_json json =
     match (json : Json.t) with
     | `String str ->
       (match Vcs.User_handle.of_string str with
        | Ok t -> t
-       | Error (`Msg msg) -> raise (Json_error (json, msg)))
-    | _ -> raise (Json_error (json, "User handle expected to be a json string."))
+       | Error (`Msg msg) -> raise (Json.Error (json, msg)))
+    | _ -> raise (Json.Error (json, "User handle expected to be a json string."))
   ;;
 end
 
@@ -68,7 +65,7 @@ module User_list = struct
     match (json : Json.t) with
     | `List xs -> List.map xs ~f:User_handle.of_json
     | _ ->
-      raise (Json_error (json, "User handle list expected to be a list of json strings."))
+      raise (Json.Error (json, "User handle list expected to be a list of json strings."))
   ;;
 end
 
@@ -79,26 +76,28 @@ type t =
   ; crs_due_now_annotation_severity : Annotation_severity.t option
   }
 
-let to_dyn
+let to_json
       { default_repo_owner
       ; user_mentions_allowlist
       ; invalid_crs_annotation_severity
       ; crs_due_now_annotation_severity
       }
+  : Json.t
   =
-  let opt field d = function
+  let opt field to_json = function
     | None -> []
-    | Some v -> [ field, d v ]
+    | Some v -> [ field, to_json v ]
   in
-  Dyn.record
+  `Assoc
     (List.concat
-       [ default_repo_owner |> opt "default_repo_owner" User_handle.to_dyn
+       [ default_repo_owner |> opt "default_repo_owner" User_handle.to_json
        ; user_mentions_allowlist
-         |> opt "user_mentions_allowlist" (Dyn.list User_handle.to_dyn)
+         |> opt "user_mentions_allowlist" (fun xs ->
+           `List (List.map xs ~f:User_handle.to_json))
        ; invalid_crs_annotation_severity
-         |> opt "invalid_crs_annotation_severity" Annotation_severity.to_dyn
+         |> opt "invalid_crs_annotation_severity" Annotation_severity.to_json
        ; crs_due_now_annotation_severity
-         |> opt "crs_due_now_annotation_severity" Annotation_severity.to_dyn
+         |> opt "crs_due_now_annotation_severity" Annotation_severity.to_json
        ])
 ;;
 
@@ -254,11 +253,11 @@ let empty =
 ;;
 
 let load_exn ~path ~emit_github_annotations =
-  match Json.from_file (Fpath.to_string path) with
+  match Yojson_five.Basic.from_file (Fpath.to_string path) with
   | Ok json ->
     let loc = Loc.of_file ~path in
     (try parse_json json ~loc ~emit_github_annotations with
-     | Json_error (json, msg) ->
+     | Json.Error (json, msg) ->
        Err.raise
          ~loc
          Pp.O.

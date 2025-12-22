@@ -23,6 +23,7 @@
 
 module Code_error = Code_error
 module Dyn = Dyn0
+module Json = Json
 module Ordering = Ordering
 
 val print_dyn : Dyn.t -> unit
