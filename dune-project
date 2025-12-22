@@ -64,8 +64,6 @@
    (>= v0.17))
   (volgo
    (>= 0.0.18))
-  (volgo-base
-   (>= 0.0.18))
   (volgo-git-unix
    (>= 0.0.18))
   (volgo-hg-unix
@@ -135,8 +133,6 @@
    (>= 1.0.4))
   (volgo
    (>= 0.0.18))
-  (volgo-base
-   (>= 0.0.18))
   (volgo-git-unix
    (>= 0.0.18))
   (volgo-hg-unix
@@ -155,8 +151,6 @@
    (>= 5.2))
   (ocamlformat
    (= 0.28.1))
-  (base
-   (>= v0.17))
   (bisect_ppx
    (>= 2.8.3))
   (crs
