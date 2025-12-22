@@ -1,6 +1,6 @@
 (library
  (name reviewdog_test)
- (public_name crs-tests.reviewdog_test)
+ (package crs-tests)
  (flags
   :standard
   -w
