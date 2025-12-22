@@ -28,6 +28,14 @@ module Ordering = Ordering
 val print_dyn : Dyn.t -> unit
 val phys_equal : 'a -> 'a -> bool
 
+module Char : sig
+  include module type of struct
+    include Char
+  end
+
+  val is_whitespace : t -> bool
+end
+
 module Int : sig
   include module type of struct
     include Int
