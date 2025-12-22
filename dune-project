@@ -64,8 +64,6 @@
    (>= v0.17))
   (ppx_sexp_conv
    (>= v0.17))
-  (ppx_sexp_value
-   (>= v0.17))
   (ppxlib
    (>= 0.33))
   (print-table
@@ -154,8 +152,6 @@
   (ppx_let
    (>= v0.17))
   (ppx_sexp_conv
-   (>= v0.17))
-  (ppx_sexp_value
    (>= v0.17))
   (ppxlib
    (>= 0.33))
@@ -262,8 +258,6 @@
   (ppx_let
    (>= v0.17))
   (ppx_sexp_conv
-   (>= v0.17))
-  (ppx_sexp_value
    (>= v0.17))
   (ppxlib
    (>= 0.33))
