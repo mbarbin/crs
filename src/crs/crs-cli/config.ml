@@ -33,7 +33,6 @@ module Annotation_severity = struct
     | Info -> "Info"
   ;;
 
-  let to_dyn t = Dyn.Variant (variant_constructor_name t, [])
   let to_json t : Json.t = `String (variant_constructor_name t)
 
   let of_string = function
@@ -47,7 +46,6 @@ end
 module User_handle = struct
   type t = Vcs.User_handle.t
 
-  let to_dyn t = Dyn.stringable (module Vcs.User_handle) t
   let to_json t : Json.t = `String (Vcs.User_handle.to_string t)
 
   let of_json json =
@@ -77,29 +75,6 @@ type t =
   ; invalid_crs_annotation_severity : Annotation_severity.t option
   ; crs_due_now_annotation_severity : Annotation_severity.t option
   }
-
-let to_dyn
-      { default_repo_owner
-      ; user_mentions_allowlist
-      ; invalid_crs_annotation_severity
-      ; crs_due_now_annotation_severity
-      }
-  =
-  let opt field d = function
-    | None -> []
-    | Some v -> [ field, d v ]
-  in
-  Dyn.record
-    (List.concat
-       [ default_repo_owner |> opt "default_repo_owner" User_handle.to_dyn
-       ; user_mentions_allowlist
-         |> opt "user_mentions_allowlist" (Dyn.list User_handle.to_dyn)
-       ; invalid_crs_annotation_severity
-         |> opt "invalid_crs_annotation_severity" Annotation_severity.to_dyn
-       ; crs_due_now_annotation_severity
-         |> opt "crs_due_now_annotation_severity" Annotation_severity.to_dyn
-       ])
-;;
 
 let to_json
       { default_repo_owner
