@@ -32,5 +32,5 @@ let to_dyn { message; data } = Dyn.Tuple [ Dyn.String message; Record data ]
 let () =
   Printexc.register_printer (function
     | E t -> Some (Dyn.to_string (to_dyn t))
-    | _ -> None)
+    | _ -> None [@coverage off])
 ;;

@@ -36,7 +36,8 @@ let stringable (type a) (module M : Stringable_S with type t = a) (a : a) =
 let to_sexp =
   let module Sexp = Sexplib0.Sexp in
   let module S = Sexplib0.Sexp_conv in
-  let rec aux : Dyn.t -> Sexp.t = function
+  let rec aux (dyn : Dyn.t) : Sexp.t =
+    match[@coverage off] dyn with
     | Opaque -> Atom "<opaque>"
     | Unit -> List []
     | Int i -> S.sexp_of_int i

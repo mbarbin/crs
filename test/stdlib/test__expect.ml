@@ -19,6 +19,22 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
+let%expect_test "phys_equal" =
+  let hello () = "Hello" ^ " World" in
+  let h1 = hello () in
+  print_dyn (phys_equal h1 h1 |> Dyn.bool);
+  [%expect {| true |}];
+  print_dyn (phys_equal h1 (hello ()) |> Dyn.bool);
+  [%expect {| false |}];
+  ()
+;;
+
+let%expect_test "require_does_raise" =
+  require_does_raise (fun () -> failwith "Hello Exn");
+  [%expect {| Failure("Hello Exn") |}];
+  ()
+;;
+
 let%expect_test "require_does_raise did not raise" =
   (match require_does_raise ignore with
    | () -> assert false
