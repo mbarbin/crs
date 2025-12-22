@@ -54,6 +54,7 @@
 
 module Code_error = Code_error
 module Dyn = Dyn0
+module Json = Json
 module Ordering = Ordering
 
 let print pp = Format.printf "%a@." Pp.to_fmt pp

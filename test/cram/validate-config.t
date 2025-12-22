@@ -22,7 +22,7 @@ An empty json.
 Note we can re-print the config too.
 
   $ crs tools config validate crs-config.json --print
-  ()
+  {}
 
 Let's try with valid configs.
 
@@ -36,9 +36,12 @@ Let's try with valid configs.
 
   $ crs tools config validate crs-config.json
   $ crs tools config validate crs-config.json --print
-  ((default_repo_owner user1) (user_mentions_allowlist (user1 user2 pr-author))
-   (invalid_crs_annotation_severity Warning)
-   (crs_due_now_annotation_severity Info))
+  {
+    "default_repo_owner": "user1",
+    "user_mentions_allowlist": [ "user1", "user2", "pr-author" ],
+    "invalid_crs_annotation_severity": "Warning",
+    "crs_due_now_annotation_severity": "Info"
+  }
 
 Fields are usually optional.
 
@@ -47,7 +50,7 @@ Fields are usually optional.
   > EOF
 
   $ crs tools config validate crs-config.json --print
-  ((invalid_crs_annotation_severity Error))
+  { "invalid_crs_annotation_severity": "Error" }
 
 Wrapped variants. At this time we allow both representation for variants,
 wrapped in a list and unwrapped. The goal is to deprecate the wrapper version
@@ -79,8 +82,10 @@ at some future point.
   Warning: The config field name [crs_due_now_annotation_severity] is now
   expected to be a json string rather than a list.
   Hint: Change it to simply: "Info"
-  ((invalid_crs_annotation_severity Warning)
-   (crs_due_now_annotation_severity Info))
+  {
+    "invalid_crs_annotation_severity": "Warning",
+    "crs_due_now_annotation_severity": "Info"
+  }
 
 Unknown fields.
 
@@ -142,7 +147,7 @@ Test severity field with invalid type (object instead of string).
 
   $ crs tools config validate crs-config.json
   File "crs-config.json", line 1, characters 0-0:
-  Error: In: {"nested":"object"}
+  Error: In: { "nested": "object" }
   Field [crs_due_now_annotation_severity] expected to be a json string.
   [123]
 
@@ -177,7 +182,7 @@ Test invalid type for user handle (should be string, not array).
   $ crs tools config validate crs-config.json
   File "crs-config.json", line 1, characters 0-0:
   Error: Invalid config.
-  In: ["not","a","string"]
+  In: [ "not", "a", "string" ]
   User handle expected to be a json string.
   [123]
 

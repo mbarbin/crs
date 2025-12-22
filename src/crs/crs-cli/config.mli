@@ -38,11 +38,13 @@ module Annotation_severity : sig
     | Info
 
   val to_dyn : t -> Dyn.t
+  val to_json : t -> Json.t
 end
 
 type t
 
 val to_dyn : t -> Dyn.t
+val to_json : t -> Json.t
 
 (** {1 Getters} *)
 

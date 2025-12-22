@@ -27,13 +27,10 @@ let main =
        file for $(b,crs).")
     (let open Command.Std in
      let+ path = Arg.pos ~pos:0 Param.file ~doc:"Config file to customize crs."
-     and+ print = Arg.flag [ "print" ] ~doc:"Print the parsed config as a S-expression."
+     and+ print = Arg.flag [ "print" ] ~doc:"Print the parsed config as JSON."
      and+ emit_github_annotations =
        Common_helpers.emit_github_annotations_arg ~default:false
      in
      let config = Config.load_exn ~path:(Fpath.v path) ~emit_github_annotations in
-     if print
-     then
-       print_endline
-         (config |> Config.to_dyn |> Dyn.to_sexp |> Sexplib0.Sexp.to_string_hum))
+     if print then print_endline (Json.to_string (Config.to_json config)))
 ;;
