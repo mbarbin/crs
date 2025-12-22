@@ -9,3 +9,4 @@ lib/crs_parser/src
 lib/crs_parser/test
 src/stdlib
 test/expect
+test/stdlib
