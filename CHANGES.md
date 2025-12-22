@@ -4,6 +4,8 @@
 
 - Upgrade test deps `ocaml-protoc` & all to `4.0` (#99, @mbarbin).
 - Reduce printed context in some tests diffs (#99, @mbarbin).
+- Enable OCaml 5.4 in CI (#98, @mbarbin).
+- Add OCaml alerts to deprecated api (#94, @mbarbin).
 
 ## 0.0.20251014 (2025-10-14)
 

@@ -3,7 +3,7 @@
 ;; With some exceptions everything else is instrumented
 (rule
  (cond
-  ((path (glob lib/reviewdog/**)) return)
+  ((path (glob src/reviewdog/**)) return)
   (true
    (enforce
     (dune
@@ -14,20 +14,18 @@
 (rule
  (cond
   ((path
-    (glob **/test/*))
+    (glob test/**))
    (enforce
     (dune
      (library
       (and
-       (public_name
-        (is_prefix crs-tests.))
-       (name
-        (is_suffix _test)))))))))
+       (not (has_field public_name))
+       (name (is_suffix _test)))))))))
 
 ;; Configure the ppx_js_style linter
 (rule
  (cond
-  ((path (glob lib/reviewdog/test/**)) return)
+  ((path (glob src/reviewdog/test/**)) return)
   (true
    (enforce
     (dune
@@ -45,3 +43,10 @@
          (param none)
          (applies_to
           (pp ppx_js_style)))))))))))
+
+(rule
+ (cond
+  ((path
+    (or
+     (glob src/crs/**)))
+   (enforce (dune (preprocess no_preprocessing))))))

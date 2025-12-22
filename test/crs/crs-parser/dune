@@ -1,6 +1,6 @@
 (library
- (name crs_cli_test)
- (public_name crs-tests.crs_cli_test)
+ (name crs_parser_test)
+ (package crs-tests)
  (flags
   :standard
   -w
@@ -12,40 +12,27 @@
   -open
   Fpath_base
   -open
-  Pplumbing_err
-  -open
   Expect_test_helpers_base
   -open
   Volgo
   -open
-  Cmdlang
-  -open
   Crs_stdlib)
  (libraries
   base
-  cmdlang
-  cmdlang-stdlib-runner
   cr_comment
-  crs_cli
   crs_parser
   crs_stdlib
   expect_test_helpers_core.expect_test_helpers_base
   fpath
   fpath-base
   loc
-  pplumbing-err
-  print-table
-  printbox
-  printbox-md
-  printbox-text
-  reviewdog
-  uutf
-  volgo
-  yojson)
+  patdiff.expect_test_patdiff
+  re
+  volgo)
  (inline_tests)
  (instrumentation
   (backend bisect_ppx))
  (lint
   (pps ppx_js_style -allow-let-operators -check-doc-comments))
  (preprocess
-  (pps ppx_expect)))
+  (pps ppx_expect ppx_here)))

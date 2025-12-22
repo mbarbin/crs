@@ -1,12 +1,12 @@
 # List of directories for headache.sh
 # Add new directories below. Lines starting with '#' are ignored.
-bin
-lib/cr_comment/src
-lib/cr_comment/test
-lib/crs_cli/src
-lib/crs_cli/test
-lib/crs_parser/src
-lib/crs_parser/test
+src/crs/bin
+src/crs/cr-comment
+src/crs/crs-cli
+src/crs/crs-parser
 src/stdlib
+test/crs/cr-comment
+test/crs/crs-cli
+test/crs/crs-parser
 test/expect
 test/stdlib

@@ -39,7 +39,7 @@ jobs:
         run: |
           dune exec crs -- --version
           mkdir -p "${{ runner.temp }}/crs-bin"
-          cp _build/default/bin/main.exe "${{ runner.temp }}/crs-bin/crs"
+          cp _build/default/src/crs/bin/main.exe "${{ runner.temp }}/crs-bin/crs"
           echo "${{ runner.temp }}/crs-bin" >> $GITHUB_PATH
 
       - name: Check crs installation
