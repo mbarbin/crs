@@ -77,8 +77,6 @@
  (depends
   (ocaml
    (>= 5.2))
-  (ocamlformat
-   (= 0.28.1))
   (base
    (>= v0.17))
   (cmdlang
