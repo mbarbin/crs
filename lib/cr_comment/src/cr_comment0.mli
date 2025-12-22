@@ -72,16 +72,19 @@
     managing code review discussions within the codebase. *)
 
 module Digest_hex : sig
-  type t [@@deriving compare, equal, sexp_of]
+  type t
 
+  val compare : t -> t -> int
+  val equal : t -> t -> bool
   val to_dyn : t -> Dyn.t
   val to_string : t -> string
   val create : string -> t
 end
 
 module Header : sig
-  type t [@@deriving equal, sexp_of]
+  type t
 
+  val equal : t -> t -> bool
   val to_dyn : t -> Dyn.t
 
   (** [reporter] is [user] in [CR user...]. *)
@@ -184,9 +187,11 @@ end
 
 (** A [Cr_comment.t] is an immutable value holding the information and metadata
     about a CR that was parsed from a file. *)
-type t [@@deriving equal, sexp_of]
+type t
 
+val equal : t -> t -> bool
 val to_dyn : t -> Dyn.t
+val sexp_of_t : t -> Sexp.t
 
 (** {1 Getters} *)
 
@@ -247,7 +252,9 @@ val print_list : t list -> unit
 (** {1 Sort} *)
 
 module For_sorted_output : sig
-  type nonrec t = t [@@deriving compare]
+  type nonrec t = t
+
+  val compare : t -> t -> int
 end
 
 val sort : t list -> t list

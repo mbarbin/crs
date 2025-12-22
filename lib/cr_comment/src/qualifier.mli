@@ -40,8 +40,10 @@ type t =
   | None
   | Soon
   | Someday
-[@@deriving compare, equal, enumerate]
 
+val compare : t -> t -> int
+val equal : t -> t -> bool
+val all : t list
 val to_dyn : t -> Dyn.t
 
 (** This returns the priority according to the qualifier, if we were to take

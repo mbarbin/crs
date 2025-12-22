@@ -29,8 +29,10 @@ type t =
   | Now
   | Soon
   | Someday
-[@@deriving compare, equal, enumerate]
 
+val compare : t -> t -> int
+val equal : t -> t -> bool
+val all : t list
 val to_dyn : t -> Dyn.t
 
 (** {1 Representation} *)

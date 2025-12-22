@@ -77,8 +77,10 @@
 module String = Base.String
 
 module Digest_hex = struct
-  type t = string [@@deriving compare, equal, sexp_of]
+  type t = string
 
+  let compare = String.compare
+  let equal = String.equal
   let to_dyn = Dyn.string
   let to_string t = t
   let create str = str |> Stdlib.Digest.string |> Stdlib.Digest.to_hex
@@ -94,7 +96,14 @@ module Header = struct
       ; reporter : Vcs.User_handle.t Loc.Txt.t
       ; recipient : Vcs.User_handle.t Loc.Txt.t option
       }
-    [@@deriving equal]
+
+    let equal t ({ status; qualifier; reporter; recipient } as t2) =
+      phys_equal t t2
+      || (Loc.Txt.equal Status.equal t.status status
+          && Loc.Txt.equal Qualifier.equal t.qualifier qualifier
+          && Loc.Txt.equal Vcs.User_handle.equal t.reporter reporter
+          && Option.equal (Loc.Txt.equal Vcs.User_handle.equal) t.recipient recipient)
+    ;;
 
     let to_dyn { status; qualifier; reporter; recipient } =
       let user_handle u = Dyn.stringable (module Vcs.User_handle) u in
@@ -106,8 +115,6 @@ module Header = struct
         ; "recipient", recipient |> Dyn.option loc_user_handle
         ]
     ;;
-
-    let sexp_of_t t = Dyn.to_sexp (to_dyn t)
   end
 
   include T
@@ -164,7 +171,27 @@ module T = struct
     ; digest_of_condensed_content : Digest_hex.t
     ; content : string
     }
-  [@@deriving equal]
+
+  let equal
+        t
+        ({ path
+         ; whole_loc
+         ; content_start_offset
+         ; header
+         ; comment_prefix
+         ; digest_of_condensed_content
+         ; content
+         } as t2)
+    =
+    phys_equal t t2
+    || (Vcs.Path_in_repo.equal t.path path
+        && Digest_hex.equal t.digest_of_condensed_content digest_of_condensed_content
+        && Loc.equal t.whole_loc whole_loc
+        && Int.equal t.content_start_offset content_start_offset
+        && Result.equal Header.equal Dyn.equal t.header header
+        && String.equal t.comment_prefix comment_prefix
+        && String.equal t.content content)
+  ;;
 
   let to_dyn
         { path : Vcs.Path_in_repo.t
@@ -226,7 +253,9 @@ let create
 let digest_ignoring_minor_text_changes t = t.digest_of_condensed_content
 
 module For_sorted_output : sig
-  type nonrec t = t [@@deriving compare]
+  type nonrec t = t
+
+  val compare : t -> t -> int
 end = struct
   type nonrec t = t
 

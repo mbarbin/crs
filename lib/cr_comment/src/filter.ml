@@ -27,7 +27,6 @@ type t =
   | Now
   | Soon
   | Someday
-[@@deriving compare, equal, enumerate]
 
 let variant_constructor_name = function
   | All -> "All"
@@ -39,6 +38,23 @@ let variant_constructor_name = function
   | Someday -> "Someday"
 ;;
 
+let variant_constructor_rank = function
+  | All -> 0
+  | Invalid -> 1
+  | CRs -> 2
+  | XCRs -> 3
+  | Now -> 4
+  | Soon -> 5
+  | Someday -> 6
+;;
+
+let all = [ All; Invalid; CRs; XCRs; Now; Soon; Someday ]
+
+let compare t1 t2 =
+  Int.compare (variant_constructor_rank t1) (variant_constructor_rank t2)
+;;
+
+let equal t1 t2 = Int.equal (variant_constructor_rank t1) (variant_constructor_rank t2)
 let to_dyn t = Dyn.Variant (variant_constructor_name t, [])
 let to_string t = String.lowercase_ascii (variant_constructor_name t)
 

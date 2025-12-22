@@ -27,7 +27,9 @@
 type t =
   | CR
   | XCR
-[@@deriving compare, equal, enumerate]
 
+val compare : t -> t -> int
+val equal : t -> t -> bool
+val all : t list
 val to_dyn : t -> Dyn.t
 val to_string : t -> string

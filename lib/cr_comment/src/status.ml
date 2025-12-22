@@ -22,7 +22,18 @@
 type t =
   | CR
   | XCR
-[@@deriving compare, equal, enumerate]
+
+let variant_constructor_rank = function
+  | CR -> 0
+  | XCR -> 1
+;;
+
+let compare t1 t2 =
+  Int.compare (variant_constructor_rank t1) (variant_constructor_rank t2)
+;;
+
+let equal t1 t2 = Int.equal (variant_constructor_rank t1) (variant_constructor_rank t2)
+let all = [ CR; XCR ]
 
 let variant_constructor_name = function
   | CR -> "CR"

@@ -23,7 +23,19 @@ type t =
   | None
   | Soon
   | Someday
-[@@deriving compare, equal, enumerate]
+
+let variant_constructor_rank = function
+  | None -> 0
+  | Soon -> 1
+  | Someday -> 2
+;;
+
+let compare t1 t2 =
+  Int.compare (variant_constructor_rank t1) (variant_constructor_rank t2)
+;;
+
+let equal t1 t2 = Int.equal (variant_constructor_rank t1) (variant_constructor_rank t2)
+let all = [ None; Soon; Someday ]
 
 let variant_constructor_name = function
   | None -> "None"
