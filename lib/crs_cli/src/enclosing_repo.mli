@@ -32,7 +32,7 @@ module Vcs_kind : sig
     | `Hg
     ]
 
-  val sexp_of_t : t -> Sexp.t
+  val to_string : t -> string
 end
 
 (** The specific list of traits that must be implemented by a vcs backend in

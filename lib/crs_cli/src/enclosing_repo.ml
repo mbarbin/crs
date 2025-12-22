@@ -25,9 +25,9 @@ module Vcs_kind = struct
     | `Hg
     ]
 
-  let sexp_of_t = function
-    | `Git -> Sexp.Atom "git"
-    | `Hg -> Sexp.Atom "hg"
+  let to_string = function
+    | `Git -> "Git"
+    | `Hg -> "Hg"
   ;;
 end
 

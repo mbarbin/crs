@@ -20,16 +20,20 @@ Git
   $ rev0=$(volgo-vcs commit -m "Initial commit")
 
   $ crs tools enclosing-repo-info
-  ((repo_root
-    $TESTCASE_ROOT/repo-git)
-   (path_in_repo ./) (vcs_kind git))
+  {
+    "repo_root": "$TESTCASE_ROOT/repo-git",
+    "path_in_repo": "./",
+    "vcs_kind": "Git"
+  }
 
   $ mkdir -p path/in/repo
 
   $ (cd path/in/repo ; crs tools enclosing-repo-info)
-  ((repo_root
-    $TESTCASE_ROOT/repo-git)
-   (path_in_repo path/in/repo/) (vcs_kind git))
+  {
+    "repo_root": "$TESTCASE_ROOT/repo-git",
+    "path_in_repo": "path/in/repo/",
+    "vcs_kind": "Git"
+  }
 
 Hg
 
@@ -49,13 +53,17 @@ Hg
   $ rev0=$(volgo-vcs commit -m "Initial commit")
 
   $ crs tools enclosing-repo-info
-  ((repo_root
-    $TESTCASE_ROOT/repo-hg)
-   (path_in_repo ./) (vcs_kind hg))
+  {
+    "repo_root": "$TESTCASE_ROOT/repo-hg",
+    "path_in_repo": "./",
+    "vcs_kind": "Hg"
+  }
 
   $ mkdir -p path/in/repo
 
   $ (cd path/in/repo ; crs tools enclosing-repo-info)
-  ((repo_root
-    $TESTCASE_ROOT/repo-hg)
-   (path_in_repo path/in/repo/) (vcs_kind hg))
+  {
+    "repo_root": "$TESTCASE_ROOT/repo-hg",
+    "path_in_repo": "path/in/repo/",
+    "vcs_kind": "Hg"
+  }

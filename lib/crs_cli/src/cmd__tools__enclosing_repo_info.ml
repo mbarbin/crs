@@ -23,9 +23,9 @@ let main =
   Command.make
     ~summary:"A util to get info about the enclosing repo."
     ~readme:(fun () ->
-      "This command locates the root of the repository containing the current working \
-       directory.\n\n\
-       It then displays a S-expression containing several fields related to that \
+      "This debug command locates the root of the repository containing the current \
+       working directory.\n\n\
+       It then displays a json-expression containing several fields related to that \
        repository and the current path.\n\n\
        - $(b,repo_root) : The root of the enclosing repo (absolute path).\n\n\
        - $(b,path_in_repo) : The path of the current directory related to the repo root \
@@ -44,11 +44,13 @@ let main =
      let path_in_repo =
        Common_helpers.relativize ~repo_root ~cwd ~path:(Relative_path.empty :> Fpath.t)
      in
-     print_s
-       (Sexp.List
-          [ List [ Atom "repo_root"; repo_root |> Vcs.Repo_root.sexp_of_t ]
-          ; List [ Atom "path_in_repo"; path_in_repo |> Vcs.Path_in_repo.sexp_of_t ]
-          ; List [ Atom "vcs_kind"; vcs_kind |> Enclosing_repo.Vcs_kind.sexp_of_t ]
-          ]);
+     print_endline
+       (Yojson.pretty_to_string
+          ~std:true
+          (`Assoc
+              [ "repo_root", `String (repo_root |> Vcs.Repo_root.to_string)
+              ; "path_in_repo", `String (path_in_repo |> Vcs.Path_in_repo.to_string)
+              ; "vcs_kind", `String (vcs_kind |> Enclosing_repo.Vcs_kind.to_string)
+              ]));
      ())
 ;;
