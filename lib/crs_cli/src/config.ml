@@ -37,7 +37,6 @@ module Annotation_severity = struct
   ;;
 
   let to_dyn t = Dyn.Variant (variant_constructor_name t, [])
-  let sexp_of_t t = Sexp.Atom (variant_constructor_name t)
 
   let of_string = function
     | "Error" -> Some Error

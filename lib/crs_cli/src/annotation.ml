@@ -77,7 +77,6 @@ let to_dyn { cr; severity; assignee; with_user_mention; title; message } =
     ]
 ;;
 
-let sexp_of_t t = Dyn.to_sexp (to_dyn t)
 let message t = t.message
 let severity t = t.severity
 let assignee t = t.assignee

@@ -72,7 +72,6 @@ module Reason = struct
   ;;
 
   let to_dyn t = Dyn.Variant (variant_constructor_name t, [])
-  let sexp_of_t t = Sexp.Atom (variant_constructor_name t)
 
   let to_string_hum = function
     | Not_due_now -> "CR not due now"
@@ -95,8 +94,6 @@ let to_dyn { user; reason } =
     ; "reason", reason |> Reason.to_dyn
     ]
 ;;
-
-let sexp_of_t t = Dyn.to_sexp (to_dyn t)
 
 let of_raw
       ~(raw_assignee : Raw_assignee.t)

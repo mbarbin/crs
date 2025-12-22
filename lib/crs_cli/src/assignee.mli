@@ -30,7 +30,6 @@ module Reason : sig
 
   val all : t list
   val to_dyn : t -> Dyn.t
-  val sexp_of_t : t -> Sexp.t
   val to_string_hum : t -> string
 end
 
@@ -40,5 +39,4 @@ type t =
   }
 
 val to_dyn : t -> Dyn.t
-val sexp_of_t : t -> Sexp.t
 val compute : cr:Cr_comment.t -> config:Config.t -> review_mode:Review_mode.t -> t

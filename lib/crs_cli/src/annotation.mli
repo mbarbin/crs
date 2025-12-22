@@ -47,7 +47,6 @@ end
 type t
 
 val to_dyn : t -> Dyn.t
-val sexp_of_t : t -> Sexp.t
 
 (** When [with_user_mentions] is true, we prefix user names by '@' in
     annotations messages. See also {!val:write_username}. *)

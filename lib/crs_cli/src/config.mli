@@ -38,7 +38,6 @@ module Annotation_severity : sig
     | Info
 
   val to_dyn : t -> Dyn.t
-  val sexp_of_t : t -> Sexp.t
 end
 
 type t
