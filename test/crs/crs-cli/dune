@@ -10,7 +10,7 @@
   -open
   Base
   -open
-  Fpath_base
+  Fpath_sexp0
   -open
   Pplumbing_err
   -open
@@ -28,7 +28,7 @@
   crs_parser
   crs_stdlib
   fpath
-  fpath-base
+  fpath-sexp0
   loc
   pplumbing-err
   print-table

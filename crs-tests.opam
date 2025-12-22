@@ -12,7 +12,6 @@ depends: [
   "ocaml" {>= "5.2"}
   "ocamlformat" {= "0.28.1"}
   "base" {>= "v0.17"}
-  "base_quickcheck" {>= "v0.17"}
   "cmdlang" {>= "0.0.9"}
   "cmdlang-cmdliner-err-runner" {>= "0.0.16"}
   "cmdlang-stdlib-runner" {>= "0.0.9"}

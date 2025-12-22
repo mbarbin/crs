@@ -11,7 +11,7 @@
   -open
   Base
   -open
-  Fpath_base
+  Fpath_sexp0
   -open
   Volgo
   -open
@@ -23,7 +23,7 @@
   crs_stdlib
   file-rewriter
   fpath
-  fpath-base
+  fpath-sexp0
   loc
   patdiff.expect_test_patdiff
   volgo)

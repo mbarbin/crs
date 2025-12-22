@@ -12,42 +12,12 @@ depends: [
   "ocaml" {>= "5.2"}
   "ocamlformat" {= "0.28.1"}
   "base" {>= "v0.17"}
-  "base_quickcheck" {>= "v0.17"}
   "bisect_ppx" {>= "2.8.3"}
-  "cmdlang" {>= "0.0.9"}
-  "cmdlang-cmdliner-err-runner" {>= "0.0.16"}
-  "conf-git"
-  "conf-hg"
   "crs" {= version}
   "crs-tests" {= version}
-  "file-rewriter" {>= "0.0.3"}
-  "loc" {>= "0.3.2"}
   "mdx" {>= "2.4"}
-  "ocaml-protoc" {>= "4.0"}
-  "pageantty" {>= "0.0.2"}
-  "patdiff" {>= "v0.17"}
-  "pbrt" {>= "4.0"}
-  "pbrt_yojson" {>= "4.0"}
-  "pp" {>= "2.0.0"}
-  "pplumbing-err" {>= "0.0.16"}
-  "pplumbing-pp-tty" {>= "0.0.16"}
-  "ppx_compare" {>= "v0.17"}
-  "ppx_deriving_yojson" {>= "3.9"}
-  "ppx_enumerate" {>= "v0.17"}
-  "ppx_expect" {>= "v0.17"}
-  "ppx_hash" {>= "v0.17"}
   "ppx_js_style" {>= "v0.17"}
-  "ppx_sexp_conv" {>= "v0.17"}
   "ppxlib" {>= "0.33"}
-  "print-table" {>= "0.1.0"}
-  "re" {>= "1.12.0"}
-  "spawn" {>= "v0.17"}
-  "stdio" {>= "v0.17"}
-  "volgo" {>= "0.0.18"}
-  "volgo-base" {>= "0.0.18"}
-  "volgo-git-unix" {>= "0.0.18"}
-  "volgo-hg-unix" {>= "0.0.18"}
-  "volgo-vcs" {>= "0.0.18"}
   "odoc" {>= "2.4.4"}
   "sherlodoc" {>= "0.2"}
 ]

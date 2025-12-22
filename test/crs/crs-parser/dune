@@ -10,7 +10,7 @@
   -open
   Base
   -open
-  Fpath_base
+  Fpath_sexp0
   -open
   Volgo
   -open
@@ -21,7 +21,7 @@
   crs_parser
   crs_stdlib
   fpath
-  fpath-base
+  fpath-sexp0
   loc
   patdiff.expect_test_patdiff
   re
