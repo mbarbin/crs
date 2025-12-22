@@ -40,7 +40,7 @@ type t =
   | None
   | Soon
   | Someday
-[@@deriving compare, equal, enumerate, sexp_of]
+[@@deriving compare, equal, enumerate]
 
 val to_dyn : t -> Dyn.t
 

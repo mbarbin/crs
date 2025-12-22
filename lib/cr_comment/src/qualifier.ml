@@ -32,7 +32,6 @@ let variant_constructor_name = function
 ;;
 
 let to_dyn t = Dyn.Variant (variant_constructor_name t, [])
-let sexp_of_t t = Sexp.Atom (variant_constructor_name t)
 
 let priority : t -> Priority.t = function
   | None -> Now

@@ -27,7 +27,7 @@
 type t =
   | CR
   | XCR
-[@@deriving compare, equal, enumerate, sexp_of]
+[@@deriving compare, equal, enumerate]
 
 val to_dyn : t -> Dyn.t
 val to_string : t -> string
