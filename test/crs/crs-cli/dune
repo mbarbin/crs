@@ -14,8 +14,6 @@
   -open
   Pplumbing_err
   -open
-  Expect_test_helpers_base
-  -open
   Volgo
   -open
   Cmdlang
@@ -29,7 +27,6 @@
   crs_cli
   crs_parser
   crs_stdlib
-  expect_test_helpers_core.expect_test_helpers_base
   fpath
   fpath-base
   loc
