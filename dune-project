@@ -60,8 +60,6 @@
    (>= v0.17))
   (ppx_hash
    (>= v0.17))
-  (ppx_here
-   (>= v0.17))
   (ppx_sexp_conv
    (>= v0.17))
   (ppxlib
@@ -211,8 +209,6 @@
    (= :version))
   (crs-tests
    (= :version))
-  (expect_test_helpers_core
-   (>= v0.17))
   (file-rewriter
    (>= 0.0.3))
   (fpath
@@ -248,8 +244,6 @@
   (ppx_expect
    (>= v0.17))
   (ppx_hash
-   (>= v0.17))
-  (ppx_here
    (>= v0.17))
   (ppx_js_style
    (>= v0.17))
