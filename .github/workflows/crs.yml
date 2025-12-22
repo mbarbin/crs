@@ -21,18 +21,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
-      - name: Setup dune
-        id: setup-dune
-        uses: mbarbin/setup-dune@b5f5154dbe381e40c33d8d22fbc92d6fe3c52c87 # v1.0.0
+      - name: Setup Dune
+        uses: mbarbin/setup-dune@fd640f52b2a84d68cd4867cb5972247b70630d1a # repkg
         with:
-          automagic: false
-
-      - name: Resolve dependencies
-        shell: bash
-        run: |
-          dune pkg lock
+          steps: install-dune enable-pkg
 
       - name: Build & Install crs binary
         shell: bash
