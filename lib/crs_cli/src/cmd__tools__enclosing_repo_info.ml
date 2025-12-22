@@ -31,7 +31,7 @@ let main =
        - $(b,path_in_repo) : The path of the current directory related to the repo root \
        (relative path).\n\n\
        - $(b,vcs_kind) : The kind of version control for the enclosing repository \
-       (git|hg).\n\n\
+       (Git|Hg).\n\n\
        This command is meant for debug and quick tests only. Its output is unstable and \
        may change without semver updates. In particular it should not be relied on in \
        scripts.")
