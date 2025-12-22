@@ -48,8 +48,6 @@ module T = struct
         ; "base", base |> Dyn.option (Dyn.stringable (module Vcs.Rev))
         ]
   ;;
-
-  let sexp_of_t t = Dyn.to_sexp (to_dyn t)
 end
 
 include T

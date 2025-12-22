@@ -211,8 +211,6 @@ module T = struct
       ; "content", content |> Dyn.string
       ]
   ;;
-
-  let sexp_of_t t = Dyn.to_sexp (to_dyn t)
 end
 
 include T

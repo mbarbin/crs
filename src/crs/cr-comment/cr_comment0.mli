@@ -191,7 +191,6 @@ type t
 
 val equal : t -> t -> bool
 val to_dyn : t -> Dyn.t
-val sexp_of_t : t -> Sexplib0.Sexp.t
 
 (** {1 Getters} *)
 

@@ -26,7 +26,7 @@ module Github_annotation = Crs_parser.Private.Github_annotation
 
 let path = Vcs.Path_in_repo.v "my_file.ml"
 
-let%expect_test "sexp_of_t" =
+let%expect_test "to_dyn" =
   let file_contents = {|(* $CR user1 for user2: Hello. *)|} in
   let crs = Tests_helpers.parse_file ~path ~file_contents in
   List.iter crs ~f:(fun cr ->
