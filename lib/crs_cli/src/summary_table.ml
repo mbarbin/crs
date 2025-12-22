@@ -127,12 +127,9 @@ module Key = struct
     ; recipient : Vcs.User_handle.t option
     }
 
-  let compare t ({ reporter; recipient } as t2) =
-    if phys_equal t t2
-    then 0
-    else (
-      let r = Vcs.User_handle.compare t.reporter reporter in
-      if r <> 0 then r else Option.compare Vcs.User_handle.compare t.recipient recipient)
+  let compare t { reporter; recipient } =
+    let r = Vcs.User_handle.compare t.reporter reporter in
+    if r <> 0 then r else Option.compare Vcs.User_handle.compare t.recipient recipient
   ;;
 
   let of_header (h : Cr_comment.Header.t) =

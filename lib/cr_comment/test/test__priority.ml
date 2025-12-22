@@ -30,3 +30,20 @@ let%expect_test "all" =
     |}];
   ()
 ;;
+
+let%expect_test "equal" =
+  require_equal (module Cr_comment.Priority) Now Now;
+  require_not_equal (module Cr_comment.Priority) Now Soon;
+  [%expect {||}];
+  ()
+;;
+
+let%expect_test "compare" =
+  print_dyn
+    (List.sort
+       (List.concat [ List.rev Cr_comment.Priority.all; [ Soon; Now; Someday; Now ] ])
+       ~compare:Cr_comment.Priority.compare
+     |> Dyn.list Cr_comment.Priority.to_dyn);
+  [%expect {| [ Now; Now; Now; Soon; Soon; Someday; Someday ] |}];
+  ()
+;;

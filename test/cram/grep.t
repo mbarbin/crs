@@ -49,15 +49,17 @@ If we grep from there, there is no CR in the tree.
 
 Now let's add some CRs.
 
-  $ printf "(* $CR user1 for user2: Hey, this is a code review comment *)\n" >> hello
+  $ printf "(* $CR user1 for user2: Hey, this is a code review comment. *)\n" >> hello
+
+  $ printf "(* $CR user2 for user1: Yes and this is one too. *)\n" >> hello
 
   $ printf "(* ${XCR} user1: Fix this. Edit: Done. *)\n" >> foo/a.txt
 
-  $ printf "/* $CR user1 for user3: Hey, this is a code review comment */\n" >> foo/foo.c
+  $ printf "/* $CR user1 for user3: Hey, this is a code review comment. */\n" >> foo/foo.c
 
   $ printf "(* ${CR}-someday user1: Reconsider if/when updating to the new version. *)\n" >> foo/b.txt
 
-  $ printf "(* ${CR}-soon user1: Hey, this is a code review comment *)\n" >> foo/bar/b.txt
+  $ printf "(* ${CR}-soon user1: Hey, this is a code review comment. *)\n" >> foo/bar/b.txt
 
 To avoid ignoring CRs that are unintentionally invalid, the tool will
 recognized comments that look like CRs, but flag them as invalid.
@@ -116,7 +118,7 @@ A basic [sexp] output is available.
    (content
     "CR-someday user1: Reconsider if/when updating to the new version."))
   ((path foo/bar/b.txt)
-   (whole_loc ((start foo/bar/b.txt:2:0) (stop foo/bar/b.txt:2:55)))
+   (whole_loc ((start foo/bar/b.txt:2:0) (stop foo/bar/b.txt:2:56)))
    (content_start_offset 35)
    (header
     (Ok
@@ -129,8 +131,8 @@ A basic [sexp] output is available.
        (loc ((start foo/bar/b.txt:2:11) (stop foo/bar/b.txt:2:16)))))
      (recipient ())))
    (comment_prefix "(*")
-   (digest_of_condensed_content 8b683d9bff5df08ee3642df3cf2426ce)
-   (content "CR-soon user1: Hey, this is a code review comment"))
+   (digest_of_condensed_content 3795b0fb1d0f2f358fbe2d0c69d35650)
+   (content "CR-soon user1: Hey, this is a code review comment."))
   ((path foo/bar/c.txt)
    (whole_loc ((start foo/bar/c.txt:1:0) (stop foo/bar/c.txt:1:52)))
    (content_start_offset 3)
@@ -150,7 +152,7 @@ A basic [sexp] output is available.
    (comment_prefix "(*")
    (digest_of_condensed_content d8a25b0acac6d3a23ff4f4c1e4c990a3)
    (content "CR : Hey, this comment look like a CR but it's not quite one."))
-  ((path foo/foo.c) (whole_loc ((start foo/foo.c:1:0) (stop foo/foo.c:1:60)))
+  ((path foo/foo.c) (whole_loc ((start foo/foo.c:1:0) (stop foo/foo.c:1:61)))
    (content_start_offset 3)
    (header
     (Ok (status ((txt CR) (loc ((start foo/foo.c:1:3) (stop foo/foo.c:1:5)))))
@@ -161,9 +163,9 @@ A basic [sexp] output is available.
      (recipient
       (((txt user3) (loc ((start foo/foo.c:1:16) (stop foo/foo.c:1:21))))))))
    (comment_prefix /*)
-   (digest_of_condensed_content 4721a5c5f8a37bdcb9e065268bbd0153)
-   (content "CR user1 for user3: Hey, this is a code review comment"))
-  ((path hello) (whole_loc ((start hello:2:0) (stop hello:2:60)))
+   (digest_of_condensed_content ca52637af0275a001e446bdc137de84e)
+   (content "CR user1 for user3: Hey, this is a code review comment."))
+  ((path hello) (whole_loc ((start hello:2:0) (stop hello:2:61)))
    (content_start_offset 15)
    (header
     (Ok (status ((txt CR) (loc ((start hello:2:3) (stop hello:2:5)))))
@@ -171,8 +173,18 @@ A basic [sexp] output is available.
      (reporter ((txt user1) (loc ((start hello:2:6) (stop hello:2:11)))))
      (recipient (((txt user2) (loc ((start hello:2:16) (stop hello:2:21))))))))
    (comment_prefix "(*")
-   (digest_of_condensed_content 970aabfe0c3d4ec5707918edd3f01a8a)
-   (content "CR user1 for user2: Hey, this is a code review comment"))
+   (digest_of_condensed_content a8e234737843b214aee20dba2c39d0ca)
+   (content "CR user1 for user2: Hey, this is a code review comment."))
+  ((path hello) (whole_loc ((start hello:3:0) (stop hello:3:50)))
+   (content_start_offset 77)
+   (header
+    (Ok (status ((txt CR) (loc ((start hello:3:3) (stop hello:3:5)))))
+     (qualifier ((txt None) (loc ((start hello:3:3) (stop hello:3:5)))))
+     (reporter ((txt user2) (loc ((start hello:3:6) (stop hello:3:11)))))
+     (recipient (((txt user1) (loc ((start hello:3:16) (stop hello:3:21))))))))
+   (comment_prefix "(*")
+   (digest_of_condensed_content 074c8b8cfbca21554288eec89782601f)
+   (content "CR user2 for user1: Yes and this is one too."))
 
 The default is to print them, visually separated.
 
@@ -183,8 +195,8 @@ The default is to print them, visually separated.
   File "foo/b.txt", line 1, characters 0-71:
     CR-someday user1: Reconsider if/when updating to the new version.
   
-  File "foo/bar/b.txt", line 2, characters 0-55:
-    CR-soon user1: Hey, this is a code review comment
+  File "foo/bar/b.txt", line 2, characters 0-56:
+    CR-soon user1: Hey, this is a code review comment.
   
   File "foo/bar/c.txt", line 1, characters 0-52:
     CR-user: Hey, I'm trying to use CR, it's cool!
@@ -192,17 +204,20 @@ The default is to print them, visually separated.
   File "foo/bar/d.txt", line 1, characters 0-67:
     CR : Hey, this comment look like a CR but it's not quite one.
   
-  File "foo/foo.c", line 1, characters 0-60:
-    CR user1 for user3: Hey, this is a code review comment
+  File "foo/foo.c", line 1, characters 0-61:
+    CR user1 for user3: Hey, this is a code review comment.
   
-  File "hello", line 2, characters 0-60:
-    CR user1 for user2: Hey, this is a code review comment
+  File "hello", line 2, characters 0-61:
+    CR user1 for user2: Hey, this is a code review comment.
+  
+  File "hello", line 3, characters 0-50:
+    CR user2 for user1: Yes and this is one too.
 
 You may restrict the search to a subdirectory only.
 
   $ crs grep --below ./foo/bar
-  File "foo/bar/b.txt", line 2, characters 0-55:
-    CR-soon user1: Hey, this is a code review comment
+  File "foo/bar/b.txt", line 2, characters 0-56:
+    CR-soon user1: Hey, this is a code review comment.
   
   File "foo/bar/c.txt", line 1, characters 0-52:
     CR-user: Hey, I'm trying to use CR, it's cool!
@@ -244,8 +259,8 @@ Filtering flags may be combined to select their union.
   File "foo/b.txt", line 1, characters 0-71:
     CR-someday user1: Reconsider if/when updating to the new version.
   
-  File "foo/bar/b.txt", line 2, characters 0-55:
-    CR-soon user1: Hey, this is a code review comment
+  File "foo/bar/b.txt", line 2, characters 0-56:
+    CR-soon user1: Hey, this is a code review comment.
 
 There's also an option to display the results as summary tables.
 
@@ -254,7 +269,7 @@ There's also an option to display the results as summary tables.
   │ CR Type │ Count │
   ├─────────┼───────┤
   │ Invalid │     2 │
-  │ CR      │     2 │
+  │ CR      │     3 │
   │ XCR     │     1 │
   │ Soon    │     1 │
   │ Someday │     1 │
@@ -266,6 +281,7 @@ There's also an option to display the results as summary tables.
   │ user1    │       │     │    1 │    1 │       1 │     3 │
   │ user1    │ user2 │   1 │      │      │         │     1 │
   │ user1    │ user3 │   1 │      │      │         │     1 │
+  │ user2    │ user1 │   1 │      │      │         │     1 │
   └──────────┴───────┴─────┴──────┴──────┴─────────┴───────┘
 
   $ crs grep --below ./foo/bar --summary
