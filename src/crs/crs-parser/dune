@@ -14,7 +14,7 @@
   -open
   Pplumbing_err
   -open
-  Fpath_base
+  Fpath_sexp0
   -open
   Stdio
   -open
@@ -26,7 +26,7 @@
   cr_comment
   crs_stdlib
   fpath
-  fpath-base
+  fpath-sexp0
   loc
   pp
   pplumbing-err

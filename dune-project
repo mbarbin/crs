@@ -38,7 +38,7 @@
    (>= 0.0.3))
   (fpath
    (>= 0.7.3))
-  (fpath-base
+  (fpath-sexp0
    (>= 0.4.0))
   (loc
    (>= 0.3.2))
@@ -52,18 +52,6 @@
    (>= 0.0.16))
   (pplumbing-pp-tty
    (>= 0.0.16))
-  (ppx_compare
-   (>= v0.17))
-  (ppx_deriving_yojson
-   (>= 3.9))
-  (ppx_enumerate
-   (>= v0.17))
-  (ppx_hash
-   (>= v0.17))
-  (ppx_sexp_conv
-   (>= v0.17))
-  (ppxlib
-   (>= 0.33))
   (print-table
    (>= 0.1.0))
   (re
@@ -113,7 +101,7 @@
    (>= 0.0.3))
   (fpath
    (>= 0.7.3))
-  (fpath-base
+  (fpath-sexp0
    (>= 0.4.0))
   (loc
    (>= 0.3.2))
@@ -209,10 +197,6 @@
    (= :version))
   (file-rewriter
    (>= 0.0.3))
-  (fpath
-   (>= 0.7.3))
-  (fpath-base
-   (>= 0.4.0))
   (loc
    (>= 0.3.2))
   (mdx

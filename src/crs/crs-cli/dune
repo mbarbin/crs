@@ -10,7 +10,7 @@
   -open
   Base
   -open
-  Fpath_base
+  Fpath_sexp0
   -open
   Pplumbing_pp_tty
   -open
@@ -31,7 +31,7 @@
   crs_stdlib
   file-rewriter
   fpath
-  fpath-base
+  fpath-sexp0
   loc
   pageantty.git-pager
   pp
