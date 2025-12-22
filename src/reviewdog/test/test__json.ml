@@ -25,10 +25,8 @@ let%expect_test "Position.to_json" =
 ;;
 
 let%expect_test "Range.to_json" =
-  (* Range with start only *)
   print_json (Reviewdog.Range.to_json { start = { line = 1; column = 1 }; end_ = None });
   [%expect {| { "start": { "line": 1, "column": 1 } } |}];
-  (* Range with start and end *)
   print_json
     (Reviewdog.Range.to_json
        { start = { line = 1; column = 1 }; end_ = Some { line = 1; column = 10 } });
@@ -37,10 +35,8 @@ let%expect_test "Range.to_json" =
 ;;
 
 let%expect_test "Location.to_json" =
-  (* Location with path only *)
   print_json (Reviewdog.Location.to_json { path = "src/main.ml"; range = None });
   [%expect {| { "path": "src/main.ml" } |}];
-  (* Location with path and range *)
   print_json
     (Reviewdog.Location.to_json
        { path = "src/main.ml"
@@ -61,10 +57,8 @@ let%expect_test "Location.to_json" =
 ;;
 
 let%expect_test "Source.to_json" =
-  (* Source with name only *)
   print_json (Reviewdog.Source.to_json { name = "ocaml-lsp"; url = None });
   [%expect {| { "name": "ocaml-lsp" } |}];
-  (* Source with name and url *)
   print_json
     (Reviewdog.Source.to_json
        { name = "ocaml-lsp"; url = Some "https://github.com/ocaml/ocaml-lsp" });
@@ -72,10 +66,8 @@ let%expect_test "Source.to_json" =
 ;;
 
 let%expect_test "Code.to_json" =
-  (* Code with value only *)
   print_json (Reviewdog.Code.to_json { value = "E001"; url = None });
   [%expect {| { "value": "E001" } |}];
-  (* Code with value and url *)
   print_json
     (Reviewdog.Code.to_json
        { value = "E001"; url = Some "https://example.com/errors/E001" });
@@ -102,12 +94,10 @@ let%expect_test "Suggestion.to_json" =
 ;;
 
 let%expect_test "Related_location.to_json" =
-  (* Without message *)
   print_json
     (Reviewdog.Related_location.to_json
        { message = None; location = { path = "src/other.ml"; range = None } });
   [%expect {| { "location": { "path": "src/other.ml" } } |}];
-  (* With message *)
   print_json
     (Reviewdog.Related_location.to_json
        { message = Some "Related definition here"
@@ -123,7 +113,7 @@ let%expect_test "Related_location.to_json" =
 ;;
 
 let%expect_test "Diagnostic.to_json" =
-  (* Minimal diagnostic *)
+  (* Minimal diagnostic. *)
   print_json
     (Reviewdog.Diagnostic.to_json
        { message = "Unused variable 'x'"
@@ -137,7 +127,7 @@ let%expect_test "Diagnostic.to_json" =
        });
   [%expect
     {| { "message": "Unused variable 'x'", "location": { "path": "src/main.ml" } } |}];
-  (* Full diagnostic *)
+  (* Full diagnostic. *)
   print_json
     (Reviewdog.Diagnostic.to_json
        { message = "Unused variable 'x'"
@@ -188,16 +178,59 @@ let%expect_test "Diagnostic.to_json" =
       ],
       "originalOutput": "Warning 26: unused variable x."
     }
+    |}];
+  (* Diagnostic with related locations. *)
+  print_json
+    (Reviewdog.Diagnostic.to_json
+       { message = "Variable 'x' shadows previous definition"
+       ; location =
+           { path = "src/main.ml"
+           ; range = Some { start = { line = 20; column = 5 }; end_ = None }
+           }
+       ; severity = Some Warning
+       ; source = None
+       ; code = None
+       ; suggestions = []
+       ; original_output = None
+       ; related_locations =
+           [ { message = Some "Previous definition here"
+             ; location =
+                 { path = "src/main.ml"
+                 ; range = Some { start = { line = 10; column = 5 }; end_ = None }
+                 }
+             }
+           ; { message = None; location = { path = "src/other.ml"; range = None } }
+           ]
+       });
+  [%expect
+    {|
+    {
+      "message": "Variable 'x' shadows previous definition",
+      "location": {
+        "path": "src/main.ml",
+        "range": { "start": { "line": 20, "column": 5 } }
+      },
+      "severity": "WARNING",
+      "relatedLocations": [
+        {
+          "message": "Previous definition here",
+          "location": {
+            "path": "src/main.ml",
+            "range": { "start": { "line": 10, "column": 5 } }
+          }
+        },
+        { "location": { "path": "src/other.ml" } }
+      ]
+    }
     |}]
 ;;
 
 let%expect_test "Diagnostic_result.to_json" =
-  (* Minimal result *)
   print_json
     (Reviewdog.Diagnostic_result.to_json
        { source = None; severity = None; diagnostics = [] });
   [%expect {| { "diagnostics": [] } |}];
-  (* With source and diagnostics *)
+  (* With source and diagnostics. *)
   print_json
     (Reviewdog.Diagnostic_result.to_json
        { source = Some { name = "ocaml-lsp"; url = None }
