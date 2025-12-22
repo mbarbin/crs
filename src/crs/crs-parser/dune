@@ -14,9 +14,7 @@
   -open
   Pplumbing_err
   -open
-  Fpath_base
-  -open
-  Stdio
+  Fpath_sexp0
   -open
   Volgo
   -open
@@ -26,7 +24,7 @@
   cr_comment
   crs_stdlib
   fpath
-  fpath-base
+  fpath-sexp0
   loc
   pp
   pplumbing-err
@@ -34,7 +32,6 @@
   re
   sexplib0
   spawn
-  stdio
   unix
   volgo)
  (instrumentation

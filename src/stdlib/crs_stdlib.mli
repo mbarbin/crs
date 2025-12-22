@@ -46,6 +46,7 @@ module String : sig
   val to_string : t -> t
 end
 
+val require : bool -> unit
 val require_does_raise : (unit -> 'a) -> unit
 
 module With_equal_and_dyn : sig
@@ -59,3 +60,8 @@ end
 
 val require_equal : (module With_equal_and_dyn.S with type t = 'a) -> 'a -> 'a -> unit
 val require_not_equal : (module With_equal_and_dyn.S with type t = 'a) -> 'a -> 'a -> unit
+
+(** Transition dependencies *)
+
+(** Used to silence base warning. *)
+val print_endline : string -> unit

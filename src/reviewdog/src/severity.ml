@@ -9,15 +9,8 @@ type t =
   | Error
   | Warning
   | Info
-[@@deriving compare, equal, enumerate]
 
-let of_string = function
-  | "UNKNOWN_SEVERITY" -> Ok Unknown_severity
-  | "ERROR" -> Ok Error
-  | "WARNING" -> Ok Warning
-  | "INFO" -> Ok Info
-  | str -> Error (Printf.sprintf "Invalid severity: %s" str)
-;;
+let all = [ Unknown_severity; Error; Warning; Info ]
 
 let to_string = function
   | Unknown_severity -> "UNKNOWN_SEVERITY"
@@ -26,10 +19,4 @@ let to_string = function
   | Info -> "INFO"
 ;;
 
-let to_yojson t = `String (to_string t)
-
-let of_yojson json =
-  match (json : Yojson.Safe.t) with
-  | `String str | `List [ `String str ] -> of_string str
-  | json -> Error (Printf.sprintf "Invalid severity: %s" (Yojson.Safe.to_string json))
-;;
+let to_json t : Yojson.Basic.t = `String (to_string t)

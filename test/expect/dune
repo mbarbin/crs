@@ -11,9 +11,7 @@
   -open
   Base
   -open
-  Fpath_base
-  -open
-  Expect_test_helpers_base
+  Fpath_sexp0
   -open
   Volgo
   -open
@@ -23,10 +21,9 @@
   cr_comment
   crs_parser
   crs_stdlib
-  expect_test_helpers_core.expect_test_helpers_base
   file-rewriter
   fpath
-  fpath-base
+  fpath-sexp0
   loc
   patdiff.expect_test_patdiff
   volgo)
@@ -35,4 +32,4 @@
  (lint
   (pps ppx_js_style -allow-let-operators -check-doc-comments))
  (preprocess
-  (pps ppx_expect ppx_here)))
+  (pps ppx_expect)))

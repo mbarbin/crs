@@ -38,7 +38,7 @@
    (>= 0.0.3))
   (fpath
    (>= 0.7.3))
-  (fpath-base
+  (fpath-sexp0
    (>= 0.4.0))
   (loc
    (>= 0.3.2))
@@ -52,20 +52,6 @@
    (>= 0.0.16))
   (pplumbing-pp-tty
    (>= 0.0.16))
-  (ppx_compare
-   (>= v0.17))
-  (ppx_deriving_yojson
-   (>= 3.9))
-  (ppx_enumerate
-   (>= v0.17))
-  (ppx_hash
-   (>= v0.17))
-  (ppx_here
-   (>= v0.17))
-  (ppx_sexp_conv
-   (>= v0.17))
-  (ppxlib
-   (>= 0.33))
   (print-table
    (>= 0.1.0))
   (re
@@ -74,11 +60,7 @@
    (>= v0.17))
   (spawn
    (>= v0.17))
-  (stdio
-   (>= v0.17))
   (volgo
-   (>= 0.0.18))
-  (volgo-base
    (>= 0.0.18))
   (volgo-git-unix
    (>= 0.0.18))
@@ -95,11 +77,7 @@
  (depends
   (ocaml
    (>= 5.2))
-  (ocamlformat
-   (= 0.28.1))
   (base
-   (>= v0.17))
-  (base_quickcheck
    (>= v0.17))
   (cmdlang
    (>= 0.0.9))
@@ -111,45 +89,25 @@
   conf-hg
   (crs
    (= :version))
-  (expect_test_helpers_core
-   (>= v0.17))
   (file-rewriter
    (>= 0.0.3))
   (fpath
    (>= 0.7.3))
-  (fpath-base
+  (fpath-sexp0
    (>= 0.4.0))
   (loc
    (>= 0.3.2))
-  (ocaml-protoc
-   (>= 4.0))
   (pageantty
    (>= 0.0.2))
   (patdiff
    (>= v0.17))
-  (pbrt
-   (>= 4.0))
-  (pbrt_yojson
-   (>= 4.0))
   (pp
    (>= 2.0.0))
   (pplumbing-err
    (>= 0.0.16))
   (pplumbing-pp-tty
    (>= 0.0.16))
-  (ppx_compare
-   (>= v0.17))
-  (ppx_deriving_yojson
-   (>= 3.9))
-  (ppx_enumerate
-   (>= v0.17))
   (ppx_expect
-   (>= v0.17))
-  (ppx_hash
-   (>= v0.17))
-  (ppx_here
-   (>= v0.17))
-  (ppx_sexp_conv
    (>= v0.17))
   (ppxlib
    (>= 0.33))
@@ -165,13 +123,9 @@
    (>= 1.12.0))
   (spawn
    (>= v0.17))
-  (stdio
-   (>= v0.17))
   (uutf
    (>= 1.0.4))
   (volgo
-   (>= 0.0.18))
-  (volgo-base
    (>= 0.0.18))
   (volgo-git-unix
    (>= 0.0.18))
@@ -180,106 +134,30 @@
   (volgo-vcs
    (>= 0.0.18))
   (yojson
-   (>= 2.1.1))
-  (sherlodoc
-   (and
-    :with-doc
-    (>= 0.2)))))
+   (>= 2.1.1))))
 
 (package
  (name crs-dev)
  (synopsis "Package to regroup dev targets, documentation, and more")
- (allow_empty) ; In case the package is wip or attached to stanzas that dune doesn't see.
+ (allow_empty)
  (depends
   (ocaml
    (>= 5.2))
   (ocamlformat
    (= 0.28.1))
-  (base
-   (>= v0.17))
-  (base_quickcheck
-   (>= v0.17))
   (bisect_ppx
    (>= 2.8.3))
-  (cmdlang
-   (>= 0.0.9))
-  (cmdlang-cmdliner-err-runner
-   (>= 0.0.16))
-  conf-git
-  conf-hg
   (crs
    (= :version))
   (crs-tests
    (= :version))
-  (expect_test_helpers_core
-   (>= v0.17))
-  (file-rewriter
-   (>= 0.0.3))
-  (fpath
-   (>= 0.7.3))
-  (fpath-base
-   (>= 0.4.0))
-  (loc
-   (>= 0.3.2))
   (mdx
    (>= 2.4))
-  (ocaml-protoc
-   (>= 4.0))
-  (pageantty
-   (>= 0.0.2))
-  (patdiff
-   (>= v0.17))
-  (pbrt
-   (>= 4.0))
-  (pbrt_yojson
-   (>= 4.0))
-  (pp
-   (>= 2.0.0))
-  (pplumbing-err
-   (>= 0.0.16))
-  (pplumbing-pp-tty
-   (>= 0.0.16))
-  (ppx_compare
-   (>= v0.17))
-  (ppx_deriving_yojson
-   (>= 3.9))
-  (ppx_enumerate
-   (>= v0.17))
-  (ppx_expect
-   (>= v0.17))
-  (ppx_hash
-   (>= v0.17))
-  (ppx_here
-   (>= v0.17))
   (ppx_js_style
-   (>= v0.17))
-  (ppx_sexp_conv
    (>= v0.17))
   (ppxlib
    (>= 0.33))
-  (print-table
-   (>= 0.1.0))
-  (re
-   (>= 1.12.0))
-  (spawn
-   (>= v0.17))
-  (stdio
-   (>= v0.17))
-  (volgo
-   (>= 0.0.18))
-  (volgo-base
-   (>= 0.0.18))
-  (volgo-git-unix
-   (>= 0.0.18))
-  (volgo-hg-unix
-   (>= 0.0.18))
-  (volgo-vcs
-   (>= 0.0.18))
   (odoc
-   (and
-    :with-doc
-    (>= 2.4.4)))
+   (>= 2.4.4))
   (sherlodoc
-   (and
-    :with-doc
-    (>= 0.2)))))
+   (>= 0.2))))

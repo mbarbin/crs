@@ -8,4 +8,7 @@ type t =
   { range : Range.t
   ; text : string
   }
-[@@deriving equal, compare, yojson]
+
+let to_json { range; text } : Yojson.Basic.t =
+  `Assoc [ "range", Range.to_json range; "text", `String text ]
+;;

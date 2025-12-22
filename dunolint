@@ -1,9 +1,8 @@
 (lang dunolint 1.0)
 
-;; With some exceptions everything else is instrumented
+;; Everything is instrumented
 (rule
  (cond
-  ((path (glob src/reviewdog/**)) return)
   (true
    (enforce
     (dune
@@ -48,5 +47,8 @@
  (cond
   ((path
     (or
-     (glob src/crs/**)))
+     (glob src/crs/**)
+     (glob src/rewiewdog/src/*)
+     (glob src/stdlib/**)
+     ))
    (enforce (dune (preprocess no_preprocessing))))))

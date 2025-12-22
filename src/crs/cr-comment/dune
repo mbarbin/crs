@@ -10,12 +10,10 @@
   -open
   Base
   -open
-  Stdio
-  -open
   Volgo
   -open
   Crs_stdlib)
- (libraries base crs_stdlib fpath loc stdio volgo)
+ (libraries base crs_stdlib fpath loc volgo)
  (instrumentation
   (backend bisect_ppx))
  (lint

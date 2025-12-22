@@ -10,15 +10,13 @@
   -open
   Base
   -open
-  Fpath_base
+  Fpath_sexp0
   -open
   Pplumbing_pp_tty
   -open
   Pplumbing_err
   -open
-  Stdio
-  -open
-  Volgo_base
+  Volgo
   -open
   Cmdlang
   -open
@@ -31,7 +29,7 @@
   crs_stdlib
   file-rewriter
   fpath
-  fpath-base
+  fpath-sexp0
   loc
   pageantty.git-pager
   pp
@@ -39,9 +37,8 @@
   pplumbing-pp-tty
   print-table
   reviewdog
-  stdio
   unix
-  volgo-base
+  volgo
   volgo-git-unix
   volgo-hg-unix
   yojson

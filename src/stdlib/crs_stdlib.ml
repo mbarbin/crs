@@ -41,6 +41,8 @@ module String = struct
   let to_string t = t
 end
 
+let require cond = if not cond then failwith "Required condition does not hold."
+
 let require_does_raise f =
   match f () with
   | _ -> Code_error.raise "Did not raise." []
@@ -79,3 +81,5 @@ let require_not_equal
   then
     Code_error.raise "Values are  equal." [ "v1", v1 |> M.to_dyn; "v2", v2 |> M.to_dyn ]
 ;;
+
+let print_endline = Stdlib.print_endline

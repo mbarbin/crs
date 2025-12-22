@@ -8,4 +8,7 @@ type t =
   { line : int
   ; column : int
   }
-[@@deriving equal, compare, yojson]
+
+let to_json { line; column } : Yojson.Basic.t =
+  `Assoc [ "line", `Int line; "column", `Int column ]
+;;

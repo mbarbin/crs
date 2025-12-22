@@ -48,7 +48,7 @@ let emit_github_annotation ~severity ~loc ~messages ~hints =
       ~title:"crs"
       ~message:(String.strip (message_text ^ hints_text))
   in
-  prerr_endline (Github_annotation.to_string github_annotation)
+  Stdlib.prerr_endline (Github_annotation.to_string github_annotation)
 ;;
 
 let warning ?loc ~emit_github_annotations ?hints messages =

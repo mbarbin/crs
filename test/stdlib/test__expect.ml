@@ -29,6 +29,13 @@ let%expect_test "phys_equal" =
   ()
 ;;
 
+let%expect_test "require" =
+  require true;
+  [%expect {||}];
+  require_does_raise (fun () -> require false);
+  [%expect {| Failure("Required condition does not hold.") |}]
+;;
+
 let%expect_test "require_does_raise" =
   require_does_raise (fun () -> failwith "Hello Exn");
   [%expect {| Failure("Hello Exn") |}];

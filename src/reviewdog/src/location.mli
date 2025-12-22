@@ -8,4 +8,5 @@ type t =
   { path : string
   ; range : Range.t option
   }
-[@@deriving equal, compare, yojson]
+
+val to_json : t -> Yojson.Basic.t

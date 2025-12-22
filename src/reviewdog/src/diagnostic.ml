@@ -7,12 +7,50 @@
 type t =
   { message : string
   ; location : Location.t
-  ; severity : Severity.t option [@yojson.default None]
-  ; source : Source.t option [@yojson.default None]
-  ; code : Code.t option [@yojson.default None]
-  ; suggestions : Suggestion.t list [@yojson.default []]
-  ; original_output : string option [@yojson.default None] [@key "originalOutput"]
+  ; severity : Severity.t option
+  ; source : Source.t option
+  ; code : Code.t option
+  ; suggestions : Suggestion.t list
+  ; original_output : string option
   ; related_locations : Related_location.t list
-        [@yojson.default []] [@key "relatedLocations"]
   }
-[@@deriving equal, compare, yojson]
+
+let to_json
+      { message
+      ; location
+      ; severity
+      ; source
+      ; code
+      ; suggestions
+      ; original_output
+      ; related_locations
+      }
+  : Yojson.Basic.t
+  =
+  `Assoc
+    (List.concat
+       [ [ "message", `String message ]
+       ; [ "location", Location.to_json location ]
+       ; (match severity with
+          | None -> []
+          | Some s -> [ "severity", Severity.to_json s ])
+       ; (match source with
+          | None -> []
+          | Some s -> [ "source", Source.to_json s ])
+       ; (match code with
+          | None -> []
+          | Some c -> [ "code", Code.to_json c ])
+       ; (match suggestions with
+          | [] -> []
+          | _ -> [ "suggestions", `List (List.map Suggestion.to_json suggestions) ])
+       ; (match original_output with
+          | None -> []
+          | Some o -> [ "originalOutput", `String o ])
+       ; (match related_locations with
+          | [] -> []
+          | _ ->
+            [ ( "relatedLocations"
+              , `List (List.map Related_location.to_json related_locations) )
+            ])
+       ])
+;;

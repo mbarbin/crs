@@ -9,4 +9,6 @@ type t =
   | Error
   | Warning
   | Info
-[@@deriving compare, equal, enumerate, yojson]
+
+val all : t list
+val to_json : t -> Yojson.Basic.t

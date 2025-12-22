@@ -5,7 +5,16 @@
 (****************************************************************************)
 
 type t =
-  { message : string option [@yojson.default None]
+  { message : string option
   ; location : Location.t
   }
-[@@deriving equal, compare, yojson]
+
+let to_json { message; location } : Yojson.Basic.t =
+  `Assoc
+    (List.concat
+       [ (match message with
+          | None -> []
+          | Some m -> [ "message", `String m ])
+       ; [ "location", Location.to_json location ]
+       ])
+;;

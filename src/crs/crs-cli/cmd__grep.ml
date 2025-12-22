@@ -90,7 +90,10 @@ let main =
        then
          Ref.set_temporarily Loc.include_sexp_of_locs true ~f:(fun () ->
            List.iter crs ~f:(fun cr ->
-             Out_channel.output_line oc (Sexp.to_string_hum (cr |> Cr_comment.sexp_of_t))))
+             Out_channel.output_string
+               oc
+               (Sexp.to_string_hum (cr |> Cr_comment.sexp_of_t));
+             Out_channel.output_char oc '\n'))
        else if summary
        then (
          let by_type =

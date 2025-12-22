@@ -6,6 +6,15 @@
 
 type t =
   { value : string
-  ; url : string option [@yojson.default None]
+  ; url : string option
   }
-[@@deriving equal, compare, yojson]
+
+let to_json { value; url } : Yojson.Basic.t =
+  `Assoc
+    (List.concat
+       [ [ "value", `String value ]
+       ; (match url with
+          | None -> []
+          | Some u -> [ "url", `String u ])
+       ])
+;;
