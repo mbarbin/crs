@@ -44,11 +44,16 @@ let%expect_test "equal" =
 let%expect_test "compare" =
   let cr = Cr_comment.Status.CR in
   let xcr = Cr_comment.Status.XCR in
-  print_dyn
-    (List.sort
-       (List.concat [ List.rev Cr_comment.Status.all; [ xcr; cr; xcr ] ])
-       ~compare:Cr_comment.Status.compare
-     |> Dyn.list Cr_comment.Status.to_dyn);
-  [%expect {| [ CR; CR; XCR; XCR; XCR ] |}];
+  let computed =
+    List.sort
+      (List.concat [ List.rev Cr_comment.Status.all; [ xcr; cr; xcr ] ])
+      ~compare:Cr_comment.Status.compare
+  in
+  let expected = [ cr; cr; xcr; xcr; xcr ] in
+  let () =
+    if not (List.equal Cr_comment.Status.equal computed expected)
+    then print_dyn (computed |> Dyn.list Cr_comment.Status.to_dyn) [@coverage off]
+  in
+  [%expect {||}];
   ()
 ;;
