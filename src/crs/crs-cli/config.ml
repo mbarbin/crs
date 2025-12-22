@@ -102,8 +102,6 @@ let to_dyn
        ])
 ;;
 
-let sexp_of_t t = Dyn.to_sexp (to_dyn t)
-
 let get_json_enum_constructor json ~loc ~field_name =
   match json with
   | `String str -> `Unwrapped str

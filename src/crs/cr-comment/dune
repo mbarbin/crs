@@ -11,7 +11,7 @@
   Volgo
   -open
   Crs_stdlib)
- (libraries crs_stdlib fpath loc sexplib0 volgo)
+ (libraries crs_stdlib fpath loc volgo)
  (instrumentation
   (backend bisect_ppx))
  (lint

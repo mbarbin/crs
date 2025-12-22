@@ -36,13 +36,7 @@ module Severity = struct
   ;;
 
   let to_dyn t = Dyn.Variant (variant_constructor_name t, [])
-  let sexp_of_t t = Sexplib0.Sexp.Atom (variant_constructor_name t)
-
-  let to_string t =
-    match sexp_of_t t with
-    | Atom s -> s
-    | List _ -> assert false
-  ;;
+  let to_string = variant_constructor_name
 
   let to_github : t -> Github_annotation.Severity.t = function
     | Error -> Error
