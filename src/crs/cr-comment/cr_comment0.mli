@@ -215,7 +215,6 @@ val comment_prefix : t -> string
     the comments boundaries from [path] as well. *)
 val whole_loc : t -> Loc.t
 
-(* CR mbarbin: Test CR for the CI. *)
 val header : t -> Header.t Or_error.t
 val status : t -> Status.t
 
