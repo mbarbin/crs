@@ -41,7 +41,7 @@
   (fpath-base
    (>= 0.4.0))
   (loc
-   (>= 0.2.2))
+   (>= 0.3.2))
   (ordering
    (>= 3.17))
   (pageantty
@@ -122,7 +122,7 @@
   (fpath-base
    (>= 0.4.0))
   (loc
-   (>= 0.2.2))
+   (>= 0.3.2))
   (ocaml-protoc
    (>= 4.0))
   (pageantty
@@ -226,7 +226,7 @@
   (fpath-base
    (>= 0.4.0))
   (loc
-   (>= 0.2.2))
+   (>= 0.3.2))
   (mdx
    (>= 2.4))
   (ocaml-protoc

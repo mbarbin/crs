@@ -23,7 +23,7 @@ depends: [
   "file-rewriter" {>= "0.0.3"}
   "fpath" {>= "0.7.3"}
   "fpath-base" {>= "0.4.0"}
-  "loc" {>= "0.2.2"}
+  "loc" {>= "0.3.2"}
   "ocaml-protoc" {>= "4.0"}
   "pageantty" {>= "0.0.2"}
   "patdiff" {>= "v0.17"}
