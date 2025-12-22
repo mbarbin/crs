@@ -56,8 +56,6 @@
  * - Migrate from [Re2] to [ocaml-re].
  *)
 
-module String = Base.String
-
 (* : and @ have other meanings in CR comments *)
 let word_t =
   Re.compl [ Re.char ' '; Re.char '\t'; Re.char '\n'; Re.char ':'; Re.char '@' ]
@@ -74,6 +72,8 @@ module Re_helper = struct
     ; recipient : int
     }
 end
+
+module Group_map = Map.Make (String)
 
 let make_re_helper () =
   let status_g = "status" in
@@ -108,8 +108,8 @@ let make_re_helper () =
            ]))
     |> Re.compile
   in
-  let groups = Re.group_names re |> Map.of_alist_exn (module String) in
-  let find_group ~name = Map.find_exn groups name in
+  let groups = Re.group_names re |> List.to_seq |> Group_map.of_seq in
+  let find_group ~name = Group_map.find name groups in
   { Re_helper.re
   ; status = find_group ~name:status_g
   ; qualifier = find_group ~name:qualifier_g

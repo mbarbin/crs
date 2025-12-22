@@ -46,7 +46,6 @@
  * - Use [Vcs] instead of [Hg].
  *)
 
-module String = Base.String
 module Unix = UnixLabels
 
 let cr_pattern_egrep = File_parser.cr_pattern_egrep
@@ -96,7 +95,7 @@ module Exit_status = struct
   ;;
 end
 
-let null_separator = String.make 1 (Char.of_int_exn 0)
+let null_separator = String.make 1 (Char.chr 0)
 
 let () =
   (* Something similar is done when you link with [Core_unix] however it is
@@ -105,7 +104,7 @@ let () =
      dependencies may change. *)
   Sexplib0.Sexp_conv.Exn_converter.add [%extension_constructor Unix.Unix_error] (function
     | Unix.Unix_error (error, fn, param) ->
-      Sexp.List
+      Sexplib0.Sexp.List
         [ Atom "Unix.Unix_error"; Atom (Unix.error_message error); Atom fn; Atom param ]
     | _ -> assert false)
 ;;

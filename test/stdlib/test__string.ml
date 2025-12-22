@@ -19,44 +19,50 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-let pp_to_string pp =
-  let buffer = Buffer.create 23 in
-  let formatter = Stdlib.Format.formatter_of_buffer buffer in
-  Stdlib.Format.fprintf formatter "%a%!" Pp.to_fmt pp;
-  let contents =
-    Buffer.contents buffer
-    |> String.split_lines
-    |> List.map ~f:(fun s -> String.rstrip s ^ "\n")
-    |> String.concat ~sep:""
-  in
-  contents
+let%expect_test "lstrip" =
+  let test s = print_dyn (Dyn.string (String.lstrip s)) in
+  test "";
+  [%expect {| "" |}];
+  test "123  ";
+  [%expect {| "123  " |}];
+  test "  123";
+  [%expect {| "123" |}];
+  ()
 ;;
 
-let emit_github_annotation ~severity ~loc ~messages ~hints =
-  let message_text = String.concat ~sep:"" (List.map messages ~f:pp_to_string) in
-  let hints_text =
-    match hints with
-    | None -> ""
-    | Some hints -> "Hints: " ^ String.concat ~sep:" " (List.map hints ~f:pp_to_string)
-  in
-  let github_annotation =
-    Github_annotation.create
-      ~loc:(Option.value loc ~default:Loc.none)
-      ~severity
-      ~title:"crs"
-      ~message:(String.strip (message_text ^ hints_text))
-  in
-  Stdlib.prerr_endline (Github_annotation.to_string github_annotation)
+let%expect_test "rstrip" =
+  let test s = print_dyn (Dyn.string (String.rstrip s)) in
+  test "";
+  [%expect {| "" |}];
+  test "123  ";
+  [%expect {| "123" |}];
+  test "  123";
+  [%expect {| "  123" |}];
+  ()
 ;;
 
-let warning ?loc ~emit_github_annotations ?hints messages =
-  Err.warning ?loc ?hints messages;
-  if emit_github_annotations
-  then emit_github_annotation ~severity:Warning ~loc ~messages ~hints
+let%expect_test "substr_replace_all" =
+  let test t ~pattern =
+    print_dyn (Dyn.string (String.substr_replace_all t ~pattern ~with_:"XXX"))
+  in
+  test "" ~pattern:"";
+  [%expect {| "" |}];
+  test "hello" ~pattern:"";
+  [%expect {| "hello" |}];
+  test "hello" ~pattern:"lo";
+  [%expect {| "helXXX" |}];
+  test "hello, hello" ~pattern:"lo";
+  [%expect {| "helXXX, helXXX" |}];
+  ()
 ;;
 
-let error ?loc ~emit_github_annotations ?hints messages =
-  Err.error ?loc ?hints messages;
-  if emit_github_annotations
-  then emit_github_annotation ~severity:Error ~loc ~messages ~hints
+let%expect_test "split_lines" =
+  let test t = print_dyn (Dyn.list Dyn.string (String.split_lines t)) in
+  test "";
+  [%expect {| [] |}];
+  test "hello\nworld";
+  [%expect {| [ "hello"; "world" ] |}];
+  test "hello\r\nworld\r\n";
+  [%expect {| [ "hello"; "world" ] |}];
+  ()
 ;;

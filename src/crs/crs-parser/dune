@@ -8,8 +8,6 @@
   -warn-error
   +a
   -open
-  Base
-  -open
   Pplumbing_pp_tty
   -open
   Pplumbing_err
@@ -20,7 +18,6 @@
   -open
   Crs_stdlib)
  (libraries
-  base
   cr_comment
   crs_stdlib
   fpath

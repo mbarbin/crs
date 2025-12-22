@@ -8,15 +8,12 @@
   -warn-error
   +a
   -open
-  Base
-  -open
   Fpath_sexp0
   -open
   Volgo
   -open
   Crs_stdlib)
  (libraries
-  base
   cr_comment
   crs_parser
   crs_stdlib

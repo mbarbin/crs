@@ -19,8 +19,6 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-module String = Base.String
-
 let path = Vcs.Path_in_repo.v "my_file.ml"
 
 let parse file_contents =

@@ -74,8 +74,6 @@
  * - Add [Dyn] to replace [Error].
  *)
 
-module String = Base.String
-
 module Digest_hex = struct
   type t = string
 
@@ -188,7 +186,7 @@ module T = struct
         && Digest_hex.equal t.digest_of_condensed_content digest_of_condensed_content
         && Loc.equal t.whole_loc whole_loc
         && Int.equal t.content_start_offset content_start_offset
-        && Result.equal Header.equal Dyn.equal t.header header
+        && Result.equal ~ok:Header.equal ~error:Dyn.equal t.header header
         && String.equal t.comment_prefix comment_prefix
         && String.equal t.content content)
   ;;
@@ -224,12 +222,7 @@ let content t = t.content
 let content_start_offset t = t.content_start_offset
 let comment_prefix t = t.comment_prefix
 let whole_loc t = t.whole_loc
-
-let header t =
-  match t.header with
-  | Ok ok -> Ok ok
-  | Error dyn -> Error (Error.create_s (Dyn.to_sexp dyn))
-;;
+let header t = t.header
 
 let create
       ~path

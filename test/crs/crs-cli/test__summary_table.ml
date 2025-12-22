@@ -37,7 +37,7 @@ let%expect_test "empty table" =
 let%expect_test "to_string" =
   let crs = Tests_helpers.parse_file ~path ~file_contents:Tests_helpers.test_cases in
   let table = Summary_table.make crs in
-  let print_table = Summary_table.to_print_table table |> Option.value_exn in
+  let print_table = Summary_table.to_print_table table |> Option.get in
   (* Ansi *)
   print_endline (Print_table.to_string_text print_table);
   [%expect

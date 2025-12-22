@@ -19,7 +19,6 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-module String = Base.String
 module Invalid_cr_parser = Crs_parser.Private.Invalid_cr_parser
 module Invalid_cr = Invalid_cr_parser.Invalid_cr
 

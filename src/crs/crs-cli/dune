@@ -8,8 +8,6 @@
   -warn-error
   +a
   -open
-  Base
-  -open
   Fpath_sexp0
   -open
   Pplumbing_pp_tty
@@ -22,7 +20,6 @@
   -open
   Crs_stdlib)
  (libraries
-  base
   cmdlang
   cr_comment
   crs_parser
@@ -37,6 +34,7 @@
   pplumbing-pp-tty
   print-table
   reviewdog
+  sexplib0
   unix
   volgo
   volgo-git-unix

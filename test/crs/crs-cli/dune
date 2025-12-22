@@ -8,8 +8,6 @@
   -warn-error
   +a
   -open
-  Base
-  -open
   Fpath_sexp0
   -open
   Pplumbing_err
@@ -20,7 +18,6 @@
   -open
   Crs_stdlib)
  (libraries
-  base
   cmdlang
   cmdlang-stdlib-runner
   cr_comment

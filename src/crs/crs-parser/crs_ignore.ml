@@ -19,8 +19,6 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-module String = Base.String
-
 let filename = Fsegment.v ".crs-ignore"
 
 module Entry = struct
@@ -93,7 +91,7 @@ let parse_and_compile_pattern
         | None -> whole_line
         | Some (pat, _comment) -> pat
       in
-      String.strip str ~drop:(fun char -> Char.equal char ' ')
+      String.strip str
     in
     if not (String.equal str txt)
     then
@@ -113,9 +111,7 @@ let parse_and_compile_pattern
           if Sys.win32
           then
             (* Use only forward slashes in the pattern for Windows compatibility *)
-            String.concat
-              ~sep:"/"
-              (String.split_on_chars txt ~on:[ '\\' ]) [@coverage off]
+            String.concat ~sep:"/" (String.split txt ~on:'\\') [@coverage off]
           else txt
         in
         Re.(
@@ -226,21 +222,24 @@ module Rules = struct
     ;;
   end
 
+  module Path_table = Hashtbl.Make (Relative_path)
+
   (* All the crs-ignore files, indexed by their directory. *)
-  type t = { files_by_dir : One_file.t Hashtbl.M(Relative_path).t }
+  type t = { files_by_dir : One_file.t Path_table.t }
 
   let create files =
     (* This would raise if several files have the same directory, but this
        shouldn't happen since they all have the same basename. *)
     let files_by_dir =
       List.map files ~f:(fun (t : File.t) -> t.directory, One_file.create t)
-      |> Hashtbl.of_alist_exn (module Relative_path)
+      |> List.to_seq
+      |> Path_table.of_seq
     in
     { files_by_dir }
   ;;
 
   let aux_dir (t : t) ~dir ~path =
-    match Hashtbl.find t.files_by_dir dir with
+    match Path_table.find_opt t.files_by_dir dir with
     | None -> false
     | Some file -> One_file.is_file_ignored file ~path
   ;;
@@ -260,8 +259,10 @@ module Rules = struct
   ;;
 
   let unused_patterns t =
-    Hashtbl.data t.files_by_dir
-    |> List.map ~f:(fun { One_file.directory; entries } ->
+    t.files_by_dir
+    |> Path_table.to_seq
+    |> List.of_seq
+    |> List.map ~f:(fun (_, { One_file.directory; entries }) ->
       let entries = List.filter entries ~f:(fun entry -> not entry.used) in
       { One_file.directory; entries })
     |> List.sort ~compare:(fun (f1 : One_file.t) f2 ->
