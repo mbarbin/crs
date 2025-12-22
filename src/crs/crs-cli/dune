@@ -16,8 +16,6 @@
   -open
   Pplumbing_err
   -open
-  Stdio
-  -open
   Volgo
   -open
   Cmdlang
@@ -39,7 +37,6 @@
   pplumbing-pp-tty
   print-table
   reviewdog
-  stdio
   unix
   volgo
   volgo-git-unix

@@ -16,8 +16,6 @@
   -open
   Fpath_sexp0
   -open
-  Stdio
-  -open
   Volgo
   -open
   Crs_stdlib)
@@ -34,7 +32,6 @@
   re
   sexplib0
   spawn
-  stdio
   unix
   volgo)
  (instrumentation

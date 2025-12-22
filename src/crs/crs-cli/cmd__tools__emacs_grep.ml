@@ -129,7 +129,7 @@ let main =
          |> List.map ~f:Print_table.to_string_text
          |> String.concat ~sep:"\n"
        in
-       Out_channel.output_string Stdio.stdout tables)
+       Out_channel.output_string Stdlib.stdout tables)
      else
        output_list
          crs

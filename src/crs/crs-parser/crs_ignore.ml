@@ -173,7 +173,10 @@ module File = struct
   let load_exn ~repo_root ~path ~invalid_patterns_are_errors ~emit_github_annotations =
     let ignore_file_path = Vcs.Repo_root.append repo_root path in
     let ignore_file_str = Absolute_path.to_string ignore_file_path in
-    let file_contents = In_channel.read_all ignore_file_str |> Vcs.File_contents.create in
+    let file_contents =
+      In_channel.with_open_bin ignore_file_str In_channel.input_all
+      |> Vcs.File_contents.create
+    in
     parse_exn
       ~repo_root
       ~path

@@ -231,8 +231,9 @@ let grep ~vcs ~repo_root ~below =
          then []
          else (
            let file_contents =
-             In_channel.read_all
+             In_channel.with_open_bin
                (Vcs.Repo_root.append repo_root path |> Absolute_path.to_string)
+               In_channel.input_all
              |> Vcs.File_contents.create
            in
            parse_file ~path ~file_contents)))
