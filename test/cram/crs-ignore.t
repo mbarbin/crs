@@ -160,10 +160,10 @@ cleanup stale entries in the ignore files. We also exercise here the support for
 inline comments and proper location tracking in the presence of surrounding
 whitespaces.
 
-  $ printf "  foo # Hello inline comment \n" > .crs-ignore
+  $ printf "  foo # Hello inline comment\n" > .crs-ignore
   $ crs tools crs-ignore validate
   File "$TESTCASE_ROOT/.crs-ignore", line 1, characters 2-5:
-  1 |   foo # Hello inline comment 
+  1 |   foo # Hello inline comment
         ^^^
   Warning: This ignore pattern is unused.
   Hint: Remove it from this [.crs-ignore] file.
