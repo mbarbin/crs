@@ -72,7 +72,7 @@ let main =
        | None -> Vcs.Path_in_repo.root
        | Some path -> Common_helpers.relativize ~repo_root ~cwd ~path
      in
-     let () = Stdlib.Sys.set_signal Stdlib.Sys.sigpipe Stdlib.Sys.Signal_ignore in
+     let () = Sys.set_signal Sys.sigpipe Sys.Signal_ignore in
      let crs =
        let all_crs = Crs_parser.grep ~vcs ~repo_root ~below in
        let selected =

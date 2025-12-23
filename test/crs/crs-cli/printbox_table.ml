@@ -78,7 +78,7 @@ let map_utf8_string s ~f =
     match Uutf.decode d with
     | `End -> ()
     | `Uchar u ->
-      Stdlib.Buffer.add_utf_8_uchar b (f u);
+      Buffer.add_utf_8_uchar b (f u);
       loop d
     | `Malformed _ | `Await -> assert false
   in
@@ -89,7 +89,7 @@ let map_utf8_string s ~f =
 
 let to_md_line s =
   map_utf8_string s ~f:(fun u ->
-    match Stdlib.Uchar.to_int u with
+    match Uchar.to_int u with
     | 9472 -> Uchar.of_char '-' (* '─' Horizontal line *)
     | 9474 -> Uchar.of_char '|' (* '│' Vertical line *)
     | 9484 -> Uchar.of_char '|' (* '┌' Top left corner *)

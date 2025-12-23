@@ -66,15 +66,15 @@ let find_executable ~path ~executable_basename =
   let rec loop = function
     | [] -> (None [@coverage off])
     | path :: rest ->
-      let fn = Stdlib.Filename.concat path executable_basename in
-      if Stdlib.Sys.file_exists fn then Some fn else loop rest
+      let fn = Filename.concat path executable_basename in
+      if Sys.file_exists fn then Some fn else loop rest
   in
   loop (String.split path ~on:':')
 ;;
 
 let find_xargs =
   lazy
-    (match Stdlib.Sys.getenv_opt "PATH" with
+    (match Sys.getenv_opt "PATH" with
      | None -> None [@coverage off]
      | Some path -> find_executable ~path ~executable_basename:"xargs")
 ;;

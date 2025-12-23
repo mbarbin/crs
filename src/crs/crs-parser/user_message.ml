@@ -21,8 +21,8 @@
 
 let pp_to_string pp =
   let buffer = Buffer.create 23 in
-  let formatter = Stdlib.Format.formatter_of_buffer buffer in
-  Stdlib.Format.fprintf formatter "%a%!" Pp.to_fmt pp;
+  let formatter = Format.formatter_of_buffer buffer in
+  Format.fprintf formatter "%a%!" Pp.to_fmt pp;
   let contents =
     Buffer.contents buffer
     |> String.split_lines
@@ -46,7 +46,7 @@ let emit_github_annotation ~severity ~loc ~messages ~hints =
       ~title:"crs"
       ~message:(String.strip (message_text ^ hints_text))
   in
-  Stdlib.prerr_endline (Github_annotation.to_string github_annotation)
+  prerr_endline (Github_annotation.to_string github_annotation)
 ;;
 
 let warning ?loc ~emit_github_annotations ?hints messages =

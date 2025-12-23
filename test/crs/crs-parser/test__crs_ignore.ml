@@ -28,7 +28,7 @@ let path = Vcs.Path_in_repo.v ".crs-ignore"
 
 let%expect_test "relative parent is dir_path" =
   let p = Relative_path.v "a/b" in
-  let parent = Relative_path.parent p |> Stdlib.Option.get in
+  let parent = Relative_path.parent p |> Option.get in
   require (Relative_path.is_dir_path parent);
   print_endline (parent |> Relative_path.to_string);
   [%expect {| a/ |}];
@@ -37,7 +37,7 @@ let%expect_test "relative parent is dir_path" =
 
 let%expect_test "absolute parent is dir_path" =
   let p = Absolute_path.v "/a/b" in
-  let parent = Absolute_path.parent p |> Stdlib.Option.get in
+  let parent = Absolute_path.parent p |> Option.get in
   require (Absolute_path.is_dir_path parent);
   print_endline (parent |> Absolute_path.to_string);
   [%expect {| /a/ |}];
@@ -46,7 +46,7 @@ let%expect_test "absolute parent is dir_path" =
 
 let%expect_test "parent of dir_path" =
   let p = Relative_path.v "a/b/" in
-  let parent = Relative_path.parent p |> Stdlib.Option.get in
+  let parent = Relative_path.parent p |> Option.get in
   require (Relative_path.is_dir_path parent);
   print_endline (parent |> Relative_path.to_string);
   [%expect {| a/ |}];

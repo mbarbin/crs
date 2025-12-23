@@ -180,7 +180,7 @@ let parse ~file_cache ~content_start_offset ~content =
       match exn with
       | Invalid_argument str -> Dyn.variant "Invalid_argument" [ Dyn.string str ]
       | Failure str -> Dyn.variant "Failure" [ Dyn.string str ] [@coverage off]
-      | _ -> Dyn.string (Stdlib.Printexc.to_string exn) [@coverage off]
+      | _ -> Dyn.string (Printexc.to_string exn) [@coverage off]
     in
     (Error (Dyn.Tuple [ Dyn.string "Could not process CR."; Dyn.string content; exn ])
     [@coverage off])

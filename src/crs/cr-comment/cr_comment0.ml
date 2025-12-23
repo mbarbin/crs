@@ -81,7 +81,7 @@ module Digest_hex = struct
   let equal = String.equal
   let to_dyn = Dyn.string
   let to_string t = t
-  let create str = str |> Stdlib.Digest.string |> Stdlib.Digest.to_hex
+  let create str = str |> Digest.string |> Digest.to_hex
 end
 
 module Header = struct
@@ -355,7 +355,7 @@ let output_list crs ~oc =
     include_delim := true)
 ;;
 
-let print_list crs = output_list crs ~oc:Stdlib.stdout
+let print_list crs = output_list crs ~oc:Out_channel.stdout
 
 module Private = struct
   module Header = Header
