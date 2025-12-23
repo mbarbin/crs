@@ -44,6 +44,11 @@ let main =
      let path_in_repo =
        Common_helpers.relativize ~repo_root ~cwd ~path:(Relative_path.empty :> Fpath.t)
      in
+     (* Even though we say that this command shall not be used by scripts, it is
+        actually used internally by the emacs-mode provided by this repo. We
+        control both code and release them in sync, however breaking upgrades
+        shall be done with care. At the moment, the emacs code relies on the
+        presence of [json-string] fields [repo_root] and [path_in_repo]. *)
      print_endline
        (Json.to_string
           (`Assoc
