@@ -64,7 +64,7 @@ Should be one of: all, crs, xcrs, now, soon, someday, invalid, summary."
   "If non-nil, enable `next-error-follow-minor-mode' in the CRs buffer by default."
   :type 'boolean
   :group 'crs-grep
-  :package-version '("crs-grep" . "0.0.3"))
+  :package-version '("crs-grep" . "0.0.4"))
 
 (defcustom crs-grep-buffer-opening-behavior "split"
   "How to open the CRs buffer when it does not already exist.
@@ -108,9 +108,9 @@ Always a string, e.g. \"now\", \"all\", etc.")
 (defvar crs-grep-path-in-repo nil
   "The path within the repository for the current CRs session.")
 
-(defun crs-grep--parse-sexp-repo-info (sexp-string)
-  "Parse SEXP-STRING output from `crs tools enclosing-repo-info`."
-  (car (read-from-string sexp-string)))
+(defun crs-grep--parse-json-repo-info (json-string)
+  "Parse JSON-STRING output from `crs tools enclosing-repo-info`."
+  (json-parse-string json-string :object-type 'alist))
 
 (defun crs-grep--update-repo-info (directory)
   "Update `crs-grep-repo-root` and `crs-grep-path-in-repo` for DIRECTORY."
@@ -128,17 +128,9 @@ Always a string, e.g. \"now\", \"all\", etc.")
                   (buffer-string)
                 nil)))))
     (when output
-      (let* ((alist (crs-grep--parse-sexp-repo-info output))
-             (repo-root
-              (let ((val (cadr (assoc 'repo_root alist))))
-                (if (stringp val)
-                    val
-                  (symbol-name val))))
-             (path-in-repo
-              (let ((val (cadr (assoc 'path_in_repo alist))))
-                (if (stringp val)
-                    val
-                  (symbol-name val)))))
+      (let* ((alist (crs-grep--parse-json-repo-info output))
+             (repo-root (alist-get "repo_root" alist nil nil #'equal))
+             (path-in-repo (alist-get "path_in_repo" alist nil nil #'equal)))
         (setq crs-grep-repo-root repo-root)
         (setq crs-grep-path-in-repo path-in-repo)))))
 
