@@ -46,11 +46,11 @@ the PR author is supplied by the workflow job as follows:
 
   $ crs tools github annotate-crs \
   >   --review-mode=pull-request \
-  >   --pull-request-author="dependabot[bot]"
-  crs: option '--pull-request-author': "dependabot[bot]": invalid user_handle
-  Usage: crs tools github annotate-crs [OPTION]…
-  Try 'crs tools github annotate-crs --help' or 'crs --help' for more information.
+  >   --pull-request-author="dependabot[bot]" > output 2>&1
   [124]
+
+  $ grep 'crs: ' output
+  crs: option '--pull-request-author': "dependabot[bot]": invalid user_handle
 
 As seen above, this type of user handle is not supported at the moment. This
 limitation is monitored by this test, with improvements left as future work.
