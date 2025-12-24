@@ -8,8 +8,10 @@
   -warn-error
   +a
   -open
+  Volgo
+  -open
   Crs_stdlib)
- (libraries cr_comment crs_stdlib)
+ (libraries cr_comment crs_stdlib volgo)
  (inline_tests)
  (instrumentation
   (backend bisect_ppx))

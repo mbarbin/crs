@@ -193,6 +193,10 @@ let%expect_test "getters" =
         }
     }
     |}];
+  (* Below we illustrate that the invalid CRs abstraction allows one to
+     manipulate components from CRs even though they are invalid, which should
+     be useful to implement tooling on top. For example below, we feature CRs
+     with invalid user handle and/or invalid qualifiers. *)
   test
     {|
 (* $CR-soneday user1 for user#2: Hello contents. *)
@@ -207,6 +211,25 @@ let%expect_test "getters" =
         ; for_or_to = Some "for"
         ; recipient = Some "user#2"
         ; contents = "Hello contents."
+        }
+    }
+    |}];
+  (* At the moment this type of user handle is not supported as evidenced by the
+     following test. Fixing this is left as future work. *)
+  test
+    {|
+(* $CR github-something[bot]: Feedback from automated workflow X. *)
+|};
+  [%expect
+    {|
+    ========================
+    { getters =
+        { status = CR
+        ; qualifier = None
+        ; reporter = Some "github-something[bot]"
+        ; for_or_to = None
+        ; recipient = None
+        ; contents = "Feedback from automated workflow X."
         }
     }
     |}];
