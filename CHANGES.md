@@ -1,7 +1,15 @@
 ## 0.0.202XXXXX (unreleased)
 
+### Added
+
+- Add tests to monitor dependabot workflows issue (#82, #112, @mbarbin).
+
 ### Changed
 
+- Use json instead of sexp in output of some commands (#106, #111, @mbarbin).
+- Refactor packages directory structure (#107, @mbarbin).
+- Internal refactors to reduce dependencies (#103, #104, #105, #108, #109, #110, @mbarbin).
+- Use dyn syntax instead of sexp in expect tests (#104, @mbarbin).
 - Upgrade test deps `ocaml-protoc` & all to `4.0` (#99, @mbarbin).
 - Reduce printed context in some tests diffs (#99, @mbarbin).
 - Enable OCaml 5.4 in CI (#98, @mbarbin).
