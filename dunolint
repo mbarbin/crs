@@ -22,6 +22,9 @@
       (and
        (not
         (has_field public_name))
+       (has_field inline_tests)
+       (package
+        (equals crs-tests))
        (name
         (is_suffix _test)))))))))
 
