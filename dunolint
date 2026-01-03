@@ -1,15 +1,17 @@
 (lang dunolint 1.0)
 
 ;; Everything is instrumented
+
 (rule
  (cond
   (true
    (enforce
     (dune
      (instrumentation
-     (backend bisect_ppx)))))))
+      (backend bisect_ppx)))))))
 
 ;; Test lib naming
+
 (rule
  (cond
   ((path
@@ -18,13 +20,21 @@
     (dune
      (library
       (and
-       (not (has_field public_name))
-       (name (is_suffix _test)))))))))
+       (not
+        (has_field public_name))
+       (has_field inline_tests)
+       (package
+        (equals crs-tests))
+       (name
+        (is_suffix _test)))))))))
 
 ;; Configure the ppx_js_style linter
+
 (rule
  (cond
-  ((path (glob src/reviewdog/test/**)) return)
+  ((path
+    (glob src/reviewdog/test/**))
+   return)
   (true
    (enforce
     (dune
@@ -49,6 +59,7 @@
     (or
      (glob src/crs/**)
      (glob src/rewiewdog/src/*)
-     (glob src/stdlib/**)
-     ))
-   (enforce (dune (preprocess no_preprocessing))))))
+     (glob src/stdlib/**)))
+   (enforce
+    (dune
+     (preprocess no_preprocessing))))))
