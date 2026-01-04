@@ -8,11 +8,11 @@
   -warn-error
   +a
   -open
+  Fpath_sexp0
+  -open
   Pplumbing_pp_tty
   -open
   Pplumbing_err
-  -open
-  Fpath_sexp0
   -open
   Volgo
   -open
