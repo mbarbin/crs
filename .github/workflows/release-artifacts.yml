@@ -24,6 +24,10 @@ jobs:
     env:
       OPAM_DESTDIR: ${{ github.workspace }}/opam-destdir
 
+    defaults:
+      run:
+        shell: bash
+
     steps:
       - name: Set TAG_NAME variable
         run: |
