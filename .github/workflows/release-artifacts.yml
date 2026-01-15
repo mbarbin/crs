@@ -38,12 +38,12 @@ jobs:
           fi
 
       - name: Checkout Code
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           ref: ${{ env.TAG_NAME }}
 
       - name: Setup OCaml
-        uses: ocaml/setup-ocaml@v3
+        uses: ocaml/setup-ocaml@dec6499fef64fc5d7ed43d43a87251b7b1c306f5 # v3.4.8
         with:
           ocaml-compiler: 5.3.x
           opam-repositories: |
@@ -72,7 +72,7 @@ jobs:
           echo "SCHEMA_NAME=$schema_name" >> $GITHUB_ENV
 
       - name: Attest Build Provenance
-        uses: actions/attest-build-provenance@v3
+        uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3.0.0
         with:
           subject-path: "${{ env.BIN_NAME }}"
 
