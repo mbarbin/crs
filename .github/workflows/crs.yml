@@ -24,7 +24,7 @@ jobs:
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
       - name: Setup Dune
-        uses: mbarbin/setup-dune@fd640f52b2a84d68cd4867cb5972247b70630d1a # repkg
+        uses: mbarbin/setup-dune@52d589512797f9c73ed0bb8d2f74a50fa67b1120 # v2.0.0
         with:
           steps: install-dune enable-pkg
 
