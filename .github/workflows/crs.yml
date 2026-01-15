@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
       - name: Setup Dune
         uses: mbarbin/setup-dune@fd640f52b2a84d68cd4867cb5972247b70630d1a # repkg
@@ -49,11 +49,11 @@ jobs:
       # GitHub annotations, step summaries, etc.
 
       - name: Comment on CRs in PR
-        uses: mbarbin/crs-actions/comment-crs-in-pr@v1.0.0-alpha.8
+        uses: mbarbin/crs-actions/comment-crs-in-pr@834bbb1d57f57cdc48b93eaf7caf0b98c4127c63 # v1.0.0-alpha.8
         with:
           crs-config: .github/crs-config.json
 
       - name: Summarize CRs in PR
-        uses: mbarbin/crs-actions/summarize-crs-in-pr@v1.0.0-alpha.8
+        uses: mbarbin/crs-actions/summarize-crs-in-pr@834bbb1d57f57cdc48b93eaf7caf0b98c4127c63 # v1.0.0-alpha.8
         with:
           crs-config: .github/crs-config.json
