@@ -16,7 +16,9 @@
   -open
   Volgo
   -open
-  Crs_stdlib)
+  Crs_stdlib
+  -open
+  Cr_comment.Std)
  (libraries
   cr_comment
   crs_stdlib

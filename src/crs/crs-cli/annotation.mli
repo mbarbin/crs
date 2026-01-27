@@ -61,7 +61,7 @@ val of_cr
     end up rendering this string. This doesn't always work, even when this is
     the correct syntax. For example, mentioning a user with '@' in a GitHub
     Annotations Panels does nothing. *)
-val write_username : user:Cr_comment.User_handle.t -> with_user_mention:bool -> string
+val write_username : user:User_handle.t -> with_user_mention:bool -> string
 
 (** {1 Getters} *)
 

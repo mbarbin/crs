@@ -145,7 +145,7 @@ let parse ~file_cache ~content_start_offset ~content =
     let reporter =
       match get re_helper.reporter with
       | None -> assert false (* Mandatory in the [regexp]. *)
-      | Some (reporter, loc) -> { Loc.Txt.txt = Cr_comment.User_handle.v reporter; loc }
+      | Some (reporter, loc) -> { Loc.Txt.txt = User_handle.v reporter; loc }
     in
     let status =
       match get re_helper.status with
@@ -161,7 +161,7 @@ let parse ~file_cache ~content_start_offset ~content =
     in
     let recipient =
       Option.map (get re_helper.recipient) ~f:(fun (user, loc) ->
-        { Loc.Txt.txt = Cr_comment.User_handle.v user; loc })
+        { Loc.Txt.txt = User_handle.v user; loc })
     in
     let qualifier =
       match get re_helper.qualifier with
