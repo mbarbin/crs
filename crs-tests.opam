@@ -38,7 +38,7 @@ depends: [
   "volgo-git-unix" {>= "0.0.18"}
   "volgo-hg-unix" {>= "0.0.18"}
   "volgo-vcs" {>= "0.0.18"}
-  "yojson" {>= "2.1.1"}
+  "yojson" {>= "2.2"}
   "odoc" {with-doc}
 ]
 build: [

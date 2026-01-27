@@ -65,9 +65,9 @@
   (volgo-hg-unix
    (>= 0.0.18))
   (yojson
-   (>= 2.1.1))
+   (>= 2.2))
   (yojson-five
-   (>= 2.1.1))))
+   (>= 2.2))))
 
 (package
  (name crs-tests)
@@ -130,7 +130,7 @@
   (volgo-vcs
    (>= 0.0.18))
   (yojson
-   (>= 2.1.1))))
+   (>= 2.2))))
 
 (package
  (name crs-dev)
