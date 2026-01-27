@@ -19,10 +19,6 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-(* At the moment the type used by crs for user-handles found in CR components is
-   from the [Vcs] library. We envision future changes where we'll mint a
-   dedicated type for that in crs, with different constraints. *)
-
 let%expect_test "of_string" =
   let or_msg_to_dyn = function
     | Ok user -> Dyn.Variant ("Ok", [ Dyn.string (User_handle.to_string user) ])
@@ -33,6 +29,14 @@ let%expect_test "of_string" =
   test "user1";
   [%expect {| Ok "user1" |}];
   test "dependabot[bot]";
-  [%expect {| Error (Msg "\"dependabot[bot]\": invalid user_handle") |}];
+  [%expect {| Ok "dependabot[bot]" |}];
+  test "github-actions[bot]";
+  [%expect {| Ok "github-actions[bot]" |}];
+  test "Heya_This.Is_valid2";
+  [%expect {| Ok "Heya_This.Is_valid2" |}];
+  test "user@invalid";
+  [%expect {| Error (Msg "\"user@invalid\": invalid user_handle") |}];
+  test "";
+  [%expect {| Error (Msg "\"\": invalid user_handle") |}];
   ()
 ;;

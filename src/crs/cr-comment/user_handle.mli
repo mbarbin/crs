@@ -20,7 +20,19 @@
 (*_*******************************************************************************)
 
 (** A user handle as it appears in CR comments and related metadata (such as
-    pull request author). *)
+    pull request author).
+
+    This type is more permissive than a git username [Vcs.User_handle.t], in
+    order to capture certain usages across platforms such as GitHub, GitLab,
+    etc. For example, square brackets are allowed to accommodate bot account
+    names on GitHub (e.g., [dependabot[bot]] as PRs author).
+
+    The supported character set is:
+    - alphanumeric characters
+    - [-] (hyphen)
+    - [_] (underscore)
+    - [.] (dot)
+    - [\[] and [\]] (square brackets) *)
 
 type t
 
