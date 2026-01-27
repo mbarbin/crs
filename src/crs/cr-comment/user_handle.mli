@@ -22,7 +22,7 @@
 (** A user handle as it appears in CR comments and related metadata (such as
     pull request author). *)
 
-type t = Vcs.User_handle.t
+type t
 
 val compare : t -> t -> int
 val equal : t -> t -> bool
