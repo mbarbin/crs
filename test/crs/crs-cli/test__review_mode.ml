@@ -19,8 +19,6 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-module Review_mode = Crs_cli.Private.Review_mode
-
 let test args =
   match
     let cmd =

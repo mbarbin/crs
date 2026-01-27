@@ -19,9 +19,6 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-module Assignee = Crs_cli.Private.Assignee
-module Config = Crs_cli.Private.Config
-
 let%expect_test "reasons" =
   List.iter Assignee.Reason.all ~f:(fun reason ->
     print_dyn
@@ -53,7 +50,7 @@ let test file_contents ~config ~review_mode =
 ;;
 
 let%expect_test "compute" =
-  let config = Config.create ~default_repo_owner:(Vcs.User_handle.v "owner") () in
+  let config = Config.create ~default_repo_owner:(User_handle.v "owner") () in
   test Tests_helpers.test_cases ~config ~review_mode:Revision;
   [%expect
     {|
@@ -88,11 +85,11 @@ let%expect_test "compute" =
     XCR-someday user: Hello.
     { assignee = { user = Some "user"; reason = Reporter } }
     |}];
-  let config = Config.create ~default_repo_owner:(Vcs.User_handle.v "owner") () in
+  let config = Config.create ~default_repo_owner:(User_handle.v "owner") () in
   test
     Tests_helpers.test_cases
     ~config
-    ~review_mode:(Pull_request { author = Vcs.User_handle.v "pr-author"; base = None });
+    ~review_mode:(Pull_request { author = User_handle.v "pr-author"; base = None });
   [%expect
     {|
     ========================

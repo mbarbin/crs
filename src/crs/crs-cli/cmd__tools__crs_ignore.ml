@@ -19,8 +19,6 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-open! Import
-
 let find_crs_ignore_files files_in_repo =
   let filename = Fsegment.to_string Crs_ignore.filename in
   List.filter files_in_repo ~f:(fun file ->

@@ -55,7 +55,7 @@ val to_json : t -> Json.t
     user. If the repository is owned by an organization, this may be set to a
     user in particular who would be assigned otherwise unassignable CRs. If it
     isn't set, such CRs will simply not be assigned to any one in particular. *)
-val default_repo_owner : t -> Vcs.User_handle.t option
+val default_repo_owner : t -> User_handle.t option
 
 (** [user_mentions_allowlist] is the list of users who can be mentioned in
     annotation comments using ["@" ^ user_name] mentions. Only users in this
@@ -63,7 +63,7 @@ val default_repo_owner : t -> Vcs.User_handle.t option
     mentions allowed). This is a protection measure to avoid spamming users that
     do not have ties to a repo in particular, or simply do not wish to be
     notified via CRs. *)
-val user_mentions_allowlist : t -> Vcs.User_handle.t list option
+val user_mentions_allowlist : t -> User_handle.t list option
 
 (** [invalid_crs_annotation_severity] controls the GitHub annotation severity
     level for invalid CR syntax. This determines how prominently invalid CRs
@@ -78,8 +78,8 @@ val crs_due_now_annotation_severity : t -> Annotation_severity.t option
 (** {1 Create configs} *)
 
 val create
-  :  ?default_repo_owner:Vcs.User_handle.t
-  -> ?user_mentions_allowlist:Vcs.User_handle.t list
+  :  ?default_repo_owner:User_handle.t
+  -> ?user_mentions_allowlist:User_handle.t list
   -> ?invalid_crs_annotation_severity:Annotation_severity.t
   -> ?crs_due_now_annotation_severity:Annotation_severity.t
   -> unit

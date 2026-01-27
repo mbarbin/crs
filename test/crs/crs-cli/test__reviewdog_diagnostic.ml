@@ -19,10 +19,6 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-module Annotation = Crs_cli.Private.Annotation
-module Config = Crs_cli.Private.Config
-module Reviewdog_utils = Crs_cli.Private.Reviewdog_utils
-
 let path = Vcs.Path_in_repo.v "my_file.ml"
 
 let test file_contents ~config ~review_mode ~with_user_mentions =

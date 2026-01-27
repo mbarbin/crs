@@ -19,9 +19,6 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-module Invalid_cr_parser = Crs_parser.Private.Invalid_cr_parser
-module Invalid_cr = Invalid_cr_parser.Invalid_cr
-
 let path = Vcs.Path_in_repo.v "my_file.ml"
 
 module Getters = struct
@@ -196,7 +193,8 @@ let%expect_test "getters" =
   (* Below we illustrate that the invalid CRs abstraction allows one to
      manipulate components from CRs even though they are invalid, which should
      be useful to implement tooling on top. For example below, we feature CRs
-     with invalid user handle and/or invalid qualifiers. *)
+     with invalid user handle and/or invalid qualifiers (see the typo below
+     when the user wrote "soneday" instead of "someday"). *)
   test
     {|
 (* $CR-soneday user1 for user#2: Hello contents. *)

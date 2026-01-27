@@ -45,7 +45,7 @@
 
 type t =
   | Pull_request of
-      { author : Vcs.User_handle.t
+      { author : User_handle.t
       ; base : Vcs.Rev.t option
       }
   | Revision

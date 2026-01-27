@@ -47,7 +47,7 @@
  * - Remove [hash_consing] constructs - do not share the values.
  * - Replace [Relpath] by [Vcs.Path_in_repo].
  * - Remove [of_sexp] constructs.
- * - Replace [Unresolved_name] by [Vcs.User_handle].
+ * - Replace [Unresolved_name] by [User_handle].
  * - Remove [deriving fields] ppx constructs.
  * - Remove alternate names and aliases resolution.
  * - Remove incremental computation features.
@@ -91,21 +91,20 @@ module Header = struct
     type t =
       { status : Status.t Loc.Txt.t
       ; qualifier : Qualifier.t Loc.Txt.t
-      ; reporter : Vcs.User_handle.t Loc.Txt.t
-      ; recipient : Vcs.User_handle.t Loc.Txt.t option
+      ; reporter : User_handle.t Loc.Txt.t
+      ; recipient : User_handle.t Loc.Txt.t option
       }
 
     let equal t ({ status; qualifier; reporter; recipient } as t2) =
       phys_equal t t2
       || (Loc.Txt.equal Status.equal t.status status
           && Loc.Txt.equal Qualifier.equal t.qualifier qualifier
-          && Loc.Txt.equal Vcs.User_handle.equal t.reporter reporter
-          && Option.equal (Loc.Txt.equal Vcs.User_handle.equal) t.recipient recipient)
+          && Loc.Txt.equal User_handle.equal t.reporter reporter
+          && Option.equal (Loc.Txt.equal User_handle.equal) t.recipient recipient)
     ;;
 
     let to_dyn { status; qualifier; reporter; recipient } =
-      let user_handle u = Dyn.stringable (module Vcs.User_handle) u in
-      let loc_user_handle ul = Loc.Txt.to_dyn user_handle ul in
+      let loc_user_handle uh = Loc.Txt.to_dyn User_handle.to_dyn uh in
       Dyn.record
         [ "status", status |> Loc.Txt.to_dyn Status.to_dyn
         ; "qualifier", qualifier |> Loc.Txt.to_dyn Qualifier.to_dyn

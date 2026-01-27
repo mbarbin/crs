@@ -19,8 +19,6 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-module Crs_ignore = Crs_parser.Private.Crs_ignore
-
 let path = Vcs.Path_in_repo.v ".crs-ignore"
 
 (* At first we have a few characterization tests related to the handling of

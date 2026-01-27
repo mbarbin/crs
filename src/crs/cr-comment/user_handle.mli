@@ -19,6 +19,22 @@
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
 
-module Crs_ignore = Crs_parser.Private.Crs_ignore
-module Github_annotation = Crs_parser.Private.Github_annotation
-module User_message = Crs_parser.Private.User_message
+(** A user handle as it appears in CR comments and related metadata (such as
+    pull request author). *)
+
+type t = Vcs.User_handle.t
+
+val compare : t -> t -> int
+val equal : t -> t -> bool
+val to_string : t -> string
+val to_dyn : t -> Dyn.t
+val to_json : t -> Json.t
+val of_json : Json.t -> t
+
+(** [of_string str] returns [Ok str] if the string is a valid user handle, and
+    an error otherwise. This is meant to be used to validate untrusted entries. *)
+val of_string : string -> (t, [ `Msg of string ]) Result.t
+
+(** [v str] is a convenient wrapper to build a [t] or raise [Invalid_argument].
+    This is typically handy for applying on trusted literals. *)
+val v : string -> t

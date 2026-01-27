@@ -26,8 +26,6 @@
    Note, at this stage this is more or less a proof of concept to get started,
    but we hope we'll be able to attend incrementally. *)
 
-module Invalid_cr_parser = Crs_parser.Private.Invalid_cr_parser
-
 let path = Vcs.Path_in_repo.v "my_file.ml"
 
 let test file_contents ~f =

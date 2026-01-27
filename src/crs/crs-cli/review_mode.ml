@@ -19,14 +19,12 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-open! Import
-
 module T = struct
   [@@@coverage off]
 
   type t =
     | Pull_request of
-        { author : Vcs.User_handle.t
+        { author : User_handle.t
         ; base : Vcs.Rev.t option
         }
     | Revision
@@ -36,7 +34,7 @@ module T = struct
     | Pull_request _, Revision | Revision, Pull_request _ -> false
     | Revision, Revision -> true
     | Pull_request { author = a1; base = b1 }, Pull_request { author = a2; base = b2 } ->
-      Vcs.User_handle.equal a1 a2 && Option.equal Vcs.Rev.equal b1 b2
+      User_handle.equal a1 a2 && Option.equal Vcs.Rev.equal b1 b2
   ;;
 
   let to_dyn = function
@@ -44,7 +42,7 @@ module T = struct
     | Pull_request { author; base } ->
       Dyn.inline_record
         "Pull_request"
-        [ "author", author |> Dyn.stringable (module Vcs.User_handle)
+        [ "author", author |> User_handle.to_dyn
         ; "base", base |> Dyn.option (Dyn.stringable (module Vcs.Rev))
         ]
   ;;
@@ -106,7 +104,7 @@ let arg ~emit_github_annotations =
   and+ pull_request_author =
     Arg.named_opt
       [ pull_request_author_switch ]
-      (Param.validated_string ~docv:"AUTHOR" (module Vcs.User_handle))
+      (Param.validated_string ~docv:"AUTHOR" (module User_handle))
       ~doc:
         (Printf.sprintf
            "When $(b,--%s) is a pull-request this argument must be supplied to set the \

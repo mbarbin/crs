@@ -22,7 +22,6 @@
 (* At the moment the type used by crs for user-handles found in CR components is
    from the [Vcs] library. We envision future changes where we'll mint a
    dedicated type for that in crs, with different constraints. *)
-module User_handle = Vcs.User_handle
 
 let%expect_test "of_string" =
   let or_msg_to_dyn = function

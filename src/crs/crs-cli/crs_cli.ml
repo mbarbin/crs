@@ -62,10 +62,12 @@ let main =
 module Private = struct
   let grep_cmd = Cmd__grep.main
 
-  module Annotation = Annotation
-  module Assignee = Assignee
-  module Config = Config
-  module Review_mode = Review_mode
-  module Reviewdog_utils = Reviewdog_utils
-  module Summary_table = Summary_table
+  module Std = struct
+    module Annotation = Annotation
+    module Assignee = Assignee
+    module Config = Config
+    module Review_mode = Review_mode
+    module Reviewdog_utils = Reviewdog_utils
+    module Summary_table = Summary_table
+  end
 end

@@ -34,7 +34,7 @@ module Reason : sig
 end
 
 type t =
-  { user : Vcs.User_handle.t option
+  { user : Cr_comment.User_handle.t option
   ; reason : Reason.t
   }
 

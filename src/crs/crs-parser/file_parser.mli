@@ -43,7 +43,7 @@
  * - Migrate to this file only the part that relates to parsing files.
  * - Remove dependency to [Core] and [Async].
  * - Remove [Cr_comment_format].
- * - Replace [Unresolved_name] by [Vcs.User_handle].
+ * - Replace [Unresolved_name] by [User_handle].
  * - Remove alternate names and aliases resolution.
  * - Use [Vcs] instead of [Hg].
  * - Remove support for extra headers.

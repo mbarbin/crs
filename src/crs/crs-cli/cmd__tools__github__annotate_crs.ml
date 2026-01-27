@@ -19,8 +19,6 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-open! Import
-
 let main =
   Command.make
     ~summary:"Output GitHub Workflow Annotations for CRs in the repo."
