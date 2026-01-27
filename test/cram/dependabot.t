@@ -7,8 +7,8 @@ includes specifics required by the GitHub Actions environment.
   $ volgo-vcs init -q .
   $ volgo-vcs set-user-config --user.name "Test User" --user.email "test@example.com"
 
-To make sure the CRs are not mistaken for actual CR comments in this
-file, we make use of some tricks.
+To make sure the CRs are not mistaken for actual CR comments in this file, we
+make use of some tricks.
 
   $ export CR="CR"
   $ export XCR="XCR"
@@ -46,13 +46,11 @@ the PR author is supplied by the workflow job as follows:
 
   $ crs tools github annotate-crs \
   >   --review-mode=pull-request \
-  >   --pull-request-author="dependabot[bot]" > output 2>&1
-  [124]
+  >   --pull-request-base="${rev0}" \
+  >   --pull-request-author="dependabot[bot]"
+  ::notice file=hello,line=2,col=1,endLine=2,endColumn=49,title=CR::This CR is assigned to dependabot[bot] (PR author).
 
-  $ grep 'crs: ' output
-  crs: option '--pull-request-author': "dependabot[bot]": invalid user_handle
-
-As seen above, this type of user handle is not supported at the moment. This
-limitation is monitored by this test, with improvements left as future work.
+GitHub bot accounts like dependabot[bot] and github-actions[bot] are now
+supported as PR authors.
 
 See also: [https://github.com/mbarbin/crs/issues/82].

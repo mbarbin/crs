@@ -212,24 +212,13 @@ let%expect_test "getters" =
         }
     }
     |}];
-  (* At the moment this type of user handle is not supported as evidenced by the
-     following test. Fixing this is left as future work. *)
+  (* Bot user handles like github-something[bot] are now valid and no longer
+     appear in this invalid CRs test. See test__user_handle.ml for bot handle
+     validation tests. *)
   test
     {|
 (* $CR github-something[bot]: Feedback from automated workflow X. *)
 |};
-  [%expect
-    {|
-    ========================
-    { getters =
-        { status = CR
-        ; qualifier = None
-        ; reporter = Some "github-something[bot]"
-        ; for_or_to = None
-        ; recipient = None
-        ; contents = "Feedback from automated workflow X."
-        }
-    }
-    |}];
+  [%expect {||}];
   ()
 ;;
