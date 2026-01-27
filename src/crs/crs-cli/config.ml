@@ -19,8 +19,6 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-open! Import
-
 module Annotation_severity = struct
   type t =
     | Error
@@ -40,21 +38,6 @@ module Annotation_severity = struct
     | "Warning" -> Some Warning
     | "Info" -> Some Info
     | _ -> None
-  ;;
-end
-
-module User_handle = struct
-  type t = Vcs.User_handle.t
-
-  let to_json t : Json.t = `String (Vcs.User_handle.to_string t)
-
-  let of_json json =
-    match (json : Json.t) with
-    | `String str ->
-      (match Vcs.User_handle.of_string str with
-       | Ok t -> t
-       | Error (`Msg msg) -> raise (Json.Error (json, msg)))
-    | _ -> raise (Json.Error (json, "User handle expected to be a json string."))
   ;;
 end
 

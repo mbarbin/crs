@@ -218,24 +218,24 @@ let () = ()
 |}
   in
   test file_contents ~f:(fun ~crs ~file_rewriter ->
-    let user1 = Vcs.User_handle.v "user1" in
-    let other = Vcs.User_handle.v "other" in
+    let user1 = User_handle.v "user1" in
+    let other = User_handle.v "other" in
     List.iter crs ~f:(fun cr ->
       Result.iter (Cr_comment.header cr) ~f:(fun p ->
         let reporter = Cr_comment.Header.With_loc.reporter p in
-        if Vcs.User_handle.equal reporter.txt user1
+        if User_handle.equal reporter.txt user1
         then
           File_rewriter.replace
             file_rewriter
             ~range:(Loc.range reporter.loc)
-            ~text:(Vcs.User_handle.to_string other);
+            ~text:(User_handle.to_string other);
         Option.iter (Cr_comment.Header.With_loc.recipient p) ~f:(fun { txt; loc } ->
-          if Vcs.User_handle.equal txt user1
+          if User_handle.equal txt user1
           then
             File_rewriter.replace
               file_rewriter
               ~range:(Loc.range loc)
-              ~text:(Vcs.User_handle.to_string other)))));
+              ~text:(User_handle.to_string other)))));
   [%expect
     {|
     -1,11 +1,11

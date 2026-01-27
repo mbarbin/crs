@@ -42,7 +42,7 @@
  *
  * - Migrate to this file only the part that relates to the parsing of the 1st line.
  * - Remove dependency to [Core] - make small adjustments to use [Base] instead.
- * - Replace [Unresolved_name] by [Vcs.User_handle].
+ * - Replace [Unresolved_name] by [User_handle].
  * - Remove alternate names and aliases resolution.
  * - Remove support for in-file `Properties.
  * - Remove support for extra headers.
@@ -145,7 +145,7 @@ let parse ~file_cache ~content_start_offset ~content =
     let reporter =
       match get re_helper.reporter with
       | None -> assert false (* Mandatory in the [regexp]. *)
-      | Some (reporter, loc) -> { Loc.Txt.txt = Vcs.User_handle.v reporter; loc }
+      | Some (reporter, loc) -> { Loc.Txt.txt = User_handle.v reporter; loc }
     in
     let status =
       match get re_helper.status with
@@ -161,7 +161,7 @@ let parse ~file_cache ~content_start_offset ~content =
     in
     let recipient =
       Option.map (get re_helper.recipient) ~f:(fun (user, loc) ->
-        { Loc.Txt.txt = Vcs.User_handle.v user; loc })
+        { Loc.Txt.txt = User_handle.v user; loc })
     in
     let qualifier =
       match get re_helper.qualifier with

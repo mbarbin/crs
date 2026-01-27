@@ -239,8 +239,11 @@ let grep ~vcs ~repo_root ~below =
 ;;
 
 module Private = struct
-  module Crs_ignore = Crs_ignore
-  module Github_annotation = Github_annotation
-  module Invalid_cr_parser = Invalid_cr_parser
-  module User_message = User_message
+  module Std = struct
+    module Crs_ignore = Crs_ignore
+    module Github_annotation = Github_annotation
+    module Invalid_cr_parser = Invalid_cr_parser
+    module Invalid_cr = Invalid_cr_parser.Invalid_cr
+    module User_message = User_message
+  end
 end

@@ -19,6 +19,16 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-module Crs_ignore = Crs_parser.Private.Crs_ignore
-module Github_annotation = Crs_parser.Private.Github_annotation
-module User_message = Crs_parser.Private.User_message
+include Vcs.User_handle
+
+let to_dyn t = Dyn.string (to_string t)
+let to_json t : Json.t = `String (to_string t)
+
+let of_json json =
+  match (json : Json.t) with
+  | `String str ->
+    (match of_string str with
+     | Ok t -> t
+     | Error (`Msg msg) -> raise (Json.Error (json, msg)))
+  | _ -> raise (Json.Error (json, "User handle expected to be a json string."))
+;;

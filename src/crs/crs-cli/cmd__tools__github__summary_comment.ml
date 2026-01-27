@@ -66,8 +66,7 @@ let main =
          match assignee with
          | None -> None
          | Some user -> Some (user, t))
-       |> List.sort_and_group ~compare:(fun (u1, _) (u2, _) ->
-         Vcs.User_handle.compare u1 u2)
+       |> List.sort_and_group ~compare:(fun (u1, _) (u2, _) -> User_handle.compare u1 u2)
        |> List.filter_map ~f:(function
          | [] -> assert false (* groups are non empty. *)
          | (user, _) :: _ as all -> Some (user, List.map all ~f:snd))

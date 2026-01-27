@@ -19,8 +19,6 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-open! Import
-
 module Severity = struct
   type t = Config.Annotation_severity.t =
     | Error
@@ -77,7 +75,7 @@ let assignee t = t.assignee
 let with_user_mention t = t.with_user_mention
 
 let write_username ~user ~with_user_mention =
-  (if with_user_mention then "@" else "") ^ Vcs.User_handle.to_string user
+  (if with_user_mention then "@" else "") ^ User_handle.to_string user
 ;;
 
 let of_cr ~cr ~(config : Config.t) ~review_mode ~with_user_mentions =
@@ -106,7 +104,7 @@ let of_cr ~cr ~(config : Config.t) ~review_mode ~with_user_mentions =
          | Some user ->
            (match Config.user_mentions_allowlist config with
             | None -> false
-            | Some list -> List.mem list user ~equal:Vcs.User_handle.equal))
+            | Some list -> List.mem list user ~equal:User_handle.equal))
     in
     let message =
       String.concat

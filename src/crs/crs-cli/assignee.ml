@@ -23,8 +23,8 @@ module Raw_assignee = struct
   type t =
     | Not_due_now
     | Invalid
-    | Recipient of Vcs.User_handle.t
-    | Reporter of Vcs.User_handle.t
+    | Recipient of User_handle.t
+    | Reporter of User_handle.t
     | Unaddressed
 
   let compute ~cr ~config:_ =
@@ -84,15 +84,13 @@ module Reason = struct
 end
 
 type t =
-  { user : Vcs.User_handle.t option
+  { user : User_handle.t option
   ; reason : Reason.t
   }
 
 let to_dyn { user; reason } =
   Dyn.record
-    [ "user", user |> Dyn.option (fun u -> Dyn.stringable (module Vcs.User_handle) u)
-    ; "reason", reason |> Reason.to_dyn
-    ]
+    [ "user", user |> Dyn.option User_handle.to_dyn; "reason", reason |> Reason.to_dyn ]
 ;;
 
 let of_raw

@@ -19,10 +19,6 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-module Annotation = Crs_cli.Private.Annotation
-module Config = Crs_cli.Private.Config
-module Github_annotation = Crs_parser.Private.Github_annotation
-
 let path = Vcs.Path_in_repo.v "my_file.ml"
 
 let test file_contents ~config ~review_mode ~with_user_mentions =
@@ -161,7 +157,7 @@ let%expect_test "compute" =
   ()
 ;;
 
-let%expect_test "multilines annotations" =
+let%expect_test "multiline annotations" =
   let github_annotation =
     Github_annotation.create
       ~loc:(Loc.of_file ~path:(Vcs.Path_in_repo.to_relative_path path :> Fpath.t))

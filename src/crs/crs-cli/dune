@@ -18,7 +18,11 @@
   -open
   Cmdlang
   -open
-  Crs_stdlib)
+  Crs_stdlib
+  -open
+  Cr_comment.Std
+  -open
+  Crs_parser.Private.Std)
  (libraries
   cmdlang
   cr_comment

@@ -19,11 +19,6 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-module Annotation = Crs_cli.Private.Annotation
-module Assignee = Crs_cli.Private.Assignee
-module Config = Crs_cli.Private.Config
-module Github_annotation = Crs_parser.Private.Github_annotation
-
 let path = Vcs.Path_in_repo.v "my_file.ml"
 
 let%expect_test "to_dyn" =
@@ -173,8 +168,8 @@ let%expect_test "compute" =
     Info: This XCR is assigned to user (CR reporter).
     |}];
   let config =
-    let user = Vcs.User_handle.v "user" in
-    let user2 = Vcs.User_handle.v "user2" in
+    let user = User_handle.v "user" in
+    let user2 = User_handle.v "user2" in
     Config.create ~default_repo_owner:user ~user_mentions_allowlist:[ user; user2 ] ()
   in
   test Tests_helpers.test_cases ~config ~review_mode:Revision ~with_user_mentions:true;
@@ -224,7 +219,7 @@ let%expect_test "compute" =
     Info: This CR is assigned to user3 (CR recipient).
     |}];
   let config =
-    let user = Vcs.User_handle.v "user" in
+    let user = User_handle.v "user" in
     Config.create
       ~default_repo_owner:user
       ~invalid_crs_annotation_severity:Error
@@ -234,7 +229,7 @@ let%expect_test "compute" =
   test
     Tests_helpers.test_cases
     ~config
-    ~review_mode:(Pull_request { author = Vcs.User_handle.v "user"; base = None })
+    ~review_mode:(Pull_request { author = User_handle.v "user"; base = None })
     ~with_user_mentions:false;
   [%expect
     {|

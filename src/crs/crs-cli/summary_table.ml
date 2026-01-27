@@ -123,13 +123,13 @@ end
 
 module Key = struct
   type t =
-    { reporter : Vcs.User_handle.t
-    ; recipient : Vcs.User_handle.t option
+    { reporter : User_handle.t
+    ; recipient : User_handle.t option
     }
 
   let compare t { reporter; recipient } =
-    let r = Vcs.User_handle.compare t.reporter reporter in
-    if r <> 0 then r else Option.compare Vcs.User_handle.compare t.recipient recipient
+    let r = User_handle.compare t.reporter reporter in
+    if r <> 0 then r else Option.compare User_handle.compare t.recipient recipient
   ;;
 
   let of_header (h : Cr_comment.Header.t) =
@@ -139,8 +139,8 @@ end
 
 module Row = struct
   type t =
-    { reporter : Vcs.User_handle.t
-    ; recipient : Vcs.User_handle.t option
+    { reporter : User_handle.t
+    ; recipient : User_handle.t option
     ; cr_count : int
     ; xcr_count : int
     ; soon_count : int
@@ -197,11 +197,11 @@ let columns =
   in
   Print_table.O.
     [ Column.make ~header:"Reporter" (fun (row : Row.t) ->
-        Cell.text (Vcs.User_handle.to_string row.reporter))
+        Cell.text (User_handle.to_string row.reporter))
     ; Column.make ~header:"For" (fun (row : Row.t) ->
         match row.recipient with
         | None -> Cell.empty
-        | Some user -> Cell.text (Vcs.User_handle.to_string user))
+        | Some user -> Cell.text (User_handle.to_string user))
     ; count ~header:"CRs" (fun row -> row.cr_count)
     ; count ~header:"XCRs" (fun row -> row.xcr_count)
     ; count ~header:"Soon" (fun row -> row.soon_count)

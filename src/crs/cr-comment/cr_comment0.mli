@@ -45,7 +45,7 @@
  * - Replace [Relpath] by [Vcs.Path_in_repo].
  * - Remove [of_sexp] constructs.
  * - Remove [Cr_comment_format].
- * - Replace [Unresolved_name] by [Vcs.User_handle].
+ * - Replace [Unresolved_name] by [User_handle].
  * - Remove [deriving fields] ppx constructs.
  * - Remove alternate names and aliases resolution.
  * - Remove incremental computation features.
@@ -88,12 +88,12 @@ module Header : sig
   val to_dyn : t -> Dyn.t
 
   (** [reporter] is [user] in [CR user...]. *)
-  val reporter : t -> Vcs.User_handle.t
+  val reporter : t -> User_handle.t
 
   (** [recipient] is [user2] in [CR user1 for user2: ...]. Assigning CRs to
       particular users is optional. This returns [None] if that part is left
       out, such as in [CR user1: Comment]. *)
-  val recipient : t -> Vcs.User_handle.t option
+  val recipient : t -> User_handle.t option
 
   val status : t -> Status.t
 
@@ -114,12 +114,12 @@ module Header : sig
 
     (** The location includes the entire reporter username, without the
         surrounding spaces. *)
-    val reporter : t -> Vcs.User_handle.t Loc.Txt.t
+    val reporter : t -> User_handle.t Loc.Txt.t
 
     (** The location includes the entire recipient username, if it is present,
         without the surrounding spaces. In particular, the location does not
         include the ["for"] keyword itself. *)
-    val recipient : t -> Vcs.User_handle.t Loc.Txt.t option
+    val recipient : t -> User_handle.t Loc.Txt.t option
 
     (** The location includes the entire keyword ["CR"] or ["XCR"] depending on
         the case. It stops right before the following char, that being a space
@@ -145,13 +145,13 @@ module Header : sig
     [@@migrate { repl = Rel.status }]
 
     (** This was renamed [reporter]. Hint: Run [ocamlmig migrate]. *)
-    val reported_by : t -> Vcs.User_handle.t Loc.Txt.t
+    val reported_by : t -> User_handle.t Loc.Txt.t
     [@@ocaml.deprecated
       "[since 2025-10] Use [Header.With_loc.reporter]. Hint: Run [ocamlmig migrate]"]
     [@@migrate { repl = Rel.reporter }]
 
     (** This was renamed [recipient]. Hint: Run [ocamlmig migrate]. *)
-    val for_ : t -> Vcs.User_handle.t Loc.Txt.t option
+    val for_ : t -> User_handle.t Loc.Txt.t option
     [@@ocaml.deprecated
       "[since 2025-10] Use [Header.With_loc.recipient]. Hint: Run [ocamlmig migrate]"]
     [@@migrate { repl = Rel.recipient }]
@@ -168,13 +168,13 @@ module Header : sig
       The following is deprecated. Please migrate, and do not use in new code. *)
 
   (** This was renamed [reporter]. Hint: Run [ocamlmig migrate]. *)
-  val reported_by : t -> Vcs.User_handle.t
+  val reported_by : t -> User_handle.t
   [@@ocaml.deprecated
     "[since 2025-10] Use [Header.reporter]. Hint: Run [ocamlmig migrate]"]
   [@@migrate { repl = Rel.reporter }]
 
   (** This was renamed [recipient]. Hint: Run [ocamlmig migrate]. *)
-  val for_ : t -> Vcs.User_handle.t option
+  val for_ : t -> User_handle.t option
   [@@ocaml.deprecated
     "[since 2025-10] Use [Header.recipient]. Hint: Run [ocamlmig migrate]"]
   [@@migrate { repl = Rel.recipient }]
@@ -275,8 +275,8 @@ module Private : sig
     val create
       :  status:Status.t Loc.Txt.t
       -> qualifier:Qualifier.t Loc.Txt.t
-      -> reporter:Vcs.User_handle.t Loc.Txt.t
-      -> recipient:Vcs.User_handle.t Loc.Txt.t option
+      -> reporter:User_handle.t Loc.Txt.t
+      -> recipient:User_handle.t Loc.Txt.t option
       -> header
   end
 

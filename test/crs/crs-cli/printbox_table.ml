@@ -28,7 +28,7 @@
 
 (* This was mostly an experiment. We ended up implementing a direct rendering
    from [Print_table] to markdown without [PrintBox] intermediary. Keeping for
-   experimentations (test dependencies only). *)
+   experimentation (test dependencies only). *)
 
 type t = PrintBox.t
 

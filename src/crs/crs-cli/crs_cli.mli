@@ -30,10 +30,12 @@ val main : unit Command.t
 module Private : sig
   val grep_cmd : unit Command.t
 
-  module Annotation = Annotation
-  module Assignee = Assignee
-  module Config = Config
-  module Review_mode = Review_mode
-  module Reviewdog_utils = Reviewdog_utils
-  module Summary_table = Summary_table
+  module Std : sig
+    module Annotation = Annotation
+    module Assignee = Assignee
+    module Config = Config
+    module Review_mode = Review_mode
+    module Reviewdog_utils = Reviewdog_utils
+    module Summary_table = Summary_table
+  end
 end

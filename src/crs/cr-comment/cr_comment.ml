@@ -23,4 +23,9 @@ module Status = Status
 module Filter = Filter
 module Priority = Priority
 module Qualifier = Qualifier
+module User_handle = User_handle
 include Cr_comment0
+
+module Std = struct
+  module User_handle = User_handle
+end
