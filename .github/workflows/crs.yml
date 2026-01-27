@@ -27,6 +27,7 @@ jobs:
         uses: mbarbin/setup-dune@d38f7c80df59974cbe417c7f2a849219d54b4fdf # v2.0.0+patch-3
         with:
           version: "3.21.0"
+          workspace: "dune-workspace-5.3"
           cache-prefix: "crs-bin"
           only-packages: "crs"
           steps: install-dune enable-pkg
@@ -34,7 +35,7 @@ jobs:
       - name: Build & Install crs binary
         shell: bash
         run: |
-          dune exec crs -- --version
+          dune build src/crs/bin/main.exe --only-packages crs
           mkdir -p "${{ runner.temp }}/crs-bin"
           cp _build/default/src/crs/bin/main.exe "${{ runner.temp }}/crs-bin/crs"
           echo "${{ runner.temp }}/crs-bin" >> $GITHUB_PATH
