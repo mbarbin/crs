@@ -23,19 +23,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
+      - name: Environment setup
+        run: |
+          echo "DUNE_WORKSPACE=$PWD/dune-workspace-5.3" >> "$GITHUB_ENV"
+          echo "PACKAGES=crs" >> "$GITHUB_ENV"
+
       - name: Setup Dune
         uses: mbarbin/setup-dune@d38f7c80df59974cbe417c7f2a849219d54b4fdf # v2.0.0+patch-3
         with:
           version: "3.21.0"
-          workspace: "dune-workspace-5.3"
+          workspace: ${{ env.DUNE_WORKSPACE }}
           cache-prefix: "crs-bin"
-          only-packages: "crs"
+          only-packages: ${{ env.PACKAGES }}
           steps: install-dune enable-pkg
 
       - name: Build & Install crs binary
         shell: bash
         run: |
-          dune build src/crs/bin/main.exe --only-packages crs
+          dune build src/crs/bin/main.exe --only-packages=${{ env.PACKAGES }}
           mkdir -p "${{ runner.temp }}/crs-bin"
           cp _build/default/src/crs/bin/main.exe "${{ runner.temp }}/crs-bin/crs"
           echo "${{ runner.temp }}/crs-bin" >> $GITHUB_PATH
