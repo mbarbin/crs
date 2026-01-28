@@ -43,7 +43,7 @@
   (ordering
    (>= 3.17))
   (pageantty
-   (>= 0.0.2))
+   (>= 0.0.3))
   (pp
    (>= 2.0.0))
   (pplumbing-err
@@ -51,7 +51,7 @@
   (pplumbing-pp-tty
    (>= 0.0.16))
   (print-table
-   (>= 0.1.0))
+   (>= 0.1.3))
   (re
    (>= 1.12.0))
   (sexplib0
@@ -59,15 +59,15 @@
   (spawn
    (>= v0.17))
   (volgo
-   (>= 0.0.18))
+   (>= 0.0.21))
   (volgo-git-unix
-   (>= 0.0.18))
+   (>= 0.0.21))
   (volgo-hg-unix
-   (>= 0.0.18))
+   (>= 0.0.21))
   (yojson
-   (>= 2.2))
+   (>= 2.2.2))
   (yojson-five
-   (>= 2.2))))
+   (>= 2.2.2))))
 
 (package
  (name crs-tests)
@@ -94,7 +94,7 @@
   (loc
    (>= 0.3.2))
   (pageantty
-   (>= 0.0.2))
+   (>= 0.0.3))
   (patdiff
    (>= v0.17))
   (pp
@@ -108,7 +108,7 @@
   (ppxlib
    (>= 0.33))
   (print-table
-   (>= 0.1.0))
+   (>= 0.1.3))
   (printbox
    (>= 0.12))
   (printbox-md
@@ -122,15 +122,15 @@
   (uutf
    (>= 1.0.4))
   (volgo
-   (>= 0.0.18))
+   (>= 0.0.21))
   (volgo-git-unix
-   (>= 0.0.18))
+   (>= 0.0.21))
   (volgo-hg-unix
-   (>= 0.0.18))
+   (>= 0.0.21))
   (volgo-vcs
-   (>= 0.0.18))
+   (>= 0.0.21))
   (yojson
-   (>= 2.2))))
+   (>= 2.2.2))))
 
 (package
  (name crs-dev)

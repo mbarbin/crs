@@ -20,25 +20,25 @@ depends: [
   "fpath" {>= "0.7.3"}
   "fpath-sexp0" {>= "0.4.0"}
   "loc" {>= "0.3.2"}
-  "pageantty" {>= "0.0.2"}
+  "pageantty" {>= "0.0.3"}
   "patdiff" {>= "v0.17"}
   "pp" {>= "2.0.0"}
   "pplumbing-err" {>= "0.0.16"}
   "pplumbing-pp-tty" {>= "0.0.16"}
   "ppx_expect" {>= "v0.17"}
   "ppxlib" {>= "0.33"}
-  "print-table" {>= "0.1.0"}
+  "print-table" {>= "0.1.3"}
   "printbox" {>= "0.12"}
   "printbox-md" {>= "0.12"}
   "printbox-text" {>= "0.12"}
   "re" {>= "1.12.0"}
   "spawn" {>= "v0.17"}
   "uutf" {>= "1.0.4"}
-  "volgo" {>= "0.0.18"}
-  "volgo-git-unix" {>= "0.0.18"}
-  "volgo-hg-unix" {>= "0.0.18"}
-  "volgo-vcs" {>= "0.0.18"}
-  "yojson" {>= "2.2"}
+  "volgo" {>= "0.0.21"}
+  "volgo-git-unix" {>= "0.0.21"}
+  "volgo-hg-unix" {>= "0.0.21"}
+  "volgo-vcs" {>= "0.0.21"}
+  "yojson" {>= "2.2.2"}
   "odoc" {with-doc}
 ]
 build: [
