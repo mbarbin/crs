@@ -51,7 +51,7 @@
   (pplumbing-pp-tty
    (>= 0.0.16))
   (print-table
-   (>= 0.1.0))
+   (>= 0.1.3))
   (re
    (>= 1.12.0))
   (sexplib0
@@ -65,9 +65,9 @@
   (volgo-hg-unix
    (>= 0.0.18))
   (yojson
-   (>= 2.2))
+   (>= 2.2.2))
   (yojson-five
-   (>= 2.2))))
+   (>= 2.2.2))))
 
 (package
  (name crs-tests)
@@ -108,7 +108,7 @@
   (ppxlib
    (>= 0.33))
   (print-table
-   (>= 0.1.0))
+   (>= 0.1.3))
   (printbox
    (>= 0.12))
   (printbox-md
@@ -130,7 +130,7 @@
   (volgo-vcs
    (>= 0.0.18))
   (yojson
-   (>= 2.2))))
+   (>= 2.2.2))))
 
 (package
  (name crs-dev)
