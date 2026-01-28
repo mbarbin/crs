@@ -1,11 +1,20 @@
 ## 0.0.202XXXXX (unreleased)
 
+Starting from this version we're using GitHub immutable releases.
+
 ### Added
 
+- Added new CI workflow based on setup-dune (#115, @mbarbin).
+- Upgrade dunolint and add new invariants (#114, @mbarbin).
 - Add tests to monitor dependabot workflows issue (#82, #112, @mbarbin).
 
 ### Changed
 
+- Increase some lower bounds to ease maintenance (#119, @mbarbin).
+- Adapt release artifacts jobs for immutable releases (@mbarbin).
+- Make type `User_handle` independent instead of from `Vcs` (#116, @mbarbin).
+- Refactor systematic internal scope propagation (#116, @mbarbin).
+- Assorted improvements to CI scripts. Upgrade an pin actions deps (@mbarbin).
 - Use json instead of sexp in output of some commands (#106, #111, @mbarbin).
 - Refactor packages directory structure (#107, @mbarbin).
 - Internal refactors to reduce dependencies (#103, #104, #105, #108, #109, #110, @mbarbin).
@@ -14,6 +23,12 @@
 - Reduce printed context in some tests diffs (#99, @mbarbin).
 - Enable OCaml 5.4 in CI (#98, @mbarbin).
 - Add OCaml alerts to deprecated api (#94, @mbarbin).
+- Upgrade to fpath-base 0.4.0 (#95, @mbarbin).
+- Refactor JSON config parsing (#93, @mbarbin).
+
+### Fixed
+
+- Support "dependabot[bot]" user as PR author (#82, #116, #117, @mbarbin).
 
 ## 0.0.20251014 (2025-10-14)
 
