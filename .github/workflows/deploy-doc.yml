@@ -14,6 +14,8 @@ jobs:
   build:
     name: Build Docusaurus
     runs-on: ubuntu-latest
+    env:
+      OCAML_VERSION: "5.4"
     defaults:
       run:
         shell: bash
@@ -34,23 +36,20 @@ jobs:
         working-directory: ./doc
         run: npm ci --ignore-scripts
 
-      - name: Setup OCaml
-        uses: ocaml/setup-ocaml@dec6499fef64fc5d7ed43d43a87251b7b1c306f5 # v3.4.8
-        with:
-          ocaml-compiler: "5.4.x"
-          dune-cache: true
-          opam-repositories: |
-            default: https://github.com/ocaml/opam-repository.git
-            mbarbin: https://github.com/mbarbin/opam-repository.git
-            alpha:   https://github.com/kit-ty-kate/opam-alpha-repository.git
-      #     janestreet-bleeding: https://github.com/janestreet/opam-repository.git
-      #     janestreet-bleeding-external: https://github.com/janestreet/opam-repository.git#external-packages
+      - name: Environment setup
+        run: |
+          echo "DUNE_WORKSPACE=$PWD/dune-workspace-${{ env.OCAML_VERSION }}" >> "$GITHUB_ENV"
 
-      - name: Install OCaml Dependencies
-        run: opam install . --deps-only --with-doc
+      - name: Setup Dune
+        uses: mbarbin/setup-dune@d38f7c80df59974cbe417c7f2a849219d54b4fdf # v2.0.0+patch-3
+        with:
+          version: "3.21.0"
+          workspace: ${{ env.DUNE_WORKSPACE }}
+          cache-prefix: "deploy-doc-${{ env.OCAML_VERSION }}"
+          steps: install-dune enable-pkg lazy-update-depexts install-gpatch install-depexts
 
       - name: Build Odoc Pages
-        run: opam exec -- dune build @doc
+        run: dune build @doc
 
       - name: Copy Odoc Pages to Docusaurus Static Directory
         run: |
