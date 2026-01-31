@@ -71,3 +71,10 @@ module Private = struct
     module Summary_table = Summary_table
   end
 end
+
+open struct
+  (* In a next version we are going to use this dependency to create auto edit
+     tooling. Think specialized code mods for CRs (edit priorities, bulk Xing,
+     strip, etc.). Make the dep used in the meanwhile. *)
+  open! File_rewriter
+end
