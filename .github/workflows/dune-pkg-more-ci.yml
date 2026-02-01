@@ -1,5 +1,4 @@
 # Additional CI workflow using setup-dune (dune package management).
-# This workflow is intended to eventually replace more-ci.yml.
 #
 # This tests across multiple operating systems and OCaml versions, but skips
 # steps not necessary for every combination (linting, coverage, etc.).
