@@ -1,5 +1,5 @@
 <h1 align="center">
-  <p align="center">A Tool for Managing Code Review Comments Embedded in Source Code</p>
+  <p align="center">A Tool for Managing Inline Review Comments Embedded in Source Code</p>
 </h1>
 
 <p align="center">
@@ -8,7 +8,7 @@
   <a href="https://github.com/mbarbin/crs/actions/workflows/deploy-doc.yml"><img src="https://github.com/mbarbin/crs/workflows/deploy-doc/badge.svg" alt="Deploy Doc Status"/></a>
 </p>
 
-Welcome to **crs**, a project that provides libraries and a command-line interface to help manage code review comments embedded directly in source code using a specialized syntax.
+Welcome to **crs**, a project that provides libraries and a command-line interface to help manage inline review comments embedded directly in source code using a specialized syntax.
 
 The primary goal of **crs** is to make it easy to locate, parse, and manipulate these comments. It offers ergonomic tools for tasks such as systematically updating comments across multiple files, changing their priority, marking them as resolved, modifying reporter or assignee information, and more.
 

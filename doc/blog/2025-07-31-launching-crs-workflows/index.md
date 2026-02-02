@@ -6,7 +6,7 @@ tags: [ci, github]
 ---
 
 **TL;DR:**
-🚀 I’m launching CRs Workflows — GitHub Actions for code review comments embedded directly in your source code. They’re new, open source, and looking for adventurous early adopters and collaborators! See real examples and visuals in the linked workflows below.
+🚀 I’m launching CRs Workflows — GitHub Actions for inline review comments embedded directly in your source code. They’re new, open source, and looking for adventurous early adopters and collaborators! See real examples and visuals in the linked workflows below.
 
 <!-- truncate -->
 
@@ -14,7 +14,7 @@ They're brand new, simple yet intriguing — and most importantly, they're now a
 
 ## Huh? What's a CR?
 
-CRs are code review comments embedded directly in source code! [Learn more here](https://mbarbin.github.io/crs/).
+CRs are inline review comments embedded directly in source code! [Learn more here](https://mbarbin.github.io/crs/).
 
 ## What's a CR Workflow?
 

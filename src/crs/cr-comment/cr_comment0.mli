@@ -66,10 +66,10 @@
 (** Code review comments embedded in source code.
 
     This module provides the core types and functions for representing and
-    manipulating code review comments (CRs) embedded directly in source code
-    using a special syntax. A CR captures actionable feedback, metadata, and
-    assignment information, supporting workflows for tracking, resolving, and
-    managing code review discussions within the codebase. *)
+    manipulating inline code review comments (CRs) embedded directly in source
+    code using a special syntax. A CR captures actionable feedback, metadata,
+    and assignment information, supporting workflows for tracking, resolving,
+    and managing code review discussions within the codebase. *)
 
 module Digest_hex : sig
   type t

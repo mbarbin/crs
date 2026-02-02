@@ -7,7 +7,7 @@
 
 ## Introduction
 
-Welcome to **crs**, a project that provides libraries and a command-line interface to help manage code review comments embedded directly in source code using a specialized syntax.
+Welcome to **crs**, a project that provides libraries and a command-line interface to help manage inline review comments embedded directly in source code using a specialized syntax.
 
 ### A Quick Example of a Code Review Comment (CR)
 
