@@ -1,6 +1,6 @@
 (********************************************************************************)
-(*  crs - A tool for managing code review comments embedded in source code      *)
-(*  Copyright (C) 2024-2025 Mathieu Barbin <mathieu.barbin@gmail.com>           *)
+(*  crs - A tool for managing inline review comments embedded in source code    *)
+(*  Copyright (C) 2024-2026 Mathieu Barbin <mathieu.barbin@gmail.com>           *)
 (*                                                                              *)
 (*  This file is part of crs.                                                   *)
 (*                                                                              *)
@@ -21,10 +21,10 @@
 
 let main =
   Command.group
-    ~summary:"A tool for managing code review comments embedded in source code."
+    ~summary:"A tool for managing inline review comments embedded in source code."
     ~readme:(fun () ->
       "The primary goal of $(b,crs) is to make it easy to locate, parse, and manipulate \
-       special code review comments called 'CRs' (pronounced \"C\"-\"R\"-z), embedded \
+       special inline review comments called 'CRs' (pronounced \"C\"-\"R\"-z), embedded \
        directly in source code.\n\n\
        This CLI aims to offer ergonomic helpers for tasks such as systematically \
        updating comments across multiple files, changing their priority, marking them as \

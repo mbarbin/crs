@@ -26,7 +26,7 @@ We've included a copy of Iron's `Apache-2.0` License in the repository [here](./
 
 We're referring to the Iron source code as of `v0.9.114.44+47`, revision `dfb106cb82abf5d16e548d4ee4f419d0994d3644`.
 
-`Iron` includes functionality for interacting with `Mercurial` repositories, and parsing code review comments embedded in source code.
+`Iron` includes functionality for interacting with `Mercurial` repositories, and parsing review comments embedded in source code.
 
 To build this project, we've used a format for code review comments almost identical to the syntax used by Iron. Moreover, we have used as a starting point the code from Iron responsible for modeling and parsing the comments.
 

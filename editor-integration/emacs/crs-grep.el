@@ -1,4 +1,4 @@
-;;; crs-grep.el --- Search and Navigate Code Review Comments (CRs) -*- lexical-binding: t; -*-
+;;; crs-grep.el --- Search and Navigate Inline Code Review Comments (CRs) -*- lexical-binding: t; -*-
 ;;
 ;; Copyright 2025 Mathieu Barbin
 ;;
@@ -33,7 +33,7 @@
 
 ;;; Customization group
 (defgroup crs-grep nil
-  "Navigate and search Code Review Comments (CRs) using the `crs` CLI."
+  "Search and navigate inline code review comments (CRs) using the `crs` CLI."
   :group 'tools
   :prefix "crs-grep-")
 

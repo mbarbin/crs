@@ -1,6 +1,6 @@
 (*_*******************************************************************************)
-(*_  crs - A tool for managing code review comments embedded in source code      *)
-(*_  Copyright (C) 2024-2025 Mathieu Barbin <mathieu.barbin@gmail.com>           *)
+(*_  crs - A tool for managing inline review comments embedded in source code    *)
+(*_  Copyright (C) 2024-2026 Mathieu Barbin <mathieu.barbin@gmail.com>           *)
 (*_                                                                              *)
 (*_  This file is part of crs.                                                   *)
 (*_                                                                              *)
@@ -66,10 +66,10 @@
 (** Code review comments embedded in source code.
 
     This module provides the core types and functions for representing and
-    manipulating code review comments (CRs) embedded directly in source code
-    using a special syntax. A CR captures actionable feedback, metadata, and
-    assignment information, supporting workflows for tracking, resolving, and
-    managing code review discussions within the codebase. *)
+    manipulating inline code review comments (CRs) embedded directly in source
+    code using a special syntax. A CR captures actionable feedback, metadata,
+    and assignment information, supporting workflows for tracking, resolving,
+    and managing code review discussions within the codebase. *)
 
 module Digest_hex : sig
   type t

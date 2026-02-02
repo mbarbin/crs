@@ -1,6 +1,6 @@
 (********************************************************************************)
-(*  crs - A tool for managing code review comments embedded in source code      *)
-(*  Copyright (C) 2024-2025 Mathieu Barbin <mathieu.barbin@gmail.com>           *)
+(*  crs - A tool for managing inline review comments embedded in source code    *)
+(*  Copyright (C) 2024-2026 Mathieu Barbin <mathieu.barbin@gmail.com>           *)
 (*                                                                              *)
 (*  This file is part of crs.                                                   *)
 (*                                                                              *)
@@ -103,9 +103,9 @@ $CR user1: message.
 
 let%expect_test "invalid syntax CR" =
   (* Here we monitor fragments that may look like CRs but are not. We make use
-     of some heurisitic, and opinionated choices, to decide whether to flag
-     these constructs as invalid CRs, or simply ignore them. This test is used
-     to characterize the behavior around this question. *)
+     of some heuristic, and opinionated choices, to decide whether to flag these
+     constructs as invalid CRs, or simply ignore them. This test is used to
+     characterize the behavior around this question. *)
   (* No text. *)
   test
     {|

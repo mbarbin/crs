@@ -3,6 +3,6 @@
 # would not be grepped as actual CRs. However doing this adds a level of
 # complexity for new readers and people discovering the project. Ignoring CRs
 # from the README prevents us from using the CRs workflow in this file. We've
-# accepted this tradeof.
+# accepted this tradeoff.
 
 README.md

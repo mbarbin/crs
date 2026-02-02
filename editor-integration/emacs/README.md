@@ -1,6 +1,6 @@
 # crs-grep
 
-`crs-grep` is an Emacs package for searching and navigating Code Review Comments (CRs) found in your current repository directly from within your editor.
+`crs-grep` is an Emacs package for searching and navigating inline Code Review Comments (CRs) found in your current repository directly from within your editor.
 
 Early releases of `crs-grep` aim to provide a minimal but usable tool for working with CRs. It currently has very few features and some limitations, but it serves as a starting point. Feedback from adventurous users is encouraged to help shape future versions!
 

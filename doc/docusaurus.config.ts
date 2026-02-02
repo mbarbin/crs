@@ -4,7 +4,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
   title: 'CRs',
-  tagline: 'A tool for managing code review comments embedded in source code',
+  tagline: 'A tool for managing inline review comments embedded in source code',
   // favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
