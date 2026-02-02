@@ -1,6 +1,6 @@
 (*_*******************************************************************************)
-(*_  crs - A tool for managing code review comments embedded in source code      *)
-(*_  Copyright (C) 2024-2025 Mathieu Barbin <mathieu.barbin@gmail.com>           *)
+(*_  crs - A tool for managing inline review comments embedded in source code    *)
+(*_  Copyright (C) 2024-2026 Mathieu Barbin <mathieu.barbin@gmail.com>           *)
 (*_                                                                              *)
 (*_  This file is part of crs.                                                   *)
 (*_                                                                              *)
