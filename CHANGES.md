@@ -117,7 +117,7 @@ Starting from this version we're using GitHub immutable releases.
 
 ### Fixed
 
-- Fix rendering of empty lines in multilines CRs with comment prefix (@mbarbin).
+- Fix rendering of empty lines in multiline CRs with comment prefix (@mbarbin).
 
 ## 0.0.20250626 (2025-06-26)
 
