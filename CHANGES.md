@@ -1,4 +1,4 @@
-## 0.0.202XXXXX (unreleased)
+## 0.0.20260202 (2026-02-02)
 
 Starting from this version we're using GitHub immutable releases.
 
@@ -10,6 +10,8 @@ Starting from this version we're using GitHub immutable releases.
 
 ### Changed
 
+- Improve project synopsis and update source headers (#123, @mbarbin).
+- Migrate main and doc CIs to `setup-dune` (#122, @mbarbin).
 - Increase some lower bounds to ease maintenance (#119, @mbarbin).
 - Adapt release artifacts jobs for immutable releases (@mbarbin).
 - Make type `User_handle` independent instead of from `Vcs` (#116, @mbarbin).
