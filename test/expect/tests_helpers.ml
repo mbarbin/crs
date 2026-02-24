@@ -40,5 +40,5 @@ let test ~path ~file_contents:original_contents ~f =
     |> String.substr_replace_all ~pattern:" CR" ~with_:" $CR"
     |> String.substr_replace_all ~pattern:" XCR" ~with_:" $XCR"
   in
-  Expect_test_patdiff.print_patdiff original_contents output ~context:3
+  Myers.print_diff original_contents output ~context:3
 ;;

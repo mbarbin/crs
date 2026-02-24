@@ -24,9 +24,9 @@
   fpath
   fpath-sexp0
   loc
-  patdiff.expect_test_patdiff
   re
-  volgo)
+  volgo
+  windtrap.myers)
  (inline_tests)
  (instrumentation
   (backend bisect_ppx))

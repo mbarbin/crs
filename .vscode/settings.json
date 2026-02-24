@@ -109,6 +109,7 @@
         "volgo",
         "waitpid",
         "WEXITED",
+        "windtrap",
         "WSIGNALED",
         "WSTOPPED",
         "xcrs",

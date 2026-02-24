@@ -921,26 +921,29 @@ end
     (Cr_comment.digest_ignoring_minor_text_changes cr2);
   print_endline (Cr_comment.Digest_hex.to_string d1);
   [%expect {| 03997213173fb186a59985ae32f89cfd |}];
-  Expect_test_patdiff.print_patdiff
+  Myers.print_diff
     (Dyn.to_string (cr1 |> Cr_comment.to_dyn))
     (Dyn.to_string (cr2 |> Cr_comment.to_dyn));
   [%expect
     {|
-    -1,12 +1,12
+    --- expected
+    +++ actual
+    @@ -1,6 +1,6 @@
       { path = "my_file.ml"
       ; whole_loc = "_"
-    -|; content_start_offset = 16
-    +|; content_start_offset = 38
+    - ; content_start_offset = 16
+    + ; content_start_offset = 38
       ; header =
           Ok
             { status = CR; qualifier = None; reporter = "user1"; recipient = None }
+    @@ -7,6 +7,6 @@
       ; comment_prefix = "(*"
       ; digest_of_condensed_content = "03997213173fb186a59985ae32f89cfd"
       ; content =
-    -|    "CR user1: We want to be able to compute a digest for the message that is stable across\n\
-    -|    \     indentation changes such as across a refactoring."
-    +|    "CR user1: We want to be able to compute a digest for the message that is stable\n\
-    +|    \       across indentation changes such as across a refactoring."
+    -     "CR user1: We want to be able to compute a digest for the message that is stable across\n\
+    -     \     indentation changes such as across a refactoring."
+    +     "CR user1: We want to be able to compute a digest for the message that is stable\n\
+    +     \       across indentation changes such as across a refactoring."
       }
     |}];
   let cr1_reindented = Cr_comment.to_string cr1 in
@@ -959,14 +962,18 @@ end
       CR user1: We want to be able to compute a digest for the message that is stable
       across indentation changes such as across a refactoring.
     |}];
-  Expect_test_patdiff.print_patdiff cr1_reindented cr2_reindented;
+  Myers.print_diff cr1_reindented cr2_reindented;
   [%expect
     {|
-    -1,3 +1,3
-    -|File "my_file.ml", lines 2-3, characters 2-149:
-    +|File "my_file.ml", lines 3-4, characters 4-153:
-        CR user1: We want to be able to compute a digest for the message that is stable
-        across indentation changes such as across a refactoring.
+    --- expected
+    +++ actual
+    @@ -1,3 +1,3 @@
+    - File "my_file.ml", lines 2-3, characters 2-149:
+    -   CR user1: We want to be able to compute a digest for the message that is stable across
+    -   indentation changes such as across a refactoring.
+    + File "my_file.ml", lines 3-4, characters 4-153:
+    +   CR user1: We want to be able to compute a digest for the message that is stable
+    +   across indentation changes such as across a refactoring.
     |}];
   ()
 ;;

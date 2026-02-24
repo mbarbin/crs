@@ -75,12 +75,14 @@ let () =
         File_rewriter.replace file_rewriter ~range:(Loc.range for_or_to.loc) ~text:"for"));
   [%expect
     {|
-    -10,6 +10,6
+    --- expected
+    +++ actual
+    @@ -10,6 +10,6 @@
       ;;
 
       let () =
-    -|  (* $CR user1 to user2: This comment is for you and it is addressed to you. *)
-    +|  (* $CR user1 for user2: This comment is for you and it is addressed to you. *)
+    -   (* $CR user1 to user2: This comment is for you and it is addressed to you. *)
+    +   (* $CR user1 for user2: This comment is for you and it is addressed to you. *)
         ()
       ;;
     |}];

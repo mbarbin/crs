@@ -26,8 +26,8 @@
   fpath
   fpath-sexp0
   loc
-  patdiff.expect_test_patdiff
-  volgo)
+  volgo
+  windtrap.myers)
  (instrumentation
   (backend bisect_ppx))
  (lint

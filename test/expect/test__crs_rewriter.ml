@@ -47,17 +47,22 @@ let () = ()
       File_rewriter.remove file_rewriter ~range:(Loc.range (Cr_comment.whole_loc cr))));
   [%expect
     {|
-    -1,11 +1,11
+    --- expected
+    +++ actual
+    @@ -1,11 +1,11 @@
 
       let () =
-    -|  (* $CR jdoe: This will be removed. *)
+    -   (* $CR jdoe: This will be removed. *)
+    +
         ()
       ;;
 
-    -|(* $XCR jdoe: This too *)
+    - (* $XCR jdoe: This too *)
+    +
       let () = ()
 
-    -|(* $CR-jdoe: Invalid CRs are removed too. *)
+    - (* $CR-jdoe: Invalid CRs are removed too. *)
+    +
       let () = ()
     |}];
   ()
@@ -89,17 +94,20 @@ let () = ()
           ~text)));
   [%expect
     {|
-    -1,8 +1,8
+    --- expected
+    +++ actual
+    @@ -1,8 +1,8 @@
 
       let () =
-    -|  (* $CR user1: Message *)
-    +|  (* $XCR user1: Message *)
+    -   (* $CR user1: Message *)
+    +   (* $XCR user1: Message *)
         ()
       ;;
 
-    -|(* $XCR jdoe for user1: This other message *)
-    +|(* $CR jdoe for user1: This other message *)
-      let () = () |}];
+    - (* $XCR jdoe for user1: This other message *)
+    + (* $CR jdoe for user1: This other message *)
+      let () = ()
+    |}];
   ()
 ;;
 
@@ -132,16 +140,18 @@ let () = ()
               })));
   [%expect
     {|
-    -4,8 +4,8
+    --- expected
+    +++ actual
+    @@ -4,8 +4,8 @@
         ()
       ;;
 
-    -|(* $XCR jdoe for user1: This other message *)
-    +|(* $XCR jdoe: This other message *)
+    - (* $XCR jdoe for user1: This other message *)
+    + (* $XCR jdoe: This other message *)
       let () = ()
 
-    -|(* $CR user1 for user2: This third message *)
-    +|(* $CR user1: This third message *)
+    - (* $CR user1 for user2: This third message *)
+    + (* $CR user1: This third message *)
       let () = ()
     |}];
   ()
@@ -179,24 +189,26 @@ let () = ()
             ~text:" for assignee")));
   [%expect
     {|
-    -1,6 +1,6
+    --- expected
+    +++ actual
+    @@ -1,6 +1,6 @@
 
       let () =
-    -|  (* $CR user1: Message *)
-    +|  (* $CR user1 for assignee: Message *)
+    -   (* $CR user1: Message *)
+    +   (* $CR user1 for assignee: Message *)
         ()
       ;;
 
-    -9,8 +9,8
+    @@ -9,8 +9,8 @@
         ()
       ;;
 
-    -|(* $XCR jdoe: This other message *)
-    +|(* $XCR jdoe for assignee: This other message *)
+    - (* $XCR jdoe: This other message *)
+    + (* $XCR jdoe for assignee: This other message *)
       let () = ()
 
-    -|(* $CR user1: This third message *)
-    +|(* $CR user1 for assignee: This third message *)
+    - (* $CR user1: This third message *)
+    + (* $CR user1 for assignee: This third message *)
       let () = ()
     |}];
   ()
@@ -238,21 +250,24 @@ let () = ()
               ~text:(User_handle.to_string other)))));
   [%expect
     {|
-    -1,11 +1,11
+    --- expected
+    +++ actual
+    @@ -1,11 +1,11 @@
 
       let () =
-    -|  (* $CR user1: Message *)
-    +|  (* $CR other: Message *)
+    -   (* $CR user1: Message *)
+    +   (* $CR other: Message *)
         ()
       ;;
 
-    -|(* $XCR jdoe for user1: This other message *)
-    +|(* $XCR jdoe for other: This other message *)
+    - (* $XCR jdoe for user1: This other message *)
+    + (* $XCR jdoe for other: This other message *)
       let () = ()
 
-    -|(* $CR user1 for user2: This third message *)
-    +|(* $CR other for user2: This third message *)
-      let () = () |}];
+    - (* $CR user1 for user2: This third message *)
+    + (* $CR other for user2: This third message *)
+      let () = ()
+    |}];
   ()
 ;;
 
@@ -296,17 +311,20 @@ let () =
                ~text:"-soon"))));
   [%expect
     {|
-    -1,11 +1,11
+    --- expected
+    +++ actual
+    @@ -1,6 +1,6 @@
 
       let () =
-    -|  (* $CR user1: Message *)
-    +|  (* $CR-soon user1: Message *)
+    -   (* $CR user1: Message *)
+    +   (* $CR-soon user1: Message *)
         ()
       ;;
 
+    @@ -7,5 +7,5 @@
       let () =
-    -|  (* $CR user1 for user2: Message *)
-    +|  (* $CR-soon user1 for user2: Message *)
+    -   (* $CR user1 for user2: Message *)
+    +   (* $CR-soon user1 for user2: Message *)
         ()
       ;;
     |}];
@@ -348,12 +366,14 @@ let () = ()
              File_rewriter.replace file_rewriter ~range:(Loc.range loc) ~text:"someday"))));
   [%expect
     {|
-    -5,7 +5,7
+    --- expected
+    +++ actual
+    @@ -5,7 +5,7 @@
       ;;
 
       let () =
-    -|  (* $CR-soon user1 for user2: Message *)
-    +|  (* $CR-someday user1 for user2: Message *)
+    -   (* $CR-soon user1 for user2: Message *)
+    +   (* $CR-someday user1 for user2: Message *)
         ()
       ;;
     |}];
@@ -397,24 +417,27 @@ let () = ()
               })));
   [%expect
     {|
-    -5,15 +5,15
+    --- expected
+    +++ actual
+    @@ -5,11 +5,11 @@
       ;;
 
       let () =
-    -|  (* $CR-soon user1 for user2: Message *)
-    +|  (* $CR user1 for user2: Message *)
+    -   (* $CR-soon user1 for user2: Message *)
+    +   (* $CR user1 for user2: Message *)
         ()
       ;;
 
-    -|(* $XCR-soon jdoe: This other message *)
-    +|(* $XCR jdoe: This other message *)
+    - (* $XCR-soon jdoe: This other message *)
+    + (* $XCR jdoe: This other message *)
       let () = ()
 
       (* $XCR jdoe: This other message *)
+    @@ -16,4 +16,4 @@
       let () = ()
 
-    -|(* $CR-someday user1: This third message *)
-    +|(* $CR user1: This third message *)
+    - (* $CR-someday user1: This third message *)
+    + (* $CR user1: This third message *)
       let () = ()
     |}];
   ()
