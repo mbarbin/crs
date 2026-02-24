@@ -27,6 +27,101 @@
 let path = Vcs.Path_in_repo.v "my_file.ml"
 let test file_contents ~f = Tests_helpers.test ~path ~file_contents ~f
 
+let%expect_test "extended_range" =
+  let test original_contents ~start ~stop =
+    let range : Loc.Range.t = { start; stop } in
+    let { Loc.Range.start; stop } =
+      Tests_helpers.extended_range ~original_contents ~range
+    in
+    print_dyn
+      (Dyn.record
+         [ "start", Dyn.int start
+         ; "stop", Dyn.int stop
+         ; ( "contents"
+           , Dyn.string (String.sub original_contents ~pos:start ~len:(stop - start)) )
+         ])
+  in
+  (* Range covering the entire contents. *)
+  test "hello" ~start:0 ~stop:5;
+  [%expect {| { start = 0; stop = 5; contents = "hello" } |}];
+  (* Range at the very start, with trailing whitespace and newline. *)
+  test "hello  \nworld" ~start:0 ~stop:5;
+  [%expect
+    {|
+    { start = 0; stop = 8; contents = "hello  \n\
+                                       " }
+    |}];
+  (* Range at the very end, with leading whitespace after newline. *)
+  test "world\n  hello" ~start:8 ~stop:13;
+  [%expect {| { start = 6; stop = 13; contents = "  hello" } |}];
+  (* Range at the very end, with leading whitespace and no trailing newline. *)
+  test "  hello" ~start:2 ~stop:7;
+  [%expect {| { start = 0; stop = 7; contents = "  hello" } |}];
+  (* Range touching both bounds with surrounding whitespace. *)
+  test "  hello  " ~start:2 ~stop:7;
+  [%expect {| { start = 0; stop = 9; contents = "  hello  " } |}];
+  (* Whitespace extends to newline on the right, includes it. *)
+  test "  hello  \n" ~start:2 ~stop:7;
+  [%expect
+    {|
+    { start = 0; stop = 10; contents = "  hello  \n\
+                                        " }
+    |}];
+  (* Stops at non-whitespace on the left. *)
+  test "code  hello" ~start:6 ~stop:11;
+  [%expect {| { start = 4; stop = 11; contents = "  hello" } |}];
+  (* Stops at newline on the left (not included). *)
+  test "code\n  hello" ~start:7 ~stop:12;
+  [%expect {| { start = 5; stop = 12; contents = "  hello" } |}];
+  (* Stops at non-whitespace on the right. *)
+  test "hello  code" ~start:0 ~stop:5;
+  [%expect {| { start = 0; stop = 7; contents = "hello  " } |}];
+  (* At line start: trailing newline is included. *)
+  test "\n  hello  \nworld" ~start:3 ~stop:8;
+  [%expect
+    {|
+    { start = 1; stop = 11; contents = "  hello  \n\
+                                        " }
+    |}];
+  (* Not at line start: trailing newline is preserved. *)
+  test "code  hello  \nworld" ~start:6 ~stop:11;
+  [%expect {| { start = 4; stop = 13; contents = "  hello  " } |}];
+  (* Not at line start, trailing newline: stop before newline. *)
+  test "code hello\n" ~start:5 ~stop:10;
+  [%expect {| { start = 4; stop = 10; contents = " hello" } |}];
+  (* Tab before range is consumed like spaces. *)
+  test "\n\thello\n" ~start:2 ~stop:7;
+  [%expect
+    {|
+    { start = 1; stop = 8; contents = "\thello\n\
+                                       " }
+    |}];
+  (* Tab after range is consumed like spaces. *)
+  test "\nhello\t\n" ~start:1 ~stop:6;
+  [%expect
+    {|
+    { start = 1; stop = 8; contents = "hello\t\n\
+                                       " }
+    |}];
+  (* Mixed tabs and spaces on both sides. *)
+  test "\n \thello\t \n" ~start:3 ~stop:8;
+  [%expect
+    {|
+    { start = 1; stop = 11; contents = " \thello\t \n\
+                                        " }
+    |}];
+  (* Tab before range with code preceding — not at line start. *)
+  test "code\thello" ~start:5 ~stop:10;
+  [%expect {| { start = 4; stop = 10; contents = "\thello" } |}];
+  (* Empty range at start of string. *)
+  test "hello" ~start:0 ~stop:0;
+  [%expect {| { start = 0; stop = 0; contents = "" } |}];
+  (* Empty range at end of string. *)
+  test "hello" ~start:5 ~stop:5;
+  [%expect {| { start = 5; stop = 5; contents = "" } |}];
+  ()
+;;
+
 let%expect_test "remove CR entirely" =
   let file_contents =
     {|
@@ -44,21 +139,107 @@ let () = ()
   in
   test file_contents ~f:(fun ~crs ~file_rewriter ->
     List.iter crs ~f:(fun cr ->
-      File_rewriter.remove file_rewriter ~range:(Loc.range (Cr_comment.whole_loc cr))));
+      let range =
+        Tests_helpers.extended_range
+          ~original_contents:(File_rewriter.original_contents file_rewriter)
+          ~range:(Loc.range (Cr_comment.whole_loc cr))
+      in
+      File_rewriter.remove file_rewriter ~range));
   [%expect
     {|
-    -1,11 +1,11
+    --- expected
+    +++ actual
+    @@ -1,11 +1,8 @@
 
       let () =
-    -|  (* $CR jdoe: This will be removed. *)
+    -   (* $CR jdoe: This will be removed. *)
         ()
       ;;
 
-    -|(* $XCR jdoe: This too *)
+    - (* $XCR jdoe: This too *)
       let () = ()
 
-    -|(* $CR-jdoe: Invalid CRs are removed too. *)
+    - (* $CR-jdoe: Invalid CRs are removed too. *)
       let () = ()
+    |}];
+  ()
+;;
+
+let%expect_test "remove multi-line CR entirely" =
+  let file_contents =
+    {|
+let () =
+  (* $CR jdoe: This is a long comment
+     that spans multiple lines
+     and should be fully removed. *)
+  ()
+;;
+
+(* $XCR jdoe: This too
+   is multi-line. *)
+let () = ()
+|}
+  in
+  test file_contents ~f:(fun ~crs ~file_rewriter ->
+    List.iter crs ~f:(fun cr ->
+      let range =
+        Tests_helpers.extended_range
+          ~original_contents:(File_rewriter.original_contents file_rewriter)
+          ~range:(Loc.range (Cr_comment.whole_loc cr))
+      in
+      File_rewriter.remove file_rewriter ~range));
+  [%expect
+    {|
+    --- expected
+    +++ actual
+    @@ -1,11 +1,6 @@
+
+      let () =
+    -   (* $CR jdoe: This is a long comment
+    -      that spans multiple lines
+    -      and should be fully removed. *)
+        ()
+      ;;
+
+    - (* $XCR jdoe: This too
+    -    is multi-line. *)
+      let () = ()
+    |}];
+  ()
+;;
+
+let%expect_test "remove CR with code on the same line" =
+  let file_contents =
+    {|
+let () = (* $CR jdoe: CR on same line as code. *) ()
+
+let x = 1 (* $XCR jdoe: Trailing CR. *)
+
+let y = (* $CR jdoe: CR between code. *) 2
+|}
+  in
+  test file_contents ~f:(fun ~crs ~file_rewriter ->
+    List.iter crs ~f:(fun cr ->
+      let range =
+        Tests_helpers.extended_range
+          ~original_contents:(File_rewriter.original_contents file_rewriter)
+          ~range:(Loc.range (Cr_comment.whole_loc cr))
+      in
+      File_rewriter.remove file_rewriter ~range));
+  [%expect
+    {|
+    --- expected
+    +++ actual
+    @@ -1,6 +1,6 @@
+
+    - let () = (* $CR jdoe: CR on same line as code. *) ()
+    + let () =()
+
+    - let x = 1 (* $XCR jdoe: Trailing CR. *)
+    + let x = 1
+
+    - let y = (* $CR jdoe: CR between code. *) 2
+    + let y =2
     |}];
   ()
 ;;
@@ -89,17 +270,20 @@ let () = ()
           ~text)));
   [%expect
     {|
-    -1,8 +1,8
+    --- expected
+    +++ actual
+    @@ -1,8 +1,8 @@
 
       let () =
-    -|  (* $CR user1: Message *)
-    +|  (* $XCR user1: Message *)
+    -   (* $CR user1: Message *)
+    +   (* $XCR user1: Message *)
         ()
       ;;
 
-    -|(* $XCR jdoe for user1: This other message *)
-    +|(* $CR jdoe for user1: This other message *)
-      let () = () |}];
+    - (* $XCR jdoe for user1: This other message *)
+    + (* $CR jdoe for user1: This other message *)
+      let () = ()
+    |}];
   ()
 ;;
 
@@ -132,16 +316,18 @@ let () = ()
               })));
   [%expect
     {|
-    -4,8 +4,8
+    --- expected
+    +++ actual
+    @@ -4,8 +4,8 @@
         ()
       ;;
 
-    -|(* $XCR jdoe for user1: This other message *)
-    +|(* $XCR jdoe: This other message *)
+    - (* $XCR jdoe for user1: This other message *)
+    + (* $XCR jdoe: This other message *)
       let () = ()
 
-    -|(* $CR user1 for user2: This third message *)
-    +|(* $CR user1: This third message *)
+    - (* $CR user1 for user2: This third message *)
+    + (* $CR user1: This third message *)
       let () = ()
     |}];
   ()
@@ -179,24 +365,26 @@ let () = ()
             ~text:" for assignee")));
   [%expect
     {|
-    -1,6 +1,6
+    --- expected
+    +++ actual
+    @@ -1,6 +1,6 @@
 
       let () =
-    -|  (* $CR user1: Message *)
-    +|  (* $CR user1 for assignee: Message *)
+    -   (* $CR user1: Message *)
+    +   (* $CR user1 for assignee: Message *)
         ()
       ;;
 
-    -9,8 +9,8
+    @@ -9,8 +9,8 @@
         ()
       ;;
 
-    -|(* $XCR jdoe: This other message *)
-    +|(* $XCR jdoe for assignee: This other message *)
+    - (* $XCR jdoe: This other message *)
+    + (* $XCR jdoe for assignee: This other message *)
       let () = ()
 
-    -|(* $CR user1: This third message *)
-    +|(* $CR user1 for assignee: This third message *)
+    - (* $CR user1: This third message *)
+    + (* $CR user1 for assignee: This third message *)
       let () = ()
     |}];
   ()
@@ -238,21 +426,24 @@ let () = ()
               ~text:(User_handle.to_string other)))));
   [%expect
     {|
-    -1,11 +1,11
+    --- expected
+    +++ actual
+    @@ -1,11 +1,11 @@
 
       let () =
-    -|  (* $CR user1: Message *)
-    +|  (* $CR other: Message *)
+    -   (* $CR user1: Message *)
+    +   (* $CR other: Message *)
         ()
       ;;
 
-    -|(* $XCR jdoe for user1: This other message *)
-    +|(* $XCR jdoe for other: This other message *)
+    - (* $XCR jdoe for user1: This other message *)
+    + (* $XCR jdoe for other: This other message *)
       let () = ()
 
-    -|(* $CR user1 for user2: This third message *)
-    +|(* $CR other for user2: This third message *)
-      let () = () |}];
+    - (* $CR user1 for user2: This third message *)
+    + (* $CR other for user2: This third message *)
+      let () = ()
+    |}];
   ()
 ;;
 
@@ -296,17 +487,20 @@ let () =
                ~text:"-soon"))));
   [%expect
     {|
-    -1,11 +1,11
+    --- expected
+    +++ actual
+    @@ -1,6 +1,6 @@
 
       let () =
-    -|  (* $CR user1: Message *)
-    +|  (* $CR-soon user1: Message *)
+    -   (* $CR user1: Message *)
+    +   (* $CR-soon user1: Message *)
         ()
       ;;
 
+    @@ -7,5 +7,5 @@
       let () =
-    -|  (* $CR user1 for user2: Message *)
-    +|  (* $CR-soon user1 for user2: Message *)
+    -   (* $CR user1 for user2: Message *)
+    +   (* $CR-soon user1 for user2: Message *)
         ()
       ;;
     |}];
@@ -348,12 +542,14 @@ let () = ()
              File_rewriter.replace file_rewriter ~range:(Loc.range loc) ~text:"someday"))));
   [%expect
     {|
-    -5,7 +5,7
+    --- expected
+    +++ actual
+    @@ -5,7 +5,7 @@
       ;;
 
       let () =
-    -|  (* $CR-soon user1 for user2: Message *)
-    +|  (* $CR-someday user1 for user2: Message *)
+    -   (* $CR-soon user1 for user2: Message *)
+    +   (* $CR-someday user1 for user2: Message *)
         ()
       ;;
     |}];
@@ -397,24 +593,27 @@ let () = ()
               })));
   [%expect
     {|
-    -5,15 +5,15
+    --- expected
+    +++ actual
+    @@ -5,11 +5,11 @@
       ;;
 
       let () =
-    -|  (* $CR-soon user1 for user2: Message *)
-    +|  (* $CR user1 for user2: Message *)
+    -   (* $CR-soon user1 for user2: Message *)
+    +   (* $CR user1 for user2: Message *)
         ()
       ;;
 
-    -|(* $XCR-soon jdoe: This other message *)
-    +|(* $XCR jdoe: This other message *)
+    - (* $XCR-soon jdoe: This other message *)
+    + (* $XCR jdoe: This other message *)
       let () = ()
 
       (* $XCR jdoe: This other message *)
+    @@ -16,4 +16,4 @@
       let () = ()
 
-    -|(* $CR-someday user1: This third message *)
-    +|(* $CR user1: This third message *)
+    - (* $CR-someday user1: This third message *)
+    + (* $CR user1: This third message *)
       let () = ()
     |}];
   ()
