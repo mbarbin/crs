@@ -27,6 +27,77 @@
 let path = Vcs.Path_in_repo.v "my_file.ml"
 let test file_contents ~f = Tests_helpers.test ~path ~file_contents ~f
 
+let%expect_test "extended_range" =
+  let test original_contents ~start ~stop =
+    let range : Loc.Range.t = { start; stop } in
+    let { Loc.Range.start; stop } =
+      Tests_helpers.extended_range ~original_contents ~range
+    in
+    print_dyn
+      (Dyn.record
+         [ "start", Dyn.int start
+         ; "stop", Dyn.int stop
+         ; ( "contents"
+           , Dyn.string (String.sub original_contents ~pos:start ~len:(stop - start)) )
+         ])
+  in
+  (* Range covering the entire contents. *)
+  test "hello" ~start:0 ~stop:5;
+  [%expect {| { start = 0; stop = 5; contents = "hello" } |}];
+  (* Range at the very start, with trailing whitespace and newline. *)
+  test "hello  \nworld" ~start:0 ~stop:5;
+  [%expect
+    {|
+    { start = 0; stop = 8; contents = "hello  \n\
+                                       " }
+    |}];
+  (* Range at the very end, with leading whitespace after newline. *)
+  test "world\n  hello" ~start:8 ~stop:13;
+  [%expect {| { start = 6; stop = 13; contents = "  hello" } |}];
+  (* Range at the very end, with leading whitespace and no trailing newline. *)
+  test "  hello" ~start:2 ~stop:7;
+  [%expect {| { start = 0; stop = 7; contents = "  hello" } |}];
+  (* Range touching both bounds with surrounding whitespace. *)
+  test "  hello  " ~start:2 ~stop:7;
+  [%expect {| { start = 0; stop = 9; contents = "  hello  " } |}];
+  (* Whitespace extends to newline on the right, includes it. *)
+  test "  hello  \n" ~start:2 ~stop:7;
+  [%expect
+    {|
+    { start = 0; stop = 10; contents = "  hello  \n\
+                                        " }
+    |}];
+  (* Stops at non-whitespace on the left. *)
+  test "code  hello" ~start:6 ~stop:11;
+  [%expect {| { start = 4; stop = 11; contents = "  hello" } |}];
+  (* Stops at newline on the left (not included). *)
+  test "code\n  hello" ~start:7 ~stop:12;
+  [%expect {| { start = 5; stop = 12; contents = "  hello" } |}];
+  (* Stops at non-whitespace on the right. *)
+  test "hello  code" ~start:0 ~stop:5;
+  [%expect {| { start = 0; stop = 7; contents = "hello  " } |}];
+  (* At line start: trailing newline is included. *)
+  test "\n  hello  \nworld" ~start:3 ~stop:8;
+  [%expect
+    {|
+    { start = 1; stop = 11; contents = "  hello  \n\
+                                        " }
+    |}];
+  (* Not at line start: trailing newline is preserved. *)
+  test "code  hello  \nworld" ~start:6 ~stop:11;
+  [%expect {| { start = 4; stop = 13; contents = "  hello  " } |}];
+  (* Not at line start, trailing newline: stop before newline. *)
+  test "code hello\n" ~start:5 ~stop:10;
+  [%expect {| { start = 4; stop = 10; contents = " hello" } |}];
+  (* Empty range at start of string. *)
+  test "hello" ~start:0 ~stop:0;
+  [%expect {| { start = 0; stop = 0; contents = "" } |}];
+  (* Empty range at end of string. *)
+  test "hello" ~start:5 ~stop:5;
+  [%expect {| { start = 5; stop = 5; contents = "" } |}];
+  ()
+;;
+
 let%expect_test "remove CR entirely" =
   let file_contents =
     {|
@@ -44,26 +115,107 @@ let () = ()
   in
   test file_contents ~f:(fun ~crs ~file_rewriter ->
     List.iter crs ~f:(fun cr ->
-      File_rewriter.remove file_rewriter ~range:(Loc.range (Cr_comment.whole_loc cr))));
+      let range =
+        Tests_helpers.extended_range
+          ~original_contents:(File_rewriter.original_contents file_rewriter)
+          ~range:(Loc.range (Cr_comment.whole_loc cr))
+      in
+      File_rewriter.remove file_rewriter ~range));
   [%expect
     {|
     --- expected
     +++ actual
-    @@ -1,11 +1,11 @@
+    @@ -1,11 +1,8 @@
 
       let () =
     -   (* $CR jdoe: This will be removed. *)
-    +
         ()
       ;;
 
     - (* $XCR jdoe: This too *)
-    +
       let () = ()
 
     - (* $CR-jdoe: Invalid CRs are removed too. *)
-    +
       let () = ()
+    |}];
+  ()
+;;
+
+let%expect_test "remove multi-line CR entirely" =
+  let file_contents =
+    {|
+let () =
+  (* $CR jdoe: This is a long comment
+     that spans multiple lines
+     and should be fully removed. *)
+  ()
+;;
+
+(* $XCR jdoe: This too
+   is multi-line. *)
+let () = ()
+|}
+  in
+  test file_contents ~f:(fun ~crs ~file_rewriter ->
+    List.iter crs ~f:(fun cr ->
+      let range =
+        Tests_helpers.extended_range
+          ~original_contents:(File_rewriter.original_contents file_rewriter)
+          ~range:(Loc.range (Cr_comment.whole_loc cr))
+      in
+      File_rewriter.remove file_rewriter ~range));
+  [%expect
+    {|
+    --- expected
+    +++ actual
+    @@ -1,11 +1,6 @@
+
+      let () =
+    -   (* $CR jdoe: This is a long comment
+    -      that spans multiple lines
+    -      and should be fully removed. *)
+        ()
+      ;;
+
+    - (* $XCR jdoe: This too
+    -    is multi-line. *)
+      let () = ()
+    |}];
+  ()
+;;
+
+let%expect_test "remove CR with code on the same line" =
+  let file_contents =
+    {|
+let () = (* $CR jdoe: CR on same line as code. *) ()
+
+let x = 1 (* $XCR jdoe: Trailing CR. *)
+
+let y = (* $CR jdoe: CR between code. *) 2
+|}
+  in
+  test file_contents ~f:(fun ~crs ~file_rewriter ->
+    List.iter crs ~f:(fun cr ->
+      let range =
+        Tests_helpers.extended_range
+          ~original_contents:(File_rewriter.original_contents file_rewriter)
+          ~range:(Loc.range (Cr_comment.whole_loc cr))
+      in
+      File_rewriter.remove file_rewriter ~range));
+  [%expect
+    {|
+    --- expected
+    +++ actual
+    @@ -1,6 +1,6 @@
+
+    - let () = (* $CR jdoe: CR on same line as code. *) ()
+    + let () =()
+
+    - let x = 1 (* $XCR jdoe: Trailing CR. *)
+    + let x = 1
+
+    - let y = (* $CR jdoe: CR between code. *) 2
+    + let y =2
     |}];
   ()
 ;;
