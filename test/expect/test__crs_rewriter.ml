@@ -89,6 +89,30 @@ let%expect_test "extended_range" =
   (* Not at line start, trailing newline: stop before newline. *)
   test "code hello\n" ~start:5 ~stop:10;
   [%expect {| { start = 4; stop = 10; contents = " hello" } |}];
+  (* Tab before range is consumed like spaces. *)
+  test "\n\thello\n" ~start:2 ~stop:7;
+  [%expect
+    {|
+    { start = 1; stop = 8; contents = "\thello\n\
+                                       " }
+    |}];
+  (* Tab after range is consumed like spaces. *)
+  test "\nhello\t\n" ~start:1 ~stop:6;
+  [%expect
+    {|
+    { start = 1; stop = 8; contents = "hello\t\n\
+                                       " }
+    |}];
+  (* Mixed tabs and spaces on both sides. *)
+  test "\n \thello\t \n" ~start:3 ~stop:8;
+  [%expect
+    {|
+    { start = 1; stop = 11; contents = " \thello\t \n\
+                                        " }
+    |}];
+  (* Tab before range with code preceding — not at line start. *)
+  test "code\thello" ~start:5 ~stop:10;
+  [%expect {| { start = 4; stop = 10; contents = "\thello" } |}];
   (* Empty range at start of string. *)
   test "hello" ~start:0 ~stop:0;
   [%expect {| { start = 0; stop = 0; contents = "" } |}];
