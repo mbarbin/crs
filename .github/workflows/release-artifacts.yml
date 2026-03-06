@@ -96,7 +96,7 @@ jobs:
           echo "SCHEMA_NAME=$schema_name" >> $GITHUB_ENV
 
       - name: Attest Build Provenance
-        uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3.0.0
+        uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26 # v4.1.0
         with:
           subject-path: "${{ env.BIN_NAME }}"
 
