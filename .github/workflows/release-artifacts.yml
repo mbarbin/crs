@@ -98,7 +98,9 @@ jobs:
       - name: Attest Build Provenance
         uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26 # v4.1.0
         with:
-          subject-path: "${{ env.BIN_NAME }}"
+          subject-path: |
+            ${{ env.BIN_NAME }}
+            ${{ env.ARCHIVE_NAME }}
 
       - name: Upload Platform-Specific Binary
         uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2.5.0
