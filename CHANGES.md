@@ -4,11 +4,11 @@ From this version, pre-compiled release binaries are included as compressed arch
 
 ### Added
 
-- Distribute compressed archived for release artifacts (#4637accb, @mbarbin).
+- Distribute compressed archived for release artifacts (4637ac, @mbarbin).
 
 ### Changed
 
-- Upgrade to recent `actions/attest` GitHub workflow (#3db21657, @mbarbin).
+- Upgrade to recent `actions/attest` GitHub workflow (3db216, @mbarbin).
 
 ## 0.0.20260202 (2026-02-02)
 
