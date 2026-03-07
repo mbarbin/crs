@@ -1,3 +1,15 @@
+## 0.0.20260307 (2026-03-07)
+
+From this version, pre-compiled release binaries are included as compressed archives.
+
+### Added
+
+- Distribute compressed archived for release artifacts (#4637accb, @mbarbin).
+
+### Changed
+
+- Upgrade to recent `actions/attest` GitHub workflow (#3db21657, @mbarbin).
+
 ## 0.0.20260202 (2026-02-02)
 
 Starting from this version we're using GitHub immutable releases.
