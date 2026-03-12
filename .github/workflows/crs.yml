@@ -58,11 +58,11 @@ jobs:
       # GitHub annotations, step summaries, etc.
 
       - name: Comment on CRs in PR
-        uses: mbarbin/crs-actions/comment-crs-in-pr@061f8bc6ac432c1ebc575489f0ea1bc499be0e78 # v1.0.0-alpha.10
+        uses: mbarbin/crs-actions/comment-crs-in-pr@87cd473edbc67f6640d6356679e1dd0f749e89da # v1.0.0-alpha.12
         with:
           crs-config: .github/crs-config.json
 
       - name: Summarize CRs in PR
-        uses: mbarbin/crs-actions/summarize-crs-in-pr@061f8bc6ac432c1ebc575489f0ea1bc499be0e78 # v1.0.0-alpha.10
+        uses: mbarbin/crs-actions/summarize-crs-in-pr@87cd473edbc67f6640d6356679e1dd0f749e89da # v1.0.0-alpha.12
         with:
           crs-config: .github/crs-config.json
