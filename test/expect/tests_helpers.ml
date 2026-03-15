@@ -53,6 +53,18 @@ let extended_range ~original_contents ~(range : Loc.Range.t) =
     in
     loop range.stop
   in
+  (* When the range is surrounded by code on both sides (not at a line
+     boundary), preserve a single space so that adjacent tokens remain
+     properly separated (e.g. "let () = (* comment *) ()" becomes
+     "let () = ()" rather than "let () =()"). *)
+  let start =
+    if (not at_line_start)
+       && stop < len
+       && (not (Char.equal original_contents.[stop] '\n'))
+       && start < range.start
+    then start + 1
+    else start
+  in
   { Loc.Range.start; stop }
 ;;
 

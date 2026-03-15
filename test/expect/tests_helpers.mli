@@ -29,7 +29,12 @@
     - Right: extends through spaces and tabs forwards. A trailing newline is
       only included if the left extension reached a line boundary (beginning of
       file or preceded by a newline), preserving the line structure when the
-      range follows code on the same line. *)
+      range follows code on the same line.
+    - When code is present on both sides (not at a line boundary, and the right
+      extension stops at a non-newline character), one space is preserved on the
+      left so that adjacent tokens remain properly separated
+      (e.g. removing a comment from ["let () = (* ... *) ()"] yields
+      ["let () = ()"] rather than ["let () =()"]. *)
 val extended_range : original_contents:string -> range:Loc.Range.t -> Loc.Range.t
 
 (** Apply some rewrite after having parsed CRs from a file, and print the

@@ -113,6 +113,15 @@ let%expect_test "extended_range" =
   (* Tab before range with code preceding — not at line start. *)
   test "code\thello" ~start:5 ~stop:10;
   [%expect {| { start = 4; stop = 10; contents = "\thello" } |}];
+  (* Code on both sides: one space preserved on the left. *)
+  test "code  hello  code" ~start:6 ~stop:11;
+  [%expect {| { start = 5; stop = 13; contents = " hello  " } |}];
+  (* Code on both sides with tabs: one space preserved. *)
+  test "code\t\thello\t\tcode" ~start:6 ~stop:11;
+  [%expect {| { start = 5; stop = 13; contents = "\thello\t\t" } |}];
+  (* Code on left only (right is end of string): no space preserved. *)
+  test "code  hello" ~start:6 ~stop:11;
+  [%expect {| { start = 4; stop = 11; contents = "  hello" } |}];
   (* Empty range at start of string. *)
   test "hello" ~start:0 ~stop:0;
   [%expect {| { start = 0; stop = 0; contents = "" } |}];
@@ -227,13 +236,13 @@ let y = (* $CR jdoe: CR between code. *) 2
     -1,6 +1,6
 
     -|let () = (* $CR jdoe: CR on same line as code. *) ()
-    +|let () =()
+    +|let () = ()
 
     -|let x = 1 (* $XCR jdoe: Trailing CR. *)
     +|let x = 1
 
     -|let y = (* $CR jdoe: CR between code. *) 2
-    +|let y =2
+    +|let y = 2
     |}];
   ()
 ;;
