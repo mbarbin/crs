@@ -19,4 +19,8 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-include Stdlib0
+let set_temporarily t a ~f =
+  let x = !t in
+  t := a;
+  Fun.protect ~finally:(fun () -> t := x) f
+;;
