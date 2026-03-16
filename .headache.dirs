@@ -4,6 +4,8 @@ src/crs/bin
 src/crs/cr-comment
 src/crs/crs-cli
 src/crs/crs-parser
+src/reviewdog/src
+src/reviewdog/test
 src/stdlib
 test/crs/cr-comment
 test/crs/crs-cli
