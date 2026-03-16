@@ -19,8 +19,10 @@
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
 
-(** Extending [Stdlib] for use in the project. *)
-
 include module type of struct
-  include Stdlib0
+  include Int
 end
+
+val incr : t ref -> unit
+val to_dyn : t -> Dyn0.t
+val to_string_hum : t -> string

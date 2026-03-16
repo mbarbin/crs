@@ -19,8 +19,10 @@
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
 
-(** Extending [Stdlib] for use in the project. *)
-
 include module type of struct
-  include Stdlib0
+  include Option
 end
+
+val bind : 'a t -> f:('a -> 'b t) -> 'b t
+val iter : 'a t -> f:('a -> unit) -> unit
+val map : 'a t -> f:('a -> 'b) -> 'b t

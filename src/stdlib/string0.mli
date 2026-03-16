@@ -19,8 +19,19 @@
 (*_  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (*_*******************************************************************************)
 
-(** Extending [Stdlib] for use in the project. *)
-
 include module type of struct
-  include Stdlib0
+  include StringLabels
 end
+
+val chop_prefix : t -> prefix:t -> t option
+val concat : t list -> sep:t -> t
+val is_empty : t -> bool
+val lsplit2 : t -> on:char -> (t * t) option
+val lstrip : ?drop:(char -> bool) -> t -> t
+val rstrip : ?drop:(char -> bool) -> t -> t
+val split : t -> on:char -> t list
+val split_lines : t -> t list
+val strip : t -> t
+val substr_replace_all : t -> pattern:t -> with_:t -> t
+val to_dyn : t -> Dyn0.t
+val to_string : t -> t

@@ -19,4 +19,8 @@
 (*  <http://www.gnu.org/licenses/> and <https://spdx.org>, respectively.        *)
 (********************************************************************************)
 
-include Stdlib0
+include Stdlib.Option
+
+let bind t ~f = bind t f
+let iter t ~f = iter f t
+let map t ~f = map f t
