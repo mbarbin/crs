@@ -1,0 +1,5 @@
+(*_*************************************************************************)
+(*_  crs-myers - Vendoring windtrap.myers with minor changes               *)
+(*_  Copyright (C) 2026 Mathieu Barbin <mathieu.barbin@gmail.com>          *)
+(*_  SPDX-License-Identifier: ISC                                          *)
+(*_*************************************************************************)

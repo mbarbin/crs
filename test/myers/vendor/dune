@@ -1,0 +1,6 @@
+(test
+ (name test_myers)
+ (package crs-tests)
+ (modules test_myers)
+ (flags -open Crs_myers)
+ (libraries crs_myers windtrap))

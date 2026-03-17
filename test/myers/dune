@@ -1,7 +1,6 @@
 (library
- (name crs_expect_test)
+ (name crs_myers_test)
  (package crs-tests)
- (inline_tests)
  (flags
   :standard
   -w
@@ -9,27 +8,11 @@
   -warn-error
   +a
   -open
-  Fpath_sexp0
-  -open
-  Volgo
-  -open
   Crs_stdlib
   -open
-  Cr_comment.Std
-  -open
-  Crs_parser.Private.Std
-  -open
   Crs_myers)
- (libraries
-  cr_comment
-  crs_myers
-  crs_parser
-  crs_stdlib
-  file-rewriter
-  fpath
-  fpath-sexp0
-  loc
-  volgo)
+ (libraries crs_myers crs_stdlib)
+ (inline_tests)
  (instrumentation
   (backend bisect_ppx))
  (lint
