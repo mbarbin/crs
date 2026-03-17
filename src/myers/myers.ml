@@ -16,7 +16,7 @@
 
    - Applied local project ocamlformat.
    - Small changes to the diff rendering.
-   - Use [Lind] in more places instead of (char * string) encoding.
+   - Use [Line] in more places instead of (char * string) encoding.
    - Use [raise_notrace] for the local exception.
    - Simplify dead-code paths in [compute] (forward pass and backtracking).
 *)
