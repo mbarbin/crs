@@ -1,7 +1,13 @@
-(*_*************************************************************************)
-(*_  Copyright (c) 2026 Invariant Systems. All rights reserved.            *)
-(*_  SPDX-License-Identifier: ISC                                          *)
-(*_*************************************************************************)
+(*_***************************************************************************)
+(*_  crs-myers - Vendoring windtrap.myers with minor changes                 *)
+(*_  Copyright (C) 2024-2026 Mathieu Barbin <mathieu.barbin@gmail.com>       *)
+(*_  SPDX-License-Identifier: ISC                                            *)
+(*_                                                                          *)
+(*_  The code was vendored from [https://github.com/invariant-hq/windtrap].  *)
+(*_                                                                          *)
+(*_  Copyright (c) 2026 Invariant Systems. All rights reserved.              *)
+(*_  SPDX-License-Identifier: ISC                                            *)
+(*_***************************************************************************)
 
 (** Minimal polymorphic Myers diff implementation. *)
 
