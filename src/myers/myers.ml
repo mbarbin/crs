@@ -12,6 +12,7 @@
    - Small changes to the diff rendering.
    - Use [Lind] in more places instead of (char * string) encoding.
    - Use [raise_notrace] for the local exception.
+   - Simplify dead-code paths in [compute] (forward pass and backtracking).
 *)
 
 module type Equal = sig
@@ -55,12 +56,7 @@ let compute
             let x =
               if k = -d || (k <> d && v.(offset + k - 1) < v.(offset + k + 1))
               then v.(offset + k + 1)
-              else if k = d
-              then v.(offset + k - 1) + 1
-              else (
-                let x1 = v.(offset + k - 1) + 1 in
-                let x2 = v.(offset + k + 1) in
-                if x1 > x2 then x1 else x2)
+              else v.(offset + k - 1) + 1
             in
             let y = x - k in
             let x, y =
@@ -108,18 +104,11 @@ let compute
         x := prev_x;
         y := prev_y
       done;
-      while !x > 0 && !y > 0 do
-        ops := Line.Keep a.(!x - 1) :: !ops;
-        decr x;
-        decr y
-      done;
+      (* After backtracking, x = y (both equal the length of the initial
+         common prefix, which lies on the k=0 diagonal at d=0). *)
       while !x > 0 do
-        ops := Line.Delete a.(!x - 1) :: !ops;
+        ops := Line.Keep a.(!x - 1) :: !ops;
         decr x
-      done;
-      while !y > 0 do
-        ops := Line.Insert b.(!y - 1) :: !ops;
-        decr y
       done;
       !ops)
 ;;
