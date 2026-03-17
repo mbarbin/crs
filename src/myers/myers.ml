@@ -11,6 +11,7 @@
    - Applied local project ocamlformat.
    - Small changes to the diff rendering.
    - Use [Lind] in more places instead of (char * string) encoding.
+   - Use [raise_notrace] for the local exception.
 *)
 
 module type Equal = sig
@@ -75,7 +76,7 @@ let compute
             if x >= n && y >= m
             then (
               traces_rev := Array.copy v :: !traces_rev;
-              raise (Found (d, List.rev !traces_rev))))
+              raise_notrace (Found (d, List.rev !traces_rev))))
         done;
         traces_rev := Array.copy v :: !traces_rev
       done;
