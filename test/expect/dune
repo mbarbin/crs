@@ -17,16 +17,18 @@
   -open
   Cr_comment.Std
   -open
-  Crs_parser.Private.Std)
+  Crs_parser.Private.Std
+  -open
+  Crs_myers)
  (libraries
   cr_comment
+  crs_myers
   crs_parser
   crs_stdlib
   file-rewriter
   fpath
   fpath-sexp0
   loc
-  patdiff.expect_test_patdiff
   volgo)
  (instrumentation
   (backend bisect_ppx))
