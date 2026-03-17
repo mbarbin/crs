@@ -129,6 +129,10 @@
    (>= 0.0.21))
   (volgo-vcs
    (>= 0.0.21))
+  (windtrap
+   (and
+    :with-test
+    (>= 0.1.0)))
   (yojson
    (>= 2.2.2))))
 

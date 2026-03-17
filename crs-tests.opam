@@ -38,6 +38,7 @@ depends: [
   "volgo-git-unix" {>= "0.0.21"}
   "volgo-hg-unix" {>= "0.0.21"}
   "volgo-vcs" {>= "0.0.21"}
+  "windtrap" {with-test & >= "0.1.0"}
   "yojson" {>= "2.2.2"}
   "odoc" {with-doc}
 ]
