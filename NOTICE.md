@@ -74,3 +74,7 @@ The exact list of modules that are derived from `Iron` is as follows:
 This project has a test dependency to the opam packages [printbox](https://opam.ocaml.org/packages/printbox/), released under `BSD-2-Clause`.
 
 A copy of the license file for the printbox project is located under `third-party-licenses/`.
+
+## Windtrap.Myers
+
+`Myers` is vendored from the [windtrap](https://github.com/invariant-hq/windtrap) test framework by Thibaut Mattio (released under `ISC`) plus minor modifications documented in the file.
