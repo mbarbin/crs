@@ -19,6 +19,7 @@
    - Use [Line] in more places instead of (char * string) encoding.
    - Use [raise_notrace] for the local exception.
    - Simplify dead-code paths in [compute] (forward pass and backtracking).
+   - Remove intermediate [Array] representation in [diff].
 *)
 
 module type Equal = sig
@@ -130,8 +131,8 @@ type hunk =
 let lines_of_string s =
   let parts = String.split_on_char '\n' s in
   match List.rev parts with
-  | "" :: rev_rest -> Array.of_list (List.rev rev_rest)
-  | _ -> Array.of_list parts
+  | "" :: rev_rest -> List.rev rev_rest
+  | _ -> parts
 ;;
 
 let hunks_of_lines ~context expected actual =
@@ -141,7 +142,7 @@ let hunks_of_lines ~context expected actual =
     let equal = String.equal
   end
   in
-  let ops = compute (module Eq) (Array.to_list expected) (Array.to_list actual) in
+  let ops = compute (module Eq) expected actual in
   let pre = Queue.create () in
   let hunks_rev = ref [] in
   let in_hunk = ref false in
