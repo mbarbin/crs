@@ -10,6 +10,7 @@
 
    - Applied local project ocamlformat.
    - Small changes to the diff rendering.
+   - Use [Lind] in more places instead of (char * string) encoding.
 *)
 
 module type Equal = sig
@@ -127,7 +128,7 @@ type hunk =
   ; exp_len : int
   ; act_start : int
   ; act_len : int
-  ; lines : (char * string) list
+  ; lines : string Line.t list
   }
 
 let lines_of_string s =
@@ -170,7 +171,7 @@ let hunks_of_lines ~context expected actual =
     in_hunk := true;
     let pre_lines = queue_to_list () in
     Queue.clear pre;
-    cur_lines_rev := List.rev_map (fun l -> ' ', l) pre_lines;
+    cur_lines_rev := List.rev_map (fun l -> Line.Keep l) pre_lines;
     cur_exp_start := !exp_line - List.length pre_lines;
     cur_act_start := !act_line - List.length pre_lines;
     cur_exp_len := List.length pre_lines;
@@ -193,15 +194,14 @@ let hunks_of_lines ~context expected actual =
       in_hunk := false;
       trailing := 0)
   in
-  let add_hunk_line prefix line =
-    cur_lines_rev := (prefix, line) :: !cur_lines_rev;
-    match prefix with
-    | ' ' ->
+  let add_hunk_line (line : string Line.t) =
+    cur_lines_rev := line :: !cur_lines_rev;
+    match line with
+    | Keep _ ->
       cur_exp_len := !cur_exp_len + 1;
       cur_act_len := !cur_act_len + 1
-    | '-' -> cur_exp_len := !cur_exp_len + 1
-    | '+' -> cur_act_len := !cur_act_len + 1
-    | _ -> ()
+    | Delete _ -> cur_exp_len := !cur_exp_len + 1
+    | Insert _ -> cur_act_len := !cur_act_len + 1
   in
   List.iter
     (function
@@ -210,7 +210,7 @@ let hunks_of_lines ~context expected actual =
         then
           if !trailing > 0
           then (
-            add_hunk_line ' ' line;
+            add_hunk_line (Keep line);
             trailing := !trailing - 1)
           else (
             finish_hunk ();
@@ -223,12 +223,12 @@ let hunks_of_lines ~context expected actual =
         act_line := !act_line + 1
       | Line.Delete line ->
         if not !in_hunk then start_hunk ();
-        add_hunk_line '-' line;
+        add_hunk_line (Delete line);
         trailing := context;
         exp_line := !exp_line + 1
       | Line.Insert line ->
         if not !in_hunk then start_hunk ();
-        add_hunk_line '+' line;
+        add_hunk_line (Insert line);
         trailing := context;
         act_line := !act_line + 1)
     ops;
@@ -250,13 +250,13 @@ let diff ?(context = 3) ?expected_label ?actual_label expected actual =
          (Option.value expected_label ~default:"expected")
          (Option.value actual_label ~default:"actual"));
   (* Reorder lines in each change group so deletions appear before insertions. *)
-  let output_line (p, line) =
-    let sep =
-      match p with
-      | '+' | '-' -> "|"
-      | _ -> " "
-    in
-    Buffer.add_string buf (Printf.sprintf "%c%s%s\n" p sep line)
+  let output_line (line : string Line.t) =
+    Buffer.add_string
+      buf
+      (match line with
+       | Delete line -> Printf.sprintf "-|%s\n" line
+       | Insert line -> Printf.sprintf "+|%s\n" line
+       | Keep line -> Printf.sprintf "  %s\n" line)
   in
   let flush_changes dels adds =
     List.iter output_line (List.rev dels);
@@ -275,11 +275,11 @@ let diff ?(context = 3) ?expected_label ?actual_label expected actual =
        let dels = ref [] in
        let adds = ref [] in
        List.iter
-         (fun ((p, _) as line) ->
-            match p with
-            | '-' -> dels := line :: !dels
-            | '+' -> adds := line :: !adds
-            | _ ->
+         (fun (line : string Line.t) ->
+            match line with
+            | Delete _ -> dels := line :: !dels
+            | Insert _ -> adds := line :: !adds
+            | Keep _ ->
               flush_changes !dels !adds;
               dels := [];
               adds := [];
