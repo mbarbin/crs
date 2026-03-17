@@ -95,8 +95,6 @@
    (>= 0.3.3))
   (pageantty
    (>= 0.0.3))
-  (patdiff
-   (>= v0.17))
   (pp
    (>= 2.0.0))
   (pplumbing-err
