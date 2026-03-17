@@ -1,6 +1,6 @@
 (****************************************************************************)
 (*  crs-myers - Vendoring windtrap.myers with minor changes                 *)
-(*  Copyright (C) 2024-2026 Mathieu Barbin <mathieu.barbin@gmail.com>       *)
+(*  Copyright (C) 2026 Mathieu Barbin <mathieu.barbin@gmail.com>            *)
 (*  SPDX-License-Identifier: ISC                                            *)
 (*                                                                          *)
 (*  The code was vendored from [https://github.com/invariant-hq/windtrap].  *)
