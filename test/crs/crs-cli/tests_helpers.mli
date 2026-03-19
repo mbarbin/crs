@@ -9,7 +9,7 @@
     '$' symbol. For example:
 
     {[
-      (* $CR user1 for user2: This is a test CR. *)
+    (* $CR user1 for user2: This is a test CR. *)
     ]}
 
     [parse_file ~path ~file_contents] first removes the '$' prefixes, and then
