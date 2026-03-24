@@ -103,18 +103,14 @@ jobs:
             ${{ env.ARCHIVE_NAME }}
 
       - name: Upload Platform-Specific Binary
-        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2.5.0
-        with:
-          tag_name: ${{ env.TAG_NAME }}
-          draft: true
-          files: |
-            ${{ env.ARCHIVE_NAME }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload "$TAG_NAME" "$ARCHIVE_NAME" --repo "$GITHUB_REPOSITORY" --clobber
 
       - name: Upload Platform-Independent Artifacts
         if: matrix.os == 'ubuntu-latest'
-        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2.5.0
-        with:
-          tag_name: ${{ env.TAG_NAME }}
-          draft: true
-          files: |
-            ${{ env.SCHEMA_NAME }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload "$TAG_NAME" "$SCHEMA_NAME" --repo "$GITHUB_REPOSITORY" --clobber
