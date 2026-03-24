@@ -30,6 +30,8 @@
    (>= 0.0.9))
   (cmdlang-cmdliner-err-runner
    (>= 0.0.16))
+  (dune-build-info
+   (>= 3.17))
   (dyn
    (>= 3.17))
   (file-rewriter
