@@ -108,7 +108,6 @@ jobs:
           tag_name: ${{ env.TAG_NAME }}
           draft: true
           files: |
-            ${{ env.BIN_NAME }}
             ${{ env.ARCHIVE_NAME }}
 
       - name: Upload Platform-Independent Artifacts
