@@ -32,7 +32,6 @@ Each version of the setup-crs action is tested for compatibility with specific c
 
 Here's a simple example that installs crs and verifies the installation:
 
-<!-- $MDX skip -->
 ```yaml
 name: Setup crs
 on:
