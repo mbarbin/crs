@@ -219,7 +219,8 @@ let%expect_test "quick start" =
 let%expect_test "valid-minimal" =
   print_json_file "valid-minimal.json";
   (* @mdexp.snapshot *)
-  [%expect {|
+  [%expect
+    {|
     ```json title="valid-minimal.json"
     {}
     ```
