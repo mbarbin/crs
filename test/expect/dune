@@ -9,8 +9,6 @@
   -warn-error
   +a
   -open
-  Fpath_sexp0
-  -open
   Volgo
   -open
   Crs_stdlib
@@ -20,16 +18,7 @@
   Crs_parser.Private.Std
   -open
   Crs_myers)
- (libraries
-  cr_comment
-  crs_myers
-  crs_parser
-  crs_stdlib
-  file-rewriter
-  fpath
-  fpath-sexp0
-  loc
-  volgo)
+ (libraries cr_comment crs_myers crs_parser crs_stdlib file-rewriter volgo)
  (instrumentation
   (backend bisect_ppx))
  (lint

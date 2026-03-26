@@ -4,15 +4,23 @@
 (*  SPDX-License-Identifier: MIT OR LGPL-3.0-or-later WITH LGPL-3.0-linking-exception  *)
 (***************************************************************************************)
 
+module Absolute_path = Absolute_path0
 module Char = Char0
 module Code_error = Code_error
 module Dyn = Dyn0
+module Err = Err0
+module Fpath = Fpath0
+module Fsegment = Fsegment0
 module Int = Int0
+module Loc = Loc0
 module Json = Json
 module List = List0
 module Option = Option0
 module Ordering = Ordering
+module Pp = Pp0
+module Pp_tty = Pp_tty0
 module Ref = Ref0
+module Relative_path = Relative_path0
 module Result = Result0
 module String = String0
 

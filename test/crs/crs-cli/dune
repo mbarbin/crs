@@ -8,10 +8,6 @@
   -warn-error
   +a
   -open
-  Fpath_sexp0
-  -open
-  Pplumbing_err
-  -open
   Volgo
   -open
   Cmdlang
@@ -30,10 +26,6 @@
   crs_cli
   crs_parser
   crs_stdlib
-  fpath
-  fpath-sexp0
-  loc
-  pplumbing-err
   print-table
   printbox
   printbox-md
