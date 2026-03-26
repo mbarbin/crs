@@ -8,8 +8,6 @@
   -warn-error
   +a
   -open
-  Fpath_sexp0
-  -open
   Volgo
   -open
   Cmdlang
@@ -28,8 +26,6 @@
   crs_cli
   crs_parser
   crs_stdlib
-  fpath
-  fpath-sexp0
   print-table
   printbox
   printbox-md

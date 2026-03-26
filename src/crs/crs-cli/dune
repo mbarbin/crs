@@ -8,8 +8,6 @@
   -warn-error
   +a
   -open
-  Fpath_sexp0
-  -open
   Pplumbing_log_cli
   -open
   Volgo
@@ -27,8 +25,6 @@
   crs_parser
   crs_stdlib
   file-rewriter
-  fpath
-  fpath-sexp0
   pageantty.git-pager
   pplumbing-log-cli
   print-table
