@@ -13,7 +13,8 @@ trailing commas.
 
 Here's a complete working example showing all available configuration options:
 
-<!-- $MDX file=complete-example.json -->
+`complete-example.json`:
+
 ```json
 {
   // Enable editor validation and auto-completion (replace with your crs version).
@@ -119,7 +120,6 @@ features like auto-completion, inline validation, and hover documentation.
 Add a `$schema` field to your `.github/crs-config.json` that matches your
 installed `crs` version:
 
-<!-- $MDX skip -->
 ```json
 {
   "$schema": "https://github.com/mbarbin/crs/releases/download/0.0.20251014/crs-config.schema.json",
@@ -131,7 +131,6 @@ installed `crs` version:
 Replace `0.0.20251014` with your installed `crs` version. Check your version
 with:
 
-<!-- $MDX skip -->
 ```bash
 $ crs --version
 ```
@@ -167,7 +166,6 @@ files. The validation checks:
 
 To validate your configuration file:
 
-<!-- $MDX skip -->
 ```bash
 crs tools config validate .github/crs-config.json
 ```
@@ -177,7 +175,8 @@ crs tools config validate .github/crs-config.json
 **Valid Minimal Configuration** - At the moment all fields in the config are
 optional, so an empty json object is a minimal valid configuration:
 
-<!-- $MDX file=valid-minimal.json -->
+`valid-minimal.json`:
+
 ```json
 {}
 ```
@@ -189,7 +188,8 @@ $ crs tools config validate valid-minimal.json
 **Valid Full Configuration** - A complete configuration with all optional
 fields, in regular json:
 
-<!-- $MDX file=valid-full.json -->
+`valid-full.json`:
+
 ```json
 {
   "$schema": "https://github.com/mbarbin/crs/releases/download/0.0.20251014/crs-config.schema.json",
@@ -211,7 +211,8 @@ $ crs tools config validate valid-full.json
 **Configuration with Selected Fields Only** - Since all fields are optional,
 you can have a configuration with just specific fields:
 
-<!-- $MDX file=minimal-with-allowlist.json -->
+`minimal-with-allowlist.json`:
+
 ```json
 {
   "user_mentions_allowlist": ["alice", "bob"]
@@ -226,7 +227,8 @@ $ crs tools config validate minimal-with-allowlist.json
 config format. This is still supported for compatibility but now this creates
 a warning:
 
-<!-- $MDX file=wrapped-enum.json -->
+`wrapped-enum.json`:
+
 ```json
 {
   "invalid_crs_annotation_severity": [ "Warning" ]
@@ -244,7 +246,8 @@ Hint: Change it to simply: "Warning"
 **Invalid: Wrong Type for Field** - Configuration with incorrect type
 for `user_mentions_allowlist`:
 
-<!-- $MDX file=invalid-wrong-type.json -->
+`invalid-wrong-type.json`:
+
 ```json
 {
   "default_repo_owner": "alice",
@@ -264,7 +267,8 @@ User handle list expected to be a list of json strings.
 **Invalid: Bad Severity Value** - Configuration with invalid annotation
 severity:
 
-<!-- $MDX file=invalid-severity.json -->
+`invalid-severity.json`:
+
 ```json
 {
   "default_repo_owner": "alice",

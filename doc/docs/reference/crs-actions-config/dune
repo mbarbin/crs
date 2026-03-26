@@ -1,8 +1,37 @@
-(mdx
+(library
+ (name crs_actions_config)
  (package crs-dev)
- (deps
-  (package crs)
-  (package crs-tests)
-  (glob_files *.md)
-  (glob_files *.json))
- (preludes prelude.txt))
+ (inline_tests
+  (deps
+   crs.exe
+   (glob_files *.json)))
+ (flags :standard -w +a-4-40-41-42-44-45-48-66 -warn-error +a)
+ (libraries unix)
+ (instrumentation
+  (backend bisect_ppx))
+ (lint
+  (pps ppx_js_style -allow-let-operators -check-doc-comments))
+ (preprocess
+  (pps ppx_expect)))
+
+(rule
+ (target crs.exe)
+ (action
+  (copy %{bin:crs} %{target})))
+
+(rule
+ (package crs-dev)
+ (enabled_if %{bin-available:mdexp})
+ (target README.md.gen)
+ (deps crs_actions_config.ml)
+ (action
+  (with-stdout-to
+   %{target}
+   (run mdexp pp %{deps}))))
+
+(rule
+ (package crs-dev)
+ (enabled_if %{bin-available:mdexp})
+ (alias runtest)
+ (action
+  (diff README.md README.md.gen)))
