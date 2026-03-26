@@ -154,6 +154,8 @@
    (= :version))
   (crs-tests
    (= :version))
+  (ppx_expect
+   (>= v0.17))
   (ppx_js_style
    (>= v0.17))
   (ppxlib
