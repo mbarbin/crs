@@ -10,10 +10,6 @@
   -open
   Fpath_sexp0
   -open
-  Pplumbing_pp_tty
-  -open
-  Pplumbing_err
-  -open
   Volgo
   -open
   Crs_stdlib
@@ -24,10 +20,6 @@
   crs_stdlib
   fpath
   fpath-sexp0
-  loc
-  pp
-  pplumbing-err
-  pplumbing-pp-tty
   re
   sexplib0
   spawn
