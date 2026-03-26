@@ -19,7 +19,6 @@ Download the binary for your platform from the releases page, rename it to `crs`
 
 You can verify that binaries were built from the official source using GitHub's build attestation. This requires gh CLI (see https://cli.github.com/):
 
-<!-- $MDX skip -->
 ```bash
 gh attestation verify crs-0.0.20250705-linux-x86_64 \
   --owner mbarbin \

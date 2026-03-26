@@ -14,7 +14,8 @@ let main =
        of a pull request on GitHub, for example in conversation comments or checks \
        panels.")
     (let open Command.Std in
-     let+ with_user_mentions = Common_helpers.with_user_mentions_arg
+     let+ () = Log_cli.set_config ()
+     and+ with_user_mentions = Common_helpers.with_user_mentions_arg
      and+ config =
        Arg.named_opt [ "config" ] Param.file ~doc:"Config file to customize crs."
      and+ review_mode = Review_mode.arg ~emit_github_annotations:true in

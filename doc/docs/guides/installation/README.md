@@ -28,7 +28,6 @@ Finally, if you'd like to try or test the latest current version, or the tip of 
 
 Public releases of crs are published to the main [opam-repository](https://github.com/ocaml/opam-repository). Install it with the [opam](https://opam.ocaml.org) package manager by running:
 
-<!-- $MDX skip -->
 ```sh
 opam install crs
 ```
@@ -39,14 +38,12 @@ Note that crs needs to be installed in a switch with `ocaml >= 5.2`.
 
 Intermediate releases for this project are published to a [custom opam-repo](https://github.com/mbarbin/opam-repository.git). To add it to your current opam switch, run:
 
-<!-- $MDX skip -->
 ```sh
 opam repo add mbarbin https://github.com/mbarbin/opam-repository.git
 ```
 
 Then you can install crs using a normal opam workflow:
 
-<!-- $MDX skip -->
 ```sh
 opam install crs
 ```
@@ -55,14 +52,12 @@ opam install crs
 
 Assuming you have a working environment with `OCaml >= 5.2`, `opam` and `dune` you should be able to install the project's dependencies in your current opam switch by running:
 
-<!-- $MDX skip -->
 ```sh
 opam install . --deps-only
 ```
 
 And then build with:
 
-<!-- $MDX skip -->
 ```sh
 dune build
 ```
@@ -73,7 +68,6 @@ From time to time, the project may have temporary dependencies on packages that 
 
 For example, if you use a local opam switch, this would look like this:
 
-<!-- $MDX skip -->
 ```sh
 git clone https://github.com/mbarbin/crs.git
 cd crs
@@ -85,7 +79,6 @@ opam install . --deps-only
 
 Once this is setup, you can build with dune:
 
-<!-- $MDX skip -->
 ```sh
 dune build
 ```

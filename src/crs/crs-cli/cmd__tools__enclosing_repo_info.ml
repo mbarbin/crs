@@ -21,7 +21,7 @@ let main =
        may change without semver updates. In particular it should not be relied on in \
        scripts.")
     (let open Command.Std in
-     let+ () = Arg.return () in
+     let+ () = Log_cli.set_config () in
      let cwd = Unix.getcwd () |> Absolute_path.v in
      let { Enclosing_repo.vcs_kind; repo_root; vcs = _ } =
        Common_helpers.find_enclosing_repo ~from:cwd

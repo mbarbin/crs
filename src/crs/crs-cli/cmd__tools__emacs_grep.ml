@@ -76,7 +76,8 @@ let main =
        facilitate the integration with emacs grep-mode.\n\n\
        By default the file paths are displayed relative to the command's $(b,cwd).")
     (let open Command.Std in
-     let+ path_display_mode =
+     let+ () = Log_cli.set_config ()
+     and+ path_display_mode =
        Arg.named_with_default
          [ "path-display-mode" ]
          (Param.enumerated (module Path_display_mode))

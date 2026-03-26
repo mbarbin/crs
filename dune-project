@@ -15,8 +15,6 @@
 
 (documentation "https://mbarbin.github.io/crs/")
 
-(using mdx 0.4)
-
 (implicit_transitive_deps false)
 
 (package
@@ -49,6 +47,10 @@
   (pp
    (>= 2.0.0))
   (pplumbing-err
+   (>= 0.0.16))
+  (pplumbing-log
+   (>= 0.0.16))
+  (pplumbing-log-cli
    (>= 0.0.16))
   (pplumbing-pp-tty
    (>= 0.0.16))
@@ -156,8 +158,8 @@
    (= :version))
   (crs-tests
    (= :version))
-  (mdx
-   (>= 2.4))
+  (ppx_expect
+   (>= v0.17))
   (ppx_js_style
    (>= v0.17))
   (ppxlib

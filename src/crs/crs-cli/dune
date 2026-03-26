@@ -12,6 +12,8 @@
   -open
   Pplumbing_pp_tty
   -open
+  Pplumbing_log_cli
+  -open
   Pplumbing_err
   -open
   Volgo
@@ -35,6 +37,7 @@
   pageantty.git-pager
   pp
   pplumbing-err
+  pplumbing-log-cli
   pplumbing-pp-tty
   print-table
   reviewdog
