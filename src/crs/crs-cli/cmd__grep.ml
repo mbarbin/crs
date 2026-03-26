@@ -18,7 +18,8 @@ let main =
        filtering flags such as $(b,--xcrs) or $(b,--soon). Supplying multiple filtering \
        flags selects the union of all matching CRs (i.e., flags are combined with OR).")
     (let open Command.Std in
-     let+ below =
+     let+ () = Log_cli.set_config ()
+     and+ below =
        Arg.named_opt
          [ "below" ]
          (Param.validated_string (module Fpath))

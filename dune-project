@@ -48,6 +48,10 @@
    (>= 2.0.0))
   (pplumbing-err
    (>= 0.0.16))
+  (pplumbing-log
+   (>= 0.0.16))
+  (pplumbing-log-cli
+   (>= 0.0.16))
   (pplumbing-pp-tty
    (>= 0.0.16))
   (print-table

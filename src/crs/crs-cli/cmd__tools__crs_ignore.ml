@@ -19,7 +19,8 @@ let list_included_files_cmd =
        This is useful for understanding which files are being searched and for debugging \
        $(b,.crs-ignore) configurations.")
     (let open Command.Std in
-     let+ below =
+     let+ () = Log_cli.set_config ()
+     and+ below =
        Arg.named_opt
          [ "below" ]
          (Param.validated_string (module Fpath))
@@ -69,7 +70,8 @@ let list_ignored_files_cmd =
        This is useful for understanding which files are being searched and for debugging \
        $(b,.crs-ignore) configurations.")
     (let open Command.Std in
-     let+ below =
+     let+ () = Log_cli.set_config ()
+     and+ below =
        Arg.named_opt
          [ "below" ]
          (Param.validated_string (module Fpath))
@@ -116,7 +118,8 @@ let validate_cmd =
     ~readme:(fun () ->
       "This command validates that the crs-ignore files in the repo are valid.")
     (let open Command.Std in
-     let+ emit_github_annotations =
+     let+ () = Log_cli.set_config ()
+     and+ emit_github_annotations =
        Common_helpers.emit_github_annotations_arg ~default:false
      and+ only_this_file =
        Arg.pos_opt
