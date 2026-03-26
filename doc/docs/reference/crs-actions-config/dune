@@ -15,9 +15,12 @@
   (pps ppx_expect)))
 
 (rule
+ (package crs-dev)
  (target crs.exe)
+ (deps
+  (:exe %{project_root}/src/crs/bin/main.exe))
  (action
-  (copy %{bin:crs} %{target})))
+  (copy %{exe} %{target})))
 
 (rule
  (package crs-dev)
