@@ -16,11 +16,19 @@ let print_json_file path =
 let crs args =
   let display = "crs " ^ String.concat " " args in
   Printf.printf "$ %s\n" display;
-  let cmd = "./crs.exe " ^ String.concat " " args ^ " 2>&1" in
-  let ic = Unix.open_process_in cmd in
-  let output = In_channel.input_all ic in
-  let status = Unix.close_process_in ic in
-  print_string output;
+  let cmd =
+    (* With the current [ppluming] dependencies, supplying [--color=always]
+       doesn't work. We'll determine whether to inject colors in the
+       documentation at a later stage, once this upstream issue is fixed. *)
+    "./crs.exe " ^ String.concat " " args ^ " --color=never"
+  in
+  let stdout, stdin, stderr = Unix.open_process_full cmd (Unix.environment ()) in
+  close_out stdin;
+  let stdout_output = In_channel.input_all stdout in
+  let stderr_output = In_channel.input_all stderr in
+  let status = Unix.close_process_full (stdout, stdin, stderr) in
+  print_string stdout_output;
+  if String.length stderr_output > 0 then print_string stderr_output;
   match status with
   | WEXITED 0 -> ()
   | _ ->
