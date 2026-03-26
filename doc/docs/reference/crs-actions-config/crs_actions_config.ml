@@ -4,11 +4,13 @@
 (*  SPDX-License-Identifier: LGPL-3.0-or-later WITH LGPL-3.0-linking-exception   *)
 (*********************************************************************************)
 
-let print_file path =
+let print_json_file path =
+  Printf.printf "```json title=\"%s\"\n" path;
   let ic = open_in path in
   let content = In_channel.input_all ic in
   close_in ic;
-  print_string content
+  print_string content;
+  print_string "```"
 ;;
 
 let crs args =
@@ -46,11 +48,11 @@ let crs args =
    Here's a complete working example showing all available configuration options: *)
 
 let%expect_test "quick start" =
-  (* @mdexp `complete-example.json`: *)
-  print_file "complete-example.json";
-  (* @mdexp.snapshot { lang: "json" } *)
+  print_json_file "complete-example.json";
+  (* @mdexp.snapshot *)
   [%expect
     {|
+    ```json title="complete-example.json"
     {
       // Enable editor validation and auto-completion (replace with your crs version).
       "$schema": "https://github.com/mbarbin/crs/releases/download/0.0.20251014/crs-config.schema.json",
@@ -70,6 +72,7 @@ let%expect_test "quick start" =
       invalid_crs_annotation_severity: "Warning",
       crs_due_now_annotation_severity: "Info",
     }
+    ```
     |}]
 ;;
 
@@ -214,10 +217,13 @@ let%expect_test "quick start" =
    optional, so an empty json object is a minimal valid configuration: *)
 
 let%expect_test "valid-minimal" =
-  (* @mdexp `valid-minimal.json`: *)
-  print_file "valid-minimal.json";
-  (* @mdexp.snapshot { lang: "json" } *)
-  [%expect {| {} |}];
+  print_json_file "valid-minimal.json";
+  (* @mdexp.snapshot *)
+  [%expect {|
+    ```json title="valid-minimal.json"
+    {}
+    ```
+    |}];
   crs [ "tools"; "config"; "validate"; "valid-minimal.json" ];
   (* @mdexp.snapshot { lang: "bash" } *)
   [%expect {| $ crs tools config validate valid-minimal.json |}]
@@ -229,11 +235,11 @@ let%expect_test "valid-minimal" =
    fields, in regular json: *)
 
 let%expect_test "valid-full" =
-  (* @mdexp `valid-full.json`: *)
-  print_file "valid-full.json";
-  (* @mdexp.snapshot { lang: "json" } *)
+  print_json_file "valid-full.json";
+  (* @mdexp.snapshot *)
   [%expect
     {|
+    ```json title="valid-full.json"
     {
       "$schema": "https://github.com/mbarbin/crs/releases/download/0.0.20251014/crs-config.schema.json",
       "default_repo_owner": "alice",
@@ -245,6 +251,7 @@ let%expect_test "valid-full" =
       "invalid_crs_annotation_severity": "Warning",
       "crs_due_now_annotation_severity": "Info"
     }
+    ```
     |}];
   crs [ "tools"; "config"; "validate"; "valid-full.json" ];
   (* @mdexp.snapshot { lang: "bash" } *)
@@ -257,14 +264,15 @@ let%expect_test "valid-full" =
    you can have a configuration with just specific fields: *)
 
 let%expect_test "minimal-with-allowlist" =
-  (* @mdexp `minimal-with-allowlist.json`: *)
-  print_file "minimal-with-allowlist.json";
-  (* @mdexp.snapshot { lang: "json" } *)
+  print_json_file "minimal-with-allowlist.json";
+  (* @mdexp.snapshot *)
   [%expect
     {|
+    ```json title="minimal-with-allowlist.json"
     {
       "user_mentions_allowlist": ["alice", "bob"]
     }
+    ```
     |}];
   crs [ "tools"; "config"; "validate"; "minimal-with-allowlist.json" ];
   (* @mdexp.snapshot { lang: "bash" } *)
@@ -278,14 +286,15 @@ let%expect_test "minimal-with-allowlist" =
    a warning: *)
 
 let%expect_test "wrapped-enum" =
-  (* @mdexp `wrapped-enum.json`: *)
-  print_file "wrapped-enum.json";
-  (* @mdexp.snapshot { lang: "json" } *)
+  print_json_file "wrapped-enum.json";
+  (* @mdexp.snapshot *)
   [%expect
     {|
+    ```json title="wrapped-enum.json"
     {
       "invalid_crs_annotation_severity": [ "Warning" ]
     }
+    ```
     |}];
   crs [ "tools"; "config"; "validate"; "wrapped-enum.json" ];
   (* @mdexp.snapshot { lang: "bash" } *)
@@ -305,15 +314,16 @@ let%expect_test "wrapped-enum" =
    for `user_mentions_allowlist`: *)
 
 let%expect_test "invalid-wrong-type" =
-  (* @mdexp `invalid-wrong-type.json`: *)
-  print_file "invalid-wrong-type.json";
-  (* @mdexp.snapshot { lang: "json" } *)
+  print_json_file "invalid-wrong-type.json";
+  (* @mdexp.snapshot *)
   [%expect
     {|
+    ```json title="invalid-wrong-type.json"
     {
       "default_repo_owner": "alice",
       "user_mentions_allowlist": "bob"
     }
+    ```
     |}];
   crs [ "tools"; "config"; "validate"; "invalid-wrong-type.json" ];
   (* @mdexp.snapshot { lang: "bash" } *)
@@ -334,15 +344,16 @@ let%expect_test "invalid-wrong-type" =
    severity: *)
 
 let%expect_test "invalid-severity" =
-  (* @mdexp `invalid-severity.json`: *)
-  print_file "invalid-severity.json";
-  (* @mdexp.snapshot { lang: "json" } *)
+  print_json_file "invalid-severity.json";
+  (* @mdexp.snapshot *)
   [%expect
     {|
+    ```json title="invalid-severity.json"
     {
       "default_repo_owner": "alice",
       "invalid_crs_annotation_severity": "Notice"
     }
+    ```
     |}];
   crs [ "tools"; "config"; "validate"; "invalid-severity.json" ];
   (* @mdexp.snapshot { lang: "bash" } *)
