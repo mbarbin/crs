@@ -15,8 +15,6 @@
 
 (documentation "https://mbarbin.github.io/crs/")
 
-(using mdx 0.4)
-
 (implicit_transitive_deps false)
 
 (package
@@ -156,8 +154,6 @@
    (= :version))
   (crs-tests
    (= :version))
-  (mdx
-   (>= 2.4))
   (ppx_js_style
    (>= v0.17))
   (ppxlib

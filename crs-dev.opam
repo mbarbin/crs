@@ -14,7 +14,6 @@ depends: [
   "bisect_ppx" {>= "2.8.3"}
   "crs" {= version}
   "crs-tests" {= version}
-  "mdx" {>= "2.4"}
   "ppx_js_style" {>= "v0.17"}
   "ppxlib" {>= "0.33"}
   "odoc" {>= "2.4.4"}
