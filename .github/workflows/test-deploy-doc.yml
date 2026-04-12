@@ -16,6 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       OCAML_VERSION: "5.4"
+      DUNE_VERSION: "3.22.0"
+      DUNE_DIGEST: "sha256:33ca9308b48d9f5e90ee34f5b1045b53df6b5780a188556dab72af53621b5fba"
     defaults:
       run:
         shell: bash
@@ -38,13 +40,16 @@ jobs:
 
       - name: Environment setup
         run: |
-          echo "DUNE_WORKSPACE=$PWD/dune-workspace-${{ env.OCAML_VERSION }}" >> "$GITHUB_ENV"
+          echo "DUNE_WORKSPACE=$PWD/dune-workspace.${{ env.OCAML_VERSION }}" >> "$GITHUB_ENV"
 
       - name: Setup Dune
-        uses: mbarbin/setup-dune@ae2985bcdedc6fb24e5743d6f9dace9cf262b41c # v2.0.0+patch-4
+        uses: mbarbin/setup-dune@03ede0220d3fe665f250727d8e21b7c0f9517f3b # v2.0.0+patch-7
+        env:
+          GH_TOKEN: ${{ github.token }}
         with:
-          version: "3.21.0"
-          workspace: ${{ env.DUNE_WORKSPACE }}
+          version: "${{ env.DUNE_VERSION }}"
+          dune-digest: "${{ env.DUNE_DIGEST }}"
+          workspace: "${{ env.DUNE_WORKSPACE }}"
           cache-prefix: "main-ci-${{ env.OCAML_VERSION }}"
           cache-readonly: true
           steps: install-dune enable-pkg lazy-update-depexts install-gpatch install-depexts

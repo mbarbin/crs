@@ -61,12 +61,12 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          ref: ${{ env.TAG_NAME }}
+          ref: "${{ env.TAG_NAME }}"
 
       - name: Setup OCaml
         uses: ocaml/setup-ocaml@dec6499fef64fc5d7ed43d43a87251b7b1c306f5 # v3.4.8
         with:
-          ocaml-compiler: 5.3.x
+          ocaml-compiler: "5.3.x"
           opam-repositories: |
             default: https://github.com/ocaml/opam-repository.git
             mbarbin: https://github.com/mbarbin/opam-repository.git
