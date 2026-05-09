@@ -10,17 +10,17 @@ let%expect_test "all" =
       (Dyn.record
          [ "filter", filter |> Cr_comment.Filter.to_dyn
          ; "to_string", Cr_comment.Filter.to_string filter |> Dyn.string
-         ; "shorthand", Cr_comment.Filter.shorthand filter |> Dyn.char
+         ; "shorthand", Cr_comment.Filter.shorthand filter |> String.make 1 |> Dyn.string
          ]));
   [%expect
     {|
-    { filter = All; to_string = "all"; shorthand = a }
-    { filter = Invalid; to_string = "invalid"; shorthand = i }
-    { filter = CRs; to_string = "crs"; shorthand = c }
-    { filter = XCRs; to_string = "xcrs"; shorthand = x }
-    { filter = Now; to_string = "now"; shorthand = w }
-    { filter = Soon; to_string = "soon"; shorthand = o }
-    { filter = Someday; to_string = "someday"; shorthand = d }
+    { filter = All; to_string = "all"; shorthand = "a" }
+    { filter = Invalid; to_string = "invalid"; shorthand = "i" }
+    { filter = CRs; to_string = "crs"; shorthand = "c" }
+    { filter = XCRs; to_string = "xcrs"; shorthand = "x" }
+    { filter = Now; to_string = "now"; shorthand = "w" }
+    { filter = Soon; to_string = "soon"; shorthand = "o" }
+    { filter = Someday; to_string = "someday"; shorthand = "d" }
     |}];
   ()
 ;;
