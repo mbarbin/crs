@@ -50,7 +50,6 @@ jobs:
 
       - name: Build and Run tests
         run: |
-          rm -rf _build/default/
           mkdir $BISECT_DIR
           dune build @all @runtest --force --instrument-with bisect_ppx
         env:
