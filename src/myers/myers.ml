@@ -1,26 +1,31 @@
-(****************************************************************************)
-(*  crs-myers - Vendoring windtrap.myers with minor changes                 *)
-(*  Copyright (C) 2026 Mathieu Barbin <mathieu.barbin@gmail.com>            *)
-(*  SPDX-License-Identifier: ISC                                            *)
-(*                                                                          *)
-(*  The code was vendored from [https://github.com/invariant-hq/windtrap].  *)
-(*                                                                          *)
-(*  Copyright (c) 2026 Invariant Systems. All rights reserved.              *)
-(*  SPDX-License-Identifier: ISC                                            *)
-(****************************************************************************)
+(**************************************************************************)
+(*  crs-myers - Myers diff computation and unified-diff printing          *)
+(*  Copyright (C) 2026 Mathieu Barbin <mathieu.barbin@gmail.com>          *)
+(*  SPDX-License-Identifier: ISC                                          *)
+(**************************************************************************)
 
-(* Notice: This file was vendored from windtrap.myers as documented in
-   [vendor.json] and the project's root [NOTICE.md].
+(* Copyright (c) 2026 Invariant Systems. All rights reserved.             *)
+(* SPDX-License-Identifier: ISC                                           *)
 
-   List of changes:
+(* Notice: The unified-diff renderer and the [Equal] / [Line] / [compute] API
+   shape in this file were vendored from windtrap (the [Myers] module,
+   [lib/myers/myers.ml]) as documented in [vendor.json] and the project's root
+   [NOTICE.md]. Only the shortest-edit-script computation was replaced (it now
+   lives in [merge3.ml], vendored from gazagnaire/ocaml-merge3); the rendering
+   logic — [type hunk], [lines_of_string], [hunks_of_lines], [diff],
+   [print_diff] — derives from windtrap.
 
-   - Applied local project ocamlformat.
-   - Small changes to the diff rendering.
-   - Use [Line] in more places instead of (char * string) encoding.
-   - Use [raise_notrace] for the local exception.
-   - Simplify dead-code paths in [compute] (forward pass and backtracking).
-   - Remove intermediate [Array] representation in [diff].
-*)
+   List of changes relative to windtrap:
+
+   - Applied local project ocamlformat (janestreet profile).
+   - [compute] delegates to the vendored {!Merge3.diff}.
+   - Hunk lines use the [Line] variant instead of windtrap's [(char * string)]
+     encoding ([type hunk.lines : string Line.t list]).
+   - [lines_of_string] returns a [string list] and the intermediate [Array]
+     representation in [hunks_of_lines] was removed.
+   - Diff rendering tweaks: line prefixes are ["-|"] / ["+|"] / ["  "], and the
+     [--- / +++] header is emitted only when a label is explicitly provided
+     (windtrap always emitted it with the defaults "expected" / "actual"). *)
 
 module type Equal = sig
   type t
@@ -29,95 +34,25 @@ module type Equal = sig
 end
 
 module Line = struct
-  type 'a t =
+  (* Defined equal to [Merge3.edit] so [compute] needs no conversion and
+     [Merge3] need not be exposed. *)
+  type 'a t = 'a Merge3.edit =
+    | Keep of 'a
     | Delete of 'a
     | Insert of 'a
-    | Keep of 'a
 end
 
-exception Found of int * int array list
-
-let compute
-      (type a)
-      (module Equal : Equal with type t = a)
-      (before : a list)
-      (after : a list)
+let compute (type a) (module E : Equal with type t = a) (before : a list) (after : a list)
+  : a Line.t list
   =
-  let a = Array.of_list before in
-  let b = Array.of_list after in
-  let n = Array.length a in
-  let m = Array.length b in
-  let max_d = n + m in
-  if max_d = 0
-  then []
-  else (
-    let offset = max_d in
-    let v = Array.make ((2 * max_d) + 1) (-1) in
-    v.(offset + 1) <- 0;
-    let traces_rev = ref [] in
-    try
-      for d = 0 to max_d do
-        for k = -d to d do
-          if (k + d) mod 2 = 0
-          then (
-            let x =
-              if k = -d || (k <> d && v.(offset + k - 1) < v.(offset + k + 1))
-              then v.(offset + k + 1)
-              else v.(offset + k - 1) + 1
-            in
-            let y = x - k in
-            let x, y =
-              let x = ref x in
-              let y = ref y in
-              while !x < n && !y < m && Equal.equal a.(!x) b.(!y) do
-                incr x;
-                incr y
-              done;
-              !x, !y
-            in
-            v.(offset + k) <- x;
-            if x >= n && y >= m
-            then (
-              traces_rev := Array.copy v :: !traces_rev;
-              raise_notrace (Found (d, List.rev !traces_rev))))
-        done;
-        traces_rev := Array.copy v :: !traces_rev
-      done;
-      []
-    with
-    | Found (d_final, traces) ->
-      let traces = Array.of_list traces in
-      let x = ref n in
-      let y = ref m in
-      let ops = ref [] in
-      for d = d_final downto 1 do
-        let k = !x - !y in
-        let prev = traces.(d - 1) in
-        let prev_k =
-          if k = -d || (k <> d && prev.(offset + k - 1) < prev.(offset + k + 1))
-          then k + 1
-          else k - 1
-        in
-        let prev_x = prev.(offset + prev_k) in
-        let prev_y = prev_x - prev_k in
-        while !x > prev_x && !y > prev_y do
-          ops := Line.Keep a.(!x - 1) :: !ops;
-          decr x;
-          decr y
-        done;
-        if prev_k = k + 1
-        then ops := Line.Insert b.(prev_y) :: !ops
-        else ops := Line.Delete a.(prev_x) :: !ops;
-        x := prev_x;
-        y := prev_y
-      done;
-      (* After backtracking, x = y (both equal the length of the initial
-         common prefix, which lies on the k=0 diagonal at d=0). *)
-      while !x > 0 do
-        ops := Line.Keep a.(!x - 1) :: !ops;
-        decr x
-      done;
-      !ops)
+  Merge3.diff ~eq:E.equal (Array.of_list before) (Array.of_list after)
+;;
+
+let lines_of_string s =
+  let parts = String.split_on_char '\n' s in
+  match List.rev parts with
+  | "" :: rev_rest -> List.rev rev_rest
+  | _ -> parts
 ;;
 
 type hunk =
@@ -128,21 +63,8 @@ type hunk =
   ; lines : string Line.t list
   }
 
-let lines_of_string s =
-  let parts = String.split_on_char '\n' s in
-  match List.rev parts with
-  | "" :: rev_rest -> List.rev rev_rest
-  | _ -> parts
-;;
-
 let hunks_of_lines ~context expected actual =
-  let module Eq = struct
-    type t = string
-
-    let equal = String.equal
-  end
-  in
-  let ops = compute (module Eq) expected actual in
+  let ops = compute (module String) expected actual in
   let pre = Queue.create () in
   let hunks_rev = ref [] in
   let in_hunk = ref false in

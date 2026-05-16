@@ -1,5 +1,5 @@
 (*_*************************************************************************)
-(*_  crs-myers - Vendoring windtrap.myers with minor changes               *)
+(*_  crs-myers - Myers diff computation and unified-diff printing          *)
 (*_  Copyright (C) 2026 Mathieu Barbin <mathieu.barbin@gmail.com>          *)
 (*_  SPDX-License-Identifier: ISC                                          *)
 (*_*************************************************************************)
