@@ -5,6 +5,7 @@
         "**/crs-config.json": "jsonc"
     },
     "cSpell.words": [
+        "Algorithmica",
         "alist",
         "autofmt",
         "Barbin",
@@ -42,6 +43,7 @@
         "Fpath",
         "fprintf",
         "Fsegment",
+        "gazagnaire",
         "getcwd",
         "gpatch",
         "groupi",
@@ -57,6 +59,7 @@
         "lsplit",
         "lstrip",
         "mapi",
+        "monopampam",
         "Mathieu",
         "mbarbin",
         "MELPA",
@@ -99,6 +102,7 @@
         "Streeters",
         "stringable",
         "stringp",
+        "tangled",
         "textf",
         "textutils",
         "Uchar",

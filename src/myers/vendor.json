@@ -1,5 +1,21 @@
 {
-    "url": "https://github.com/invariant-hq/windtrap.git",
-    "gitRev": "5a6d0e2f470047306435a7d46e443d6eadb07be2",
-    "license": "ISC"
+    "note": "This directory vendors code from two upstreams. The Myers shortest-edit-script computation is in [merge3.ml] (from gazagnaire/ocaml-merge3). The unified-diff renderer and the Equal/Line/compute API shape are in [myers.ml] (from windtrap). See the in-file Notice blocks and the root [NOTICE.md] for the list of changes.",
+    "sources": [
+        {
+            "file": "merge3.ml",
+            "description": "Myers shortest-edit-script computation",
+            "url": "https://tangled.sh/@gazagnaire.org/monopampam",
+            "gitRev": "f09e84825149d6b76365bd7af347577182fe9c79",
+            "path": "ocaml-merge3/lib/merge3.ml",
+            "license": "ISC"
+        },
+        {
+            "file": "myers.ml",
+            "description": "Unified-diff renderer and Equal/Line/compute API shape",
+            "url": "https://github.com/invariant-hq/windtrap.git",
+            "gitRev": "5a6d0e2f470047306435a7d46e443d6eadb07be2",
+            "path": "lib/myers/myers.ml",
+            "license": "ISC"
+        }
+    ]
 }

@@ -1,5 +1,5 @@
 (**************************************************************************)
-(*  crs-myers - Vendoring windtrap.myers with minor changes               *)
+(*  crs-myers - Myers diff computation and unified-diff printing          *)
 (*  Copyright (C) 2026 Mathieu Barbin <mathieu.barbin@gmail.com>          *)
 (*  SPDX-License-Identifier: ISC                                          *)
 (**************************************************************************)
@@ -11,8 +11,14 @@ let print_lines (lines : _ Myers.Line.t list) =
     | Keep s -> Printf.printf " %s\n" s)
 ;;
 
-(* Exercises the [while !x > 0] loop in backtracking — all elements in
-   [before] must be deleted, none are in [after]. *)
+(* Exercises the [n = 0 && m = 0] early-return branch in [Merge3.diff]. *)
+let%expect_test "compute - empty" =
+  Myers.compute (module String) [] [] |> print_lines;
+  [%expect {| |}];
+  ()
+;;
+
+(* Exercises the [m = 0] early-return branch (all deletions). *)
 let%expect_test "compute - all deletions" =
   Myers.compute (module String) [ "a"; "b"; "c" ] [] |> print_lines;
   [%expect
@@ -24,8 +30,7 @@ let%expect_test "compute - all deletions" =
   ()
 ;;
 
-(* Exercises the [while !y > 0] loop in backtracking — all elements in [after]
-   are insertions. *)
+(* Exercises the [n = 0] early-return branch (all insertions). *)
 let%expect_test "compute - all insertions" =
   Myers.compute (module String) [] [ "x"; "y"; "z" ] |> print_lines;
   [%expect
@@ -33,6 +38,19 @@ let%expect_test "compute - all insertions" =
     +x
     +y
     +z
+    |}];
+  ()
+;;
+
+(* Identical non-empty sequences: the forward pass terminates at d = 0 and
+   backtracking emits only the trailing [while !x > 0] Keep loop. *)
+let%expect_test "compute - identical" =
+  Myers.compute (module String) [ "a"; "b"; "c" ] [ "a"; "b"; "c" ] |> print_lines;
+  [%expect
+    {|
+     a
+     b
+     c
     |}];
   ()
 ;;
@@ -54,8 +72,8 @@ let%expect_test "compute - completely different same length" =
   ()
 ;;
 
-(* Exercises the [while !x > 0 && !y > 0] loop that emits Keep operations for
-   leading common elements after backtracking. *)
+(* Exercises the trailing [while !x > 0] Keep loop after backtracking for a
+   leading common prefix, plus an interior [Delete]/[Insert] choice. *)
 let%expect_test "compute - common prefix then changes" =
   Myers.compute (module String) [ "a"; "b"; "c"; "d" ] [ "a"; "b"; "x"; "y" ]
   |> print_lines;
@@ -78,6 +96,20 @@ let%expect_test "compute - single replace" =
     {|
     -a
     +b
+    |}];
+  ()
+;;
+
+(* Mixed insert and delete around kept elements — exercises both the [Insert]
+   and [Delete] backtracking branches with interior snakes. *)
+let%expect_test "compute - mixed insert and delete" =
+  Myers.compute (module String) [ "1"; "2"; "3" ] [ "1"; "3"; "4" ] |> print_lines;
+  [%expect
+    {|
+     1
+    -2
+     3
+    +4
     |}];
   ()
 ;;
