@@ -1,4 +1,4 @@
-In this test we execise the config parsing and error handling.
+In this test we exercise the config parsing and error handling.
 
   $ volgo-vcs init -q .
   $ volgo-vcs set-user-config --user.name "Test User" --user.email "test@example.com"
