@@ -39,7 +39,7 @@ jobs:
         exclude:
           # Exclude the combination already tested in the main ci workflow.
           - os: ubuntu-latest
-            ocaml-version: "5.4"
+            ocaml-version: "5.5"
 
     runs-on: ${{ matrix.os }}
 
