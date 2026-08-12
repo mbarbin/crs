@@ -30,6 +30,8 @@ jobs:
 
       - name: Setup Dune
         uses: mbarbin/setup-dune@03ede0220d3fe665f250727d8e21b7c0f9517f3b # v2.0.0+patch-7
+        env:
+          GH_TOKEN: ${{ github.token }}
         with:
           version: "3.24.2"
           dune-digest: "sha256:3a9cac891f0b6086bfbf58d16c6c17ddfd1d493e031b6b43901f585a7f6899c7"
