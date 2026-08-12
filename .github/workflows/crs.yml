@@ -29,9 +29,10 @@ jobs:
           echo "PACKAGES=crs" >> "$GITHUB_ENV"
 
       - name: Setup Dune
-        uses: mbarbin/setup-dune@d38f7c80df59974cbe417c7f2a849219d54b4fdf # v2.0.0+patch-3
+        uses: mbarbin/setup-dune@03ede0220d3fe665f250727d8e21b7c0f9517f3b # v2.0.0+patch-7
         with:
-          version: "3.21.0"
+          version: "3.24.2"
+          dune-digest: "sha256:3a9cac891f0b6086bfbf58d16c6c17ddfd1d493e031b6b43901f585a7f6899c7"
           workspace: ${{ env.DUNE_WORKSPACE }}
           cache-prefix: "crs-bin"
           only-packages: ${{ env.PACKAGES }}
