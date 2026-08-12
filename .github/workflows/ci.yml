@@ -17,8 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       OCAML_VERSION: "5.5"
-      DUNE_VERSION: "3.23.1"
-      DUNE_DIGEST: "sha256:9cbcc7fe3b7df76f862c9ab73c241a6106b799765bdd85c75d2e31dc5f410d07"
+      DUNE_VERSION: "3.24.2"
+      DUNE_DIGEST: "sha256:3a9cac891f0b6086bfbf58d16c6c17ddfd1d493e031b6b43901f585a7f6899c7"
     defaults:
       run:
         shell: bash
