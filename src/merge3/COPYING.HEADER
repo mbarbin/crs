@@ -1,3 +1,3 @@
-crs-myers - Myers diff computation and unified-diff printing
+crs-merge3 - Myers shortest-edit-script computation
 SPDX-FileCopyrightText: 2026 Mathieu Barbin <mathieu.barbin@gmail.com>
 SPDX-License-Identifier: ISC

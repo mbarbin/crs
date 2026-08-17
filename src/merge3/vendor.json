@@ -1,0 +1,13 @@
+{
+    "note": "This directory vendors the Myers shortest-edit-script computation from gazagnaire/ocaml-merge3. See the in-file Notice block for the list of changes.",
+    "sources": [
+        {
+            "file": "merge3.ml",
+            "description": "Myers shortest-edit-script computation",
+            "url": "https://tangled.sh/@gazagnaire.org/monopampam",
+            "gitRev": "f09e84825149d6b76365bd7af347577182fe9c79",
+            "path": "ocaml-merge3/lib/merge3.ml",
+            "license": "ISC"
+        }
+    ]
+}
