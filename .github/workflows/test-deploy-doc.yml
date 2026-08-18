@@ -4,8 +4,6 @@ on:
   pull_request:
     branches:
       - main
-    # Review gh actions docs if you want to further define triggers, paths, etc
-    # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#on
 
 permissions:
   contents: read
@@ -14,29 +12,21 @@ jobs:
   test-deploy:
     name: Test deployment
     runs-on: ubuntu-latest
+
     env:
       OCAML_VERSION: "5.5"
       DUNE_VERSION: "3.24.2"
       DUNE_DIGEST: "sha256:3a9cac891f0b6086bfbf58d16c6c17ddfd1d493e031b6b43901f585a7f6899c7"
+      ZOLA_VERSION: "0.22.1"
+      ZOLA_DIGEST: "sha256:45de6b2559aba4df42199dc6b0161acb914d37be4ccaa03297cd4a26c8e14042"
+
     defaults:
       run:
         shell: bash
+
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          fetch-depth: 0
-
-      - name: Setup Node
-        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
-        with:
-          node-version: 24
-          cache: npm
-          cache-dependency-path: doc/package-lock.json
-
-      - name: Install Docusaurus Dependencies
-        working-directory: ./doc
-        run: npm ci --ignore-scripts
 
       - name: Environment setup
         run: |
@@ -57,11 +47,23 @@ jobs:
       - name: Build Odoc Pages
         run: dune build @doc
 
-      - name: Copy Odoc Pages to Docusaurus Static Directory
+      - name: Copy Odoc Pages to Zola Static Directory
         run: |
           rm -rf doc/static/odoc
           cp -R _build/default/_doc/_html doc/static/odoc
 
-      - name: Build Website
-        working-directory: ./doc
-        run: npm run build
+      - name: Cache zola binary
+        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
+        id: zola-cache
+        with:
+          path: ~/.local/bin/zola
+          key: "zola-${{ env.ZOLA_VERSION }}-${{ runner.os }}-${{ runner.arch }}-${{ env.ZOLA_DIGEST }}"
+
+      - name: Install zola
+        env:
+          BINARY_CACHE_HIT: ${{ steps.zola-cache.outputs.cache-hit }}
+        run: |
+          bash actions/install-zola.sh
+
+      - name: Build documentation
+        run: make -C doc build

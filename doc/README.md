@@ -1,9 +1,15 @@
 # Building these docs
 
-npm is needed to build the crs docs, which are built on [docusaurus](https://docusaurus.io/). To install the necessary prerequisites and launch a local development server, do:
+[Zola](https://www.getzola.org/) is needed to build the crs docs. To install it and launch a local development server, do:
 
 ```shell
 # in the doc folder
-$ npm install
-$ npm run start
+$ zola serve
+```
+
+To produce a static build (output written to `public/`):
+
+```shell
+# in the doc folder
+$ make build
 ```

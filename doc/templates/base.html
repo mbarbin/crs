@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{{ config.title }}{% endblock title %}</title>
+    {% if page %}
+    {% if page.description %}
+    <meta name="description" content="{{ page.description }}">
+    {% endif %}
+    {% elif section %}
+    {% if section.description %}
+    <meta name="description" content="{{ section.description }}">
+    {% endif %}
+    {% endif %}
+    {% if page %}<link rel="canonical" href="{{ page.permalink }}" />
+    {% elif section %}<link rel="canonical" href="{{ section.permalink }}" />
+    {% else %}<link rel="canonical" href="{{ config.base_url }}" />
+    {% endif %}
+    <link rel="stylesheet" href="{{ get_url(path="style.css") }}">
+  </head>
+  <body class="theme-{{ config.extra.zolanight.theme | default(value="tokyonight") }}">
+    <header>
+      <nav class="top-nav">
+        <a href="{{ config.base_url }}" class="site-title">CRs</a>
+        <div class="nav-links-left">
+          <a href="{{ get_url(path="@/tutorials/_index.md") }}">Tutorials</a>
+          <a href="{{ get_url(path="@/guides/_index.md") }}">Guides</a>
+          <a href="{{ get_url(path="@/reference/_index.md") }}">Reference</a>
+          <a href="{{ get_url(path="@/explanation/_index.md") }}">Explanation</a>
+        </div>
+        <div class="nav-links-right">
+          <a href="{{ get_url(path="@/blog/_index.md") }}">Blog</a>
+          <a href="{{ config.extra.github_url }}">GitHub</a>
+        </div>
+        <a class="nav-search" href="{{ get_url(path="@/search/_index.md") }}" aria-label="Search the docs">
+          <svg class="nav-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <span>Search</span>
+          <kbd class="nav-search-kbd">Ctrl K</kbd>
+        </a>
+      </nav>
+      <hr>
+    </header>
+    <div class="page-wrapper{% block wrapper_class %}{% endblock wrapper_class %}">
+      {% block sidebar %}{% endblock sidebar %}
+      <main>
+        {% block content %}{% endblock content %}
+      </main>
+    </div>
+    <hr>
+    <footer class="site-footer">
+      <p>&copy; {{ now() | date(format="%Y") }} Mathieu Barbin. Powered by <a href="https://www.getzola.org/">Zola</a> and <a href="https://github.com/mxaddict/zolanight">ZolaNight</a>. Docs organized following <a href="https://diataxis.fr/">Diátaxis</a>.</p>
+    </footer>
+    <script>
+      (function() {
+        // Ctrl+K / Cmd+K: jump to search. If we're already on the search
+        // page, focus its input instead of reloading it.
+        document.addEventListener('keydown', function(e) {
+          if (e.key !== 'k' && e.key !== 'K') return;
+          if (!e.ctrlKey && !e.metaKey) return;
+          e.preventDefault();
+          var pageInput = document.getElementById('search-input');
+          if (pageInput) {
+            pageInput.focus();
+          } else {
+            window.location.href = '{{ get_url(path="@/search/_index.md") }}';
+          }
+        });
+
+        // Header: hide on scroll down, show on scroll up
+        var header = document.querySelector('header');
+        var lastY = window.scrollY;
+        window.addEventListener('scroll', function() {
+          var y = window.scrollY;
+          if (y > lastY && y > 50) {
+            header.classList.add('header-hidden');
+          } else {
+            header.classList.remove('header-hidden');
+          }
+          lastY = y;
+        });
+
+        // Scroll spy: highlight active section in sidebar
+        var sidebarLinks = Array.from(document.querySelectorAll('.sidebar a'));
+        var headings = [];
+        sidebarLinks.forEach(function(link) {
+          var href = link.getAttribute('href');
+          var hashIdx = href.indexOf('#');
+          if (hashIdx === -1) return;
+          var id = decodeURIComponent(href.slice(hashIdx + 1));
+          var el = document.getElementById(id);
+          if (el) headings.push({ el: el, link: link });
+        });
+
+        if (headings.length > 0) {
+          function updateActive() {
+            var current = null;
+            // Scale the threshold: near the top of the page use 100px,
+            // near the bottom use up to the full viewport height so
+            // every heading becomes reachable.
+            var scrollable = document.body.scrollHeight - window.innerHeight;
+            var progress = scrollable > 0 ? window.scrollY / scrollable : 0;
+            var threshold = 100 + progress * (window.innerHeight - 100);
+            for (var i = 0; i < headings.length; i++) {
+              if (headings[i].el.getBoundingClientRect().top <= threshold) {
+                current = headings[i];
+              }
+            }
+            sidebarLinks.forEach(function(link) { link.classList.remove('active'); });
+            if (current) current.link.classList.add('active');
+          }
+
+          window.addEventListener('scroll', updateActive, { passive: true });
+          updateActive();
+        }
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,11 @@
+[mbarbin]
+name = "Mathieu Barbin"
+title = "Author & Maintainer of crs"
+url = "https://github.com/mbarbin"
+github = "mbarbin"
+
+[claude]
+name = "Claude"
+title = "AI Assistant"
+url = "https://claude.ai"
+github = "claude"

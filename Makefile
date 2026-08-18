@@ -30,5 +30,9 @@ doc:
 clean:
 	opam exec -- dune clean
 
+.PHONY: shellcheck
+shellcheck:
+	shellcheck actions/*.sh
+
 .PHONY: check-all
-check-all: deps all test doc clean lint fmt
+check-all: deps all test doc clean lint fmt shellcheck
