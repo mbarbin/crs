@@ -15,7 +15,7 @@ weight = 2
 ;;
 
 let print_json_file path =
-  Printf.printf "```json title=\"%s\"\n" path;
+  Printf.printf "```json,title=%s\n" path;
   let ic = open_in path in
   let content = In_channel.input_all ic in
   close_in ic;
@@ -68,7 +68,7 @@ let%expect_test "quick start" =
   (* @mdexp.snapshot *)
   [%expect
     {|
-    ```json title="complete-example.json"
+    ```json,title=complete-example.json
     {
       // Enable editor validation and auto-completion (replace with your crs version).
       "$schema": "https://github.com/mbarbin/crs/releases/download/0.0.20251014/crs-config.schema.json",
@@ -237,7 +237,7 @@ let%expect_test "valid-minimal" =
   (* @mdexp.snapshot *)
   [%expect
     {|
-    ```json title="valid-minimal.json"
+    ```json,title=valid-minimal.json
     {}
     ```
     |}];
@@ -256,7 +256,7 @@ let%expect_test "valid-full" =
   (* @mdexp.snapshot *)
   [%expect
     {|
-    ```json title="valid-full.json"
+    ```json,title=valid-full.json
     {
       "$schema": "https://github.com/mbarbin/crs/releases/download/0.0.20251014/crs-config.schema.json",
       "default_repo_owner": "alice",
@@ -285,7 +285,7 @@ let%expect_test "minimal-with-allowlist" =
   (* @mdexp.snapshot *)
   [%expect
     {|
-    ```json title="minimal-with-allowlist.json"
+    ```json,title=minimal-with-allowlist.json
     {
       "user_mentions_allowlist": ["alice", "bob"]
     }
@@ -307,7 +307,7 @@ let%expect_test "wrapped-enum" =
   (* @mdexp.snapshot *)
   [%expect
     {|
-    ```json title="wrapped-enum.json"
+    ```json,title=wrapped-enum.json
     {
       "invalid_crs_annotation_severity": [ "Warning" ]
     }
@@ -335,7 +335,7 @@ let%expect_test "invalid-wrong-type" =
   (* @mdexp.snapshot *)
   [%expect
     {|
-    ```json title="invalid-wrong-type.json"
+    ```json,title=invalid-wrong-type.json
     {
       "default_repo_owner": "alice",
       "user_mentions_allowlist": "bob"
@@ -365,7 +365,7 @@ let%expect_test "invalid-severity" =
   (* @mdexp.snapshot *)
   [%expect
     {|
-    ```json title="invalid-severity.json"
+    ```json,title=invalid-severity.json
     {
       "default_repo_owner": "alice",
       "invalid_crs_annotation_severity": "Notice"

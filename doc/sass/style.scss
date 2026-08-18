@@ -83,6 +83,17 @@ pre > code {
   }
 }
 
+// Filename/title label on code blocks, e.g. ```json,title=example.json
+pre > code[data-title]::before {
+  content: attr(data-title);
+  display: block;
+  margin: -0.5em -0.75em 0.5em;
+  padding: 0.35em 0.75em;
+  font-size: 0.85em;
+  color: var(--comment-color);
+  border-bottom: 1px solid var(--cyan-color);
+}
+
 hr {
   border: 0;
   height: 1px;

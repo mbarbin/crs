@@ -16,7 +16,7 @@ trailing commas.
 
 Here's a complete working example showing all available configuration options:
 
-```json title="complete-example.json"
+```json,title=complete-example.json
 {
   // Enable editor validation and auto-completion (replace with your crs version).
   "$schema": "https://github.com/mbarbin/crs/releases/download/0.0.20251014/crs-config.schema.json",
@@ -176,7 +176,7 @@ crs tools config validate .github/crs-config.json
 **Valid Minimal Configuration** - At the moment all fields in the config are
 optional, so an empty json object is a minimal valid configuration:
 
-```json title="valid-minimal.json"
+```json,title=valid-minimal.json
 {}
 ```
 
@@ -187,7 +187,7 @@ $ crs tools config validate valid-minimal.json
 **Valid Full Configuration** - A complete configuration with all optional
 fields, in regular json:
 
-```json title="valid-full.json"
+```json,title=valid-full.json
 {
   "$schema": "https://github.com/mbarbin/crs/releases/download/0.0.20251014/crs-config.schema.json",
   "default_repo_owner": "alice",
@@ -208,7 +208,7 @@ $ crs tools config validate valid-full.json
 **Configuration with Selected Fields Only** - Since all fields are optional,
 you can have a configuration with just specific fields:
 
-```json title="minimal-with-allowlist.json"
+```json,title=minimal-with-allowlist.json
 {
   "user_mentions_allowlist": ["alice", "bob"]
 }
@@ -222,7 +222,7 @@ $ crs tools config validate minimal-with-allowlist.json
 config format. This is still supported for compatibility but now this creates
 a warning:
 
-```json title="wrapped-enum.json"
+```json,title=wrapped-enum.json
 {
   "invalid_crs_annotation_severity": [ "Warning" ]
 }
@@ -239,7 +239,7 @@ Hint: Change it to simply: "Warning"
 **Invalid: Wrong Type for Field** - Configuration with incorrect type
 for `user_mentions_allowlist`:
 
-```json title="invalid-wrong-type.json"
+```json,title=invalid-wrong-type.json
 {
   "default_repo_owner": "alice",
   "user_mentions_allowlist": "bob"
@@ -258,7 +258,7 @@ User handle list expected to be a list of json strings.
 **Invalid: Bad Severity Value** - Configuration with invalid annotation
 severity:
 
-```json title="invalid-severity.json"
+```json,title=invalid-severity.json
 {
   "default_repo_owner": "alice",
   "invalid_crs_annotation_severity": "Notice"
