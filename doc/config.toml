@@ -23,6 +23,9 @@ name = "tags"
 [markdown]
 # Whether to do syntax highlighting
 highlighting = { theme = "one-dark-pro" }
+# Insert a link after each heading so sections can be shared/bookmarked
+# directly; rendered via templates/anchor-link.html.
+insert_anchor_links = "right"
 
 [extra]
 # Put all your custom variables here

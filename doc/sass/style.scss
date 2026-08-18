@@ -58,6 +58,35 @@ h2 { font-size: 1.5rem; }
 h3 { font-size: 1.25rem; }
 h4 { font-size: 1rem; }
 
+// Per-heading permalink, hidden until the heading is hovered — lets readers
+// grab a direct link to a section (see templates/anchor-link.html).
+.heading-anchor {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.5em;
+  color: var(--comment-color);
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+
+  svg {
+    display: block;
+  }
+}
+
+h1:hover .heading-anchor,
+h2:hover .heading-anchor,
+h3:hover .heading-anchor,
+h4:hover .heading-anchor,
+h5:hover .heading-anchor,
+h6:hover .heading-anchor {
+  opacity: 1;
+}
+
+.heading-anchor:hover {
+  color: var(--orange-color);
+}
+
 code {
   padding: 0.1em 0.4em;
   border-radius: 3px;
