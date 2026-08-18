@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}{{ section.title }} - {{ config.title }}{% endblock title %}
+
+{% block wrapper_class %} no-sidebar{% endblock wrapper_class %}
+
+{% block content %}
+<article>
+  <h1>{{ section.title }}</h1>
+
+  <p class="search-box">
+    <input type="search" id="search-input" placeholder="Search the docs…" autofocus>
+  </p>
+
+  <div id="search-results"></div>
+</article>
+
+<script src="{{ config.base_url }}elasticlunr.min.js"></script>
+<script src="{{ config.base_url }}search_index.en.js"></script>
+<script>
+  (function () {
+    var input = document.getElementById('search-input');
+    var results = document.getElementById('search-results');
+    var index = elasticlunr.Index.load(window.searchIndex);
+
+    function excerpt(body, query) {
+      var words = query.trim().split(/\s+/).filter(Boolean);
+      var lower = body.toLowerCase();
+      var pos = -1;
+      for (var i = 0; i < words.length; i++) {
+        pos = lower.indexOf(words[i].toLowerCase());
+        if (pos !== -1) break;
+      }
+      if (pos === -1) pos = 0;
+      var start = Math.max(0, pos - 60);
+      var snippet = body.slice(start, start + 160).trim();
+      return (start > 0 ? '… ' : '') + snippet + '…';
+    }
+
+    function render(query, hits) {
+      results.innerHTML = '';
+      if (!query) return;
+      if (hits.length === 0) {
+        var empty = document.createElement('p');
+        empty.className = 'meta';
+        empty.textContent = 'No results for "' + query + '".';
+        results.appendChild(empty);
+        return;
+      }
+      var list = document.createElement('ul');
+      list.className = 'search-results';
+      hits.forEach(function (hit) {
+        var li = document.createElement('li');
+        var a = document.createElement('a');
+        a.href = hit.ref;
+        a.textContent = hit.doc.title || hit.ref;
+        var p = document.createElement('p');
+        p.className = 'meta';
+        p.textContent = excerpt(hit.doc.body || '', query);
+        li.appendChild(a);
+        li.appendChild(p);
+        list.appendChild(li);
+      });
+      results.appendChild(list);
+    }
+
+    function search() {
+      var query = input.value.trim();
+      if (!query) {
+        render('', []);
+        return;
+      }
+      var hits = index.search(query, { expand: true });
+      render(query, hits);
+    }
+
+    input.addEventListener('input', search);
+
+    // Support linking directly to a query, e.g. /search/?q=binary
+    var params = new URLSearchParams(window.location.search);
+    var q = params.get('q');
+    if (q) {
+      input.value = q;
+      search();
+    }
+  })();
+</script>
+{% endblock content %}

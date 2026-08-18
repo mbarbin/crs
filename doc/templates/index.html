@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}{{ config.title }}{% endblock title %}
+
+{% block wrapper_class %} no-sidebar{% endblock wrapper_class %}
+
+{% block content %}
+<section class="hero">
+  <h1>{{ section.title }}</h1>
+
+  <p class="badges">
+    <a href="https://github.com/mbarbin/crs/actions/workflows/ci.yml"><img src="https://github.com/mbarbin/crs/workflows/ci/badge.svg" alt="CI Status"></a>
+    <a href="https://coveralls.io/github/mbarbin/crs?branch=main"><img src="https://coveralls.io/repos/github/mbarbin/crs/badge.svg?branch=main" alt="Coverage Status"></a>
+    <a href="https://github.com/mbarbin/crs/actions/workflows/deploy-doc.yml"><img src="https://github.com/mbarbin/crs/workflows/deploy-doc/badge.svg" alt="Deploy Doc Status"></a>
+  </p>
+
+  <div class="intro">
+    {{ section.content | safe }}
+  </div>
+</section>
+
+{% if config.extra.zolanight.home_list_latest_blog_posts %}
+{% set blog = get_section(path="blog/_index.md") %}
+<section>
+  <h2>Latest Additions</h2>
+  <ul>
+    {% for p in blog.pages | slice(end=5) %}
+    <li>
+      <time datetime="{{ p.date | date(format="%Y-%m-%d") }}">{{ p.date | date(format="%Y-%m-%d") }}</time> —
+      <a href="{{ p.permalink }}">{{ p.title }}</a>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+{% endblock content %}

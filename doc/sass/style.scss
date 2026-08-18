@@ -1,0 +1,564 @@
+// Import zolanight base styles
+@import 'reset';
+@import 'colors';
+
+// Generate CSS variables from zolanight palettes
+@mixin theme-vars($palette) {
+  --bg-color: #{map-get($palette, bg)};
+  --fg-color: #{map-get($palette, fg)};
+  --comment-color: #{map-get($palette, comment)};
+  --blue-color: #{map-get($palette, blue)};
+  --cyan-color: #{map-get($palette, cyan)};
+  --green-color: #{map-get($palette, green)};
+  --orange-color: #{map-get($palette, orange)};
+  --red-color: #{map-get($palette, red)};
+  --yellow-color: #{map-get($palette, yellow)};
+  --magenta-color: #{map-get($palette, magenta)};
+}
+
+@each $name, $palette in $palettes {
+  .theme-#{$name} {
+    @include theme-vars($palette);
+  }
+}
+
+// Base styles (from zolanight, adapted for docs layout)
+body {
+  font-family:
+    'Hack', 'Source Code Pro', Menlo, Monaco, Consolas, 'Courier New', monospace;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-color);
+  color: var(--fg-color);
+}
+
+a {
+  color: var(--orange-color);
+  text-decoration: underline;
+}
+
+p {
+  margin-bottom: 1em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--blue-color);
+  line-height: 1.25;
+  margin-bottom: 1rem;
+}
+
+h1:before { content: '# '; color: var(--cyan-color); }
+h2:before { content: '## '; color: var(--cyan-color); }
+h3:before { content: '### '; color: var(--cyan-color); }
+
+h1 { font-size: 2rem; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.25rem; }
+h4 { font-size: 1rem; }
+
+code {
+  padding: 0.1em 0.4em;
+  border-radius: 3px;
+  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--cyan-color);
+}
+
+pre {
+  padding: 0.5em 0.75em;
+  border-radius: 5px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--cyan-color);
+  overflow: auto;
+}
+
+pre > code {
+  background-color: transparent;
+  color: var(--fg-color);
+  padding: 0;
+
+  span {
+    background-color: transparent !important;
+  }
+}
+
+hr {
+  border: 0;
+  height: 1px;
+  background: var(--cyan-color);
+  margin: 0.25em 0;
+}
+
+blockquote {
+  border-left: 4px solid var(--blue-color);
+  padding: 1em;
+  margin: 1em 0;
+  background-color: rgba(255, 255, 255, 0.05);
+
+  > *:last-child {
+    margin-bottom: 0;
+  }
+}
+
+img {
+  border: 1px solid var(--magenta-color);
+  border-radius: 5px;
+  max-width: 100%;
+  height: auto;
+}
+
+table {
+  margin: 1em auto;
+  border-collapse: collapse;
+  width: auto;
+
+  thead {
+    background-color: rgba(255, 255, 255, 0.1);
+
+    th {
+      padding: 0.4em 1.25em;
+      font-weight: 700;
+      border-bottom: 2px solid var(--cyan-color);
+    }
+  }
+
+  td {
+    padding: 0.4em 1.25em;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  tbody tr:nth-child(2n) {
+    background-color: rgba(255, 255, 255, 0.04);
+  }
+}
+
+details {
+  margin-bottom: 1em;
+}
+
+// Header: hide on scroll down, show on scroll up
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: var(--bg-color);
+  transition: transform 0.3s ease;
+
+  &.header-hidden {
+    transform: translateY(-100%);
+  }
+}
+
+// Top navigation
+.top-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.5rem;
+
+  .site-title {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: var(--blue-color);
+  }
+
+  .nav-links-left, .nav-links-right {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.9rem;
+
+    a {
+      color: var(--orange-color);
+    }
+  }
+
+  .nav-links-left {
+    margin-right: auto;
+    margin-left: 2rem;
+  }
+
+  // A button, not a real input: it just links to the /search page (Ctrl+K
+  // does the same, and focuses the page's own search box once there).
+  .nav-search {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-left: 1.5rem;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.85rem;
+    color: var(--comment-color);
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--comment-color);
+    border-radius: 999px;
+    text-decoration: none;
+
+    &:hover {
+      color: var(--orange-color);
+      border-color: var(--orange-color);
+    }
+
+    &-icon {
+      flex-shrink: 0;
+    }
+
+    span {
+      flex: 1;
+    }
+
+    &-kbd {
+      flex-shrink: 0;
+      padding: 0.05rem 0.35rem;
+      font-size: 0.7rem;
+      font-family: inherit;
+      color: var(--comment-color);
+      border: 1px solid var(--comment-color);
+      border-radius: 3px;
+    }
+  }
+}
+
+// Two-column page wrapper: sidebar + content
+.page-wrapper {
+  margin: 0 auto;
+  padding: 1rem 1.5rem 1rem calc(220px + 3.5rem);
+
+  main {
+    max-width: 960px;
+    padding: 0 1.5rem;
+  }
+
+  &.no-sidebar {
+    padding: 1rem 1.5rem;
+
+    main {
+      margin: 0 auto;
+    }
+  }
+}
+
+// Left sidebar
+.sidebar {
+  width: 220px;
+  font-size: 0.85rem;
+  position: fixed;
+  left: 1.5rem;
+  top: 4.5rem;
+  max-height: calc(100vh - 4.5rem);
+  overflow-y: auto;
+
+  .sidebar-section {
+    margin-bottom: 1.2rem;
+
+    h4 {
+      margin: 0 0 0.3rem 0;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--comment-color);
+
+      a {
+        color: var(--comment-color);
+        text-decoration: none;
+
+        &:hover {
+          color: var(--blue-color);
+        }
+      }
+    }
+
+    // No # prefix on sidebar headings
+    h4:before { content: none; }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        padding: 0.15rem 0;
+
+        a {
+          display: block;
+          padding: 0.15rem 0.5rem;
+          border-radius: 3px;
+          color: var(--fg-color);
+          text-decoration: none;
+
+          &:hover {
+            color: var(--orange-color);
+            background-color: rgba(255, 255, 255, 0.05);
+          }
+
+          &.active {
+            color: var(--orange-color);
+            font-weight: bold;
+          }
+        }
+      }
+
+      ul {
+        padding-left: 0.75rem;
+      }
+    }
+  }
+}
+
+
+// Landing page
+.hero {
+  text-align: center;
+  padding: 2rem 0;
+
+  // The "# " markdown-style prefix reads fine on left-aligned article
+  // headings, but centering it along with the title text throws the
+  // title itself off-center. Drop it for the masthead only.
+  h1:before {
+    content: none;
+  }
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 1rem 0 3rem;
+
+  img {
+    vertical-align: middle;
+  }
+}
+
+.intro {
+  text-align: left;
+}
+
+// Article content
+article {
+  h1:first-child {
+    margin-top: 0;
+  }
+
+  ul {
+    padding-left: 1.5rem;
+  }
+}
+
+.meta {
+  font-size: 0.9rem;
+  color: var(--comment-color);
+}
+
+// Author byline (blog post and blog list): a plain circular photo beside a
+// bold name and a muted title underneath, sized close to the ~3.6rem photo
+// used by the original Docusaurus blog theme.
+.post-author {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0.75rem 0 1rem;
+
+  .avatar-photo {
+    display: block;
+    width: 3.6rem;
+    height: 3.6rem;
+    border-radius: 50%;
+    border: none;
+  }
+
+  &-intro {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--fg-color);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--orange-color);
+    }
+  }
+
+  &-title {
+    margin-top: 0.25rem;
+    font-size: 0.8rem;
+    color: var(--comment-color);
+  }
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+
+  a {
+    padding: 0.15rem 0.6rem;
+    border: 1px solid var(--green-color);
+    border-radius: 999px;
+    color: var(--green-color);
+    font-size: 0.85rem;
+    text-decoration: none;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+  }
+}
+
+ul.blog {
+  list-style: none;
+  padding-left: 0;
+
+  li {
+    padding-bottom: 2rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--cyan-color);
+
+    &:last-child {
+      padding-bottom: 0;
+      margin-bottom: 0;
+      border-bottom: none;
+    }
+  }
+
+  h2 {
+    margin-bottom: 0.5rem;
+
+    // Swap the usual "## " markdown-style prefix for a plain bullet, so
+    // each post reads as an item in a list rather than a page heading.
+    // Colored to match the title link right after it, not the generic
+    // heading prefix color.
+    &:before {
+      content: '• ';
+      color: var(--orange-color);
+    }
+  }
+
+  .excerpt {
+    margin: 1rem 0;
+
+    p:last-child {
+      margin-bottom: 0;
+    }
+
+    // A post's excerpt can start with its first in-content heading (e.g.
+    // "## Introduction"). Demote it to plain text so it doesn't duplicate
+    // the list item's own <h2> title right above it.
+    h1, h2, h3, h4 {
+      font-size: 1rem;
+      color: var(--fg-color);
+      margin-bottom: 0.5rem;
+
+      &:before {
+        content: none;
+      }
+    }
+  }
+
+  footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1rem;
+
+    .tags {
+      margin-top: 0;
+    }
+  }
+
+  .read-more {
+    white-space: nowrap;
+    font-size: 0.9rem;
+  }
+}
+
+// Search page
+.search-box {
+  margin: 1.5rem 0;
+
+  input {
+    width: 100%;
+    max-width: 480px;
+    padding: 0.5rem 0.75rem;
+    font: inherit;
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--fg-color);
+    border: 1px solid var(--cyan-color);
+    border-radius: 5px;
+
+    &:focus {
+      outline: none;
+      border-color: var(--orange-color);
+    }
+  }
+}
+
+.search-results {
+  list-style: none;
+  padding-left: 0;
+
+  li {
+    margin-bottom: 1.5rem;
+  }
+
+  a {
+    font-weight: bold;
+  }
+
+  .meta {
+    margin-top: 0.2rem;
+  }
+}
+
+.site-footer {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  font-size: 0.85rem;
+  color: var(--comment-color);
+
+  a {
+    color: var(--orange-color);
+  }
+}
+
+// Responsive
+@media (max-width: 1200px) {
+  body {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .page-wrapper {
+    padding-left: 1.5rem;
+  }
+
+  .sidebar {
+    width: 100%;
+    position: static;
+    left: auto;
+    max-height: none;
+  }
+
+  .top-nav {
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .nav-links-left, .nav-links-right {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .nav-links-left {
+      margin-right: 0;
+      margin-left: 0;
+    }
+  }
+
+}

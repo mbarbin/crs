@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} - {{ config.title }}{% endblock title %}
+
+{% block sidebar %}
+{% if page.toc | length > 0 %}
+<aside class="sidebar">
+  <div class="sidebar-section">
+    <h4>On this page</h4>
+    <ul>
+      {% for h in page.toc %}
+      <li><a href="{{ h.permalink }}">{{ h.title }}</a>
+        {% if h.children | length > 0 %}
+        <ul>
+          {% for child in h.children %}
+          <li><a href="{{ child.permalink }}">{{ child.title }}</a>
+            {% if child.children | length > 0 %}
+            <ul>
+              {% for grandchild in child.children %}
+              <li><a href="{{ grandchild.permalink }}">{{ grandchild.title }}</a></li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</aside>
+{% endif %}
+{% endblock sidebar %}
+
+{% block content %}
+<article>
+  <h1>{{ page.title }}</h1>
+  {% if page.date %}
+  <p class="meta">
+    <time datetime="{{ page.date | date(format="%Y-%m-%d") }}">{{ page.date | date(format="%B %d, %Y") }}</time>
+  </p>
+  {% set authors = load_data(path="data/authors.toml") %}
+  {% set author = authors[page.extra.author] %}
+  {% if author %}
+  <div class="post-author">
+    <a href="{{ author.url }}" class="avatar-photo-link">
+      <img src="https://github.com/{{ author.github }}.png" alt="{{ author.name }}" class="avatar-photo">
+    </a>
+    <div class="post-author-intro">
+      <a href="{{ author.url }}" class="post-author-name">{{ author.name }}</a>
+      {% if author.title %}<small class="post-author-title">{{ author.title }}</small>{% endif %}
+    </div>
+  </div>
+  {% endif %}
+  {% endif %}
+  {{ page.content | safe }}
+  {% if page.taxonomies.tags %}
+  <p class="tags">
+    {% for tag in page.taxonomies.tags %}
+    <a href="{{ get_taxonomy_url(kind="tags", name=tag) }}">#{{ tag }}</a>
+    {% endfor %}
+  </p>
+  {% endif %}
+</article>
+{% endblock content %}

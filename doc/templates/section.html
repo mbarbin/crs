@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}{{ section.title }} - {{ config.title }}{% endblock title %}
+
+{% block sidebar %}
+{% if section.toc | length > 0 %}
+<aside class="sidebar">
+  <div class="sidebar-section">
+    <h4>On this page</h4>
+    <ul>
+      {% for h in section.toc %}
+      <li><a href="{{ h.permalink }}">{{ h.title }}</a>
+        {% if h.children | length > 0 %}
+        <ul>
+          {% for child in h.children %}
+          <li><a href="{{ child.permalink }}">{{ child.title }}</a></li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</aside>
+{% endif %}
+{% endblock sidebar %}
+
+{% block content %}
+<article>
+  <h1>{{ section.title }}</h1>
+  {{ section.content | safe }}
+
+  {% if paginator %}
+  {# Paginated section (blog) #}
+  <ul class="blog">
+    {% for pg in paginator.pages %}
+    <li>
+      <h2><a href="{{ pg.permalink }}">{{ pg.title }}</a></h2>
+      {% if pg.date %}
+      <p class="meta">
+        <time datetime="{{ pg.date | date(format="%Y-%m-%d") }}">{{ pg.date | date(format="%Y-%m-%d") }}</time>
+        {% if pg.reading_time %} · {{ pg.reading_time }} min read{% endif %}
+      </p>
+      {% endif %}
+      {% set authors = load_data(path="data/authors.toml") %}
+      {% set author = authors[pg.extra.author] %}
+      {% if author %}
+      <div class="post-author">
+        <a href="{{ author.url }}" class="avatar-photo-link">
+          <img src="https://github.com/{{ author.github }}.png" alt="{{ author.name }}" class="avatar-photo">
+        </a>
+        <div class="post-author-intro">
+          <a href="{{ author.url }}" class="post-author-name">{{ author.name }}</a>
+          {% if author.title %}<small class="post-author-title">{{ author.title }}</small>{% endif %}
+        </div>
+      </div>
+      {% endif %}
+      {% if pg.summary %}
+      <div class="excerpt">{{ pg.summary | safe }}</div>
+      {% endif %}
+      <footer>
+        {% if pg.taxonomies.tags %}
+        <p class="tags">
+          {% for tag in pg.taxonomies.tags %}
+          <a href="{{ get_taxonomy_url(kind="tags", name=tag) }}">#{{ tag }}</a>
+          {% endfor %}
+        </p>
+        {% endif %}
+        <a href="{{ pg.permalink }}" class="read-more">Read more →</a>
+      </footer>
+    </li>
+    {% endfor %}
+  </ul>
+  {% if paginator.number_pagers > 1 %}
+  <nav class="pagination">
+    {% if paginator.previous %}
+    <a href="{{ paginator.previous }}">&lt; Prev</a>
+    {% endif %}
+    <span>Page {{ paginator.current_index }} of {{ paginator.number_pagers }}</span>
+    {% if paginator.next %}
+    <a href="{{ paginator.next }}">Next &gt;</a>
+    {% endif %}
+  </nav>
+  {% endif %}
+
+  {% endif %}
+</article>
+{% endblock content %}

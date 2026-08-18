@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}{{ term.name }} | {{ config.title }}{% endblock title %}
+
+{% block content %}
+<article>
+  <h1>{{ term.name }}</h1>
+  <ul>
+    {% for page in term.pages %}
+    <li><a href="{{ page.permalink }}">{{ page.title }}</a> — {{ page.date | date(format="%B %d, %Y") }}</li>
+    {% endfor %}
+  </ul>
+</article>
+{% endblock content %}

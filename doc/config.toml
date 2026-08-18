@@ -1,0 +1,33 @@
+# The URL the site will be built for
+base_url = "https://mbarbin.github.io/crs/"
+
+title = "CRs"
+description = "A tool for managing inline review comments embedded in source code"
+
+# The default language
+default_language = "en"
+
+# Whether to automatically compile all Sass files in the sass directory
+compile_sass = true
+
+# Whether to build a search index of the content
+build_search_index = true
+
+# Whether to generate a feed
+generate_feeds = true
+feed_filenames = ["atom.xml"]
+
+[[taxonomies]]
+name = "tags"
+
+[markdown]
+# Whether to do syntax highlighting
+highlighting = { theme = "one-dark-pro" }
+
+[extra]
+# Put all your custom variables here
+github_url = "https://github.com/mbarbin/crs"
+
+[extra.zolanight]
+theme = "tokyonight"
+home_list_latest_blog_posts = true
