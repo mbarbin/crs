@@ -27,11 +27,7 @@
   crs_parser
   crs_stdlib
   print-table
-  printbox
-  printbox-md
-  printbox-text
   reviewdog
-  uutf
   volgo)
  (inline_tests)
  (instrumentation

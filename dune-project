@@ -111,18 +111,10 @@
    (>= 0.33))
   (print-table
    (>= 0.1.3))
-  (printbox
-   (>= 0.12))
-  (printbox-md
-   (>= 0.12))
-  (printbox-text
-   (>= 0.12))
   (re
    (>= 1.12.0))
   (spawn
    (>= v0.17))
-  (uutf
-   (>= 1.0.4))
   (volgo
    (>= 0.0.21))
   (volgo-git-unix
