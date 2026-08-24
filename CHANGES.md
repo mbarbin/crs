@@ -1,3 +1,9 @@
+## 0.0.XXXXXXXX (unreleased)
+
+### Removed
+
+- Removed printbox tests and dependencies in favor of print-table only (#137, @mbarbin).
+
 ## 0.0.20260307 (2026-03-07)
 
 From this version, pre-compiled release binaries are included as compressed archives.
