@@ -69,12 +69,6 @@ The exact list of modules that are derived from `Iron` is as follows:
 - lib/crs_parser/src/file_parser
 - lib/crs_parser/src/header_parser
 
-## Printbox
-
-This project has a test dependency to the opam packages [printbox](https://opam.ocaml.org/packages/printbox/), released under `BSD-2-Clause`.
-
-A copy of the license file for the printbox project is located under `third-party-licenses/`.
-
 ## Gazagnaire ocaml-merge3 (Myers diff)
 
 Myers is vendored from by Thomas Gazagnaire (released under `ISC`)

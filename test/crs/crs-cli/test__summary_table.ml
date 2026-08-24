@@ -43,3 +43,29 @@ let%expect_test "to_string" =
     |}];
   ()
 ;;
+
+(* When all the values of a column are empty, the column itself is omitted
+   from the rendering ([print-table] drops fully empty columns). *)
+
+let%expect_test "columns that are entirely empty are omitted" =
+  let crs = Tests_helpers.parse_file ~path ~file_contents:"(* $CR-soon user: Hello. *)" in
+  let table = Summary_table.make crs in
+  let print_table = Summary_table.to_print_table table |> Option.get in
+  print_endline (Print_table.to_string_text print_table);
+  [%expect
+    {|
+    ┌──────────┬──────┬───────┐
+    │ Reporter │ Soon │ Total │
+    ├──────────┼──────┼───────┤
+    │ user     │    1 │     1 │
+    └──────────┴──────┴───────┘
+    |}];
+  print_endline (Print_table.to_string_markdown print_table);
+  [%expect
+    {|
+    | Reporter | Soon | Total |
+    |:---------|-----:|------:|
+    | user     |    1 |     1 |
+    |}];
+  ()
+;;
