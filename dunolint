@@ -33,7 +33,9 @@
 (rule
  (cond
   ((path
-    (glob src/reviewdog/test/**))
+    (or
+     (glob src/merge3/*)
+     (glob src/reviewdog/test/**)))
    return)
   (true
    (enforce

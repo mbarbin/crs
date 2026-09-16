@@ -1,8 +1,28 @@
 (****************************************************************************)
-(*  crs-merge3 - Myers shortest-edit-script computation                     *)
+(*  crs-merge3 - partial vendor of ocaml-merge3                             *)
 (*  SPDX-FileCopyrightText: 2026 Mathieu Barbin <mathieu.barbin@gmail.com>  *)
 (*  SPDX-License-Identifier: ISC                                            *)
 (****************************************************************************)
+
+(* Notice: this file is a partial vendor of gazagnaire/ocaml-merge3
+   ([lib/merge3.ml]), imported pristine at the revision recorded in
+   [vendor.json] and then trimmed to the surface this project uses.
+   ocamlformat is disabled in this directory ([.ocamlformat-ignore]) so that
+   what remains stays byte-comparable with that revision.
+
+   Upstream's copyright block and module header are kept as they stand, and
+   so describe the whole of the upstream module rather than this trimmed
+   copy.
+
+   Removed: [lcs]; the diff3 3-way merge ([merge], [to_string],
+   [has_conflicts] and [conflicts], the [conflict], [merged_chunk] and [t]
+   types, and their machinery); [pp], the only user of the [fmt] dependency;
+   and the Irmin-style merge combinators ([result], [f], [default],
+   [option], [pair], [alist]).
+
+   Changed: [myers_forward] ends its search on its own [Myers_done]
+   exception rather than [Stdlib.Exit], which an [eq] that itself raises
+   [Exit] would be caught by. *)
 
 (* Copyright (c) 2024-2026 Thomas Gazagnaire <thomas@gazagnaire.org>
 
@@ -18,19 +38,6 @@
    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. *)
 
-(* Notice: This file was vendored from gazagnaire/ocaml-merge3 (the [Merge3]
-   module, [lib/merge3.ml]) as documented in [vendor.json] and the project's
-   root [NOTICE.md].
-
-   List of changes:
-
-   - Applied local project ocamlformat (janestreet profile).
-   - Removed the parts unused by this project.
-
-   - Replace use of globally-visible [Stdlib.Exit] exception by a custom one.
-     An [eq] that itself raised [Exit] would be silently swallowed and yield
-     a wrong diff. *)
-
 (** {1 Myers' O(ND) Diff Algorithm}
 
     E. W. Myers, "An O(ND) Difference Algorithm and Its Variations",
@@ -45,10 +52,28 @@
     Time: O(ND) where N = |a| + |b| and D = edit distance. Space: O(D²) for the
     trace (one V-array per step). *)
 
-type 'a edit =
-  | Keep of 'a
-  | Delete of 'a
-  | Insert of 'a
+type 'a edit = Keep of 'a | Delete of 'a | Insert of 'a
+
+let myers_next_x v off d k =
+  if k = -d || (k <> d && v.(off + k - 1) < v.(off + k + 1)) then
+    v.(off + k + 1)
+  else v.(off + k - 1) + 1
+
+let myers_extend_snake ~eq a b ~n ~m ~x0 ~k =
+  let x = ref x0 and y = ref (x0 - k) in
+  while !x < n && !y < m && eq a.(!x) b.(!y) do
+    incr x;
+    incr y
+  done;
+  (!x, !y)
+
+let myers_forward_diagonal ~eq a b ~n ~m v ~off ~d ~k =
+  let x0 = myers_next_x v off d k in
+  let x, y = myers_extend_snake ~eq a b ~n ~m ~x0 ~k in
+  v.(off + k) <- x;
+  x >= n && y >= m
+
+exception Myers_done
 
 (** Compute the furthest-reaching D-paths.
 
@@ -60,12 +85,8 @@ type 'a edit =
 
     Returns [(D, trace)] where [trace.(d)] is an array of length [2*d+1] indexed
     by [k+d] (so trace.(d).(0) holds V[-d], trace.(d).(2*d) holds V[d]). *)
-
-exception Myers_done
-
 let myers_forward ~eq ~off a b ~max_d =
-  let n = Array.length a
-  and m = Array.length b in
+  let n = Array.length a and m = Array.length b in
   let vlen = (2 * max_d) + 1 in
   let v = Array.make vlen 0 in
   v.(off + 1) <- 0;
@@ -77,28 +98,14 @@ let myers_forward ~eq ~off a b ~max_d =
        trace.(d) <- Array.sub v (off - d) ((2 * d) + 1);
        for k0 = 0 to d do
          let k = -d + (2 * k0) in
-         let x0 =
-           if k = -d || (k <> d && v.(off + k - 1) < v.(off + k + 1))
-           then v.(off + k + 1)
-           else v.(off + k - 1) + 1
-         in
-         let x = ref x0
-         and y = ref (x0 - k) in
-         while !x < n && !y < m && eq a.(!x) b.(!y) do
-           incr x;
-           incr y
-         done;
-         v.(off + k) <- !x;
-         if !x >= n && !y >= m
-         then (
+         if myers_forward_diagonal ~eq a b ~n ~m v ~off ~d ~k then begin
            final_d := d;
-           raise_notrace Myers_done)
+           raise_notrace Myers_done
+         end
        done
      done
-   with
-   | Myers_done -> ());
-  !final_d, trace
-;;
+   with Myers_done -> ());
+  (!final_d, trace)
 
 (** Backtrack one step in the Myers trace, emitting the snake's [Keep]
     operations and the single non-diagonal edit. Returns the previous [(x, y)]
@@ -120,30 +127,23 @@ let backtrack_step ~vv ~dd ~x ~y a b edits =
   for i = x - 1 downto snake_x do
     edits := Keep a.(i) :: !edits
   done;
-  if is_insert
-  then edits := Insert b.(snake_x - k - 1) :: !edits
+  if is_insert then edits := Insert b.(snake_x - k - 1) :: !edits
   else edits := Delete a.(snake_x - 1) :: !edits;
   let prev_k = if is_insert then k + 1 else k - 1 in
   let prev_x = v_at prev_k in
-  prev_x, prev_x - prev_k
-;;
+  (prev_x, prev_x - prev_k)
 
 let diff ~eq (a : 'a array) (b : 'a array) : 'a edit list =
-  let n = Array.length a
-  and m = Array.length b in
-  if n = 0 && m = 0
-  then []
-  else if n = 0
-  then Array.to_list b |> List.map (fun x -> Insert x)
-  else if m = 0
-  then Array.to_list a |> List.map (fun x -> Delete x)
-  else (
+  let n = Array.length a and m = Array.length b in
+  if n = 0 && m = 0 then []
+  else if n = 0 then Array.to_list b |> List.map (fun x -> Insert x)
+  else if m = 0 then Array.to_list a |> List.map (fun x -> Delete x)
+  else
     let max_d = n + m in
     let off = max_d in
     let d, trace = myers_forward ~eq ~off a b ~max_d in
     let edits = ref [] in
-    let x = ref n
-    and y = ref m in
+    let x = ref n and y = ref m in
     for step = 0 to d - 1 do
       let dd = d - step in
       let nx, ny = backtrack_step ~vv:trace.(dd) ~dd ~x:!x ~y:!y a b edits in
@@ -153,5 +153,4 @@ let diff ~eq (a : 'a array) (b : 'a array) : 'a edit list =
     for i = !x - 1 downto 0 do
       edits := Keep a.(i) :: !edits
     done;
-    !edits)
-;;
+    !edits

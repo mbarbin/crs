@@ -1,6 +1,6 @@
 ISC License
 
-Copyright (c) 2024-2026 Thomas Gazagnaire <thomas@gazagnaire.org>
+Copyright (c) 2026 Thomas Gazagnaire <thomas@gazagnaire.org>
 
 Permission to use, copy, modify, and distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
